@@ -1,0 +1,122 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /admins/{userId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow write: if false;
+    }
+
+    match /leads/{leadId} {
+      allow create: if request.resource.data.keys().hasOnly([
+          'name',
+          'phone',
+          'email',
+          'projectType',
+          'message',
+          'status',
+          'source',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 1 &&
+        request.resource.data.phone is string &&
+        request.resource.data.phone.size() > 5 &&
+        request.resource.data.email is string &&
+        request.resource.data.email.size() > 5 &&
+        request.resource.data.projectType is string &&
+        request.resource.data.projectType.size() > 1 &&
+        request.resource.data.message is string &&
+        request.resource.data.message.size() > 10 &&
+        request.resource.data.status == 'new' &&
+        request.resource.data.source == 'website-contact-form' &&
+        request.resource.data.createdAt == request.time &&
+        request.resource.data.updatedAt == request.time;
+
+      allow read, delete: if isAdmin();
+
+      allow update: if isAdmin() &&
+        request.resource.data.keys().hasOnly([
+          'name',
+          'phone',
+          'email',
+          'projectType',
+          'message',
+          'status',
+          'source',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        request.resource.data.name == resource.data.name &&
+        request.resource.data.phone == resource.data.phone &&
+        request.resource.data.email == resource.data.email &&
+        request.resource.data.projectType == resource.data.projectType &&
+        request.resource.data.message == resource.data.message &&
+        request.resource.data.source == resource.data.source &&
+        request.resource.data.createdAt == resource.data.createdAt &&
+        request.resource.data.status in ['new', 'contacted'] &&
+        request.resource.data.updatedAt == request.time;
+    }
+
+    match /projects/{projectId} {
+      allow read: if isAdmin();
+
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasAll([
+          'title',
+          'category',
+          'location',
+          'budget',
+          'area',
+          'description',
+          'tags',
+          'views',
+          'cover',
+          'gallery',
+          'beforeImg',
+          'afterImg',
+          'testimonial',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        request.resource.data.title is string &&
+        request.resource.data.category is string &&
+        request.resource.data.views is number &&
+        request.resource.data.createdAt == request.time &&
+        request.resource.data.updatedAt == request.time;
+
+      allow update: if isAdmin() &&
+        request.resource.data.keys().hasAll([
+          'title',
+          'category',
+          'location',
+          'budget',
+          'area',
+          'description',
+          'tags',
+          'views',
+          'cover',
+          'gallery',
+          'beforeImg',
+          'afterImg',
+          'testimonial',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        request.resource.data.createdAt == resource.data.createdAt &&
+        request.resource.data.updatedAt == request.time;
+
+      allow delete: if isAdmin();
+    }
+  }
+}
