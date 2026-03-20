@@ -523,7 +523,7 @@ function exportLeads() {
   const link = document.createElement('a');
 
   link.href = URL.createObjectURL(blob);
-  link.download = 'elara-leads.csv';
+  link.download = 'os-leads.csv';
   link.click();
 
   setTimeout(() => URL.revokeObjectURL(link.href), 1000);

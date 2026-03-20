@@ -9,7 +9,7 @@ import {
 } from './firebase-client.js';
 
 /* ============================================================
-   ELARA INTERIORS — MAIN JAVASCRIPT
+   OS INTERIORS — MAIN JAVASCRIPT
    ============================================================ */
 
 // ── DATA ─────────────────────────────────────────────────────
@@ -20,16 +20,16 @@ const PROJECTS = [
     area: "4,200 sq ft", date: "March 2024",
     description: "A breathtaking sky-level residence blending Mughal grandeur with contemporary minimalism. Gold-leaf ceiling panels, custom Italian marble floors, and bespoke handcrafted furniture define every corner of this masterpiece. The design philosophy centered on creating spaces that feel both intimate and grand — each room is a curated experience.",
     tags: ["Luxury", "Penthouse", "Contemporary"], views: 3842,
-    cover: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=90",
+    cover: "images/IMG_2695.JPG",
     gallery: [
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=90",
-      "https://images.unsplash.com/photo-1616047006789-b7af5afb8c20?w=1200&q=90",
-      "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=1200&q=90",
-      "https://images.unsplash.com/photo-1631679706909-1844bbd07221?w=1200&q=90"
+      "images/IMG_2696.JPG",
+      "images/IMG_2697.JPG",
+      "images/IMG_2698.JPG",
+      "images/IMG_2701.JPG"
     ],
-    beforeImg: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
-    afterImg: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=90",
-    testimonial: { name: "Rajiv Oberoi", role: "Homeowner", text: "Elara transformed our vision into something beyond imagination. Every detail speaks of luxury and restraint — the perfect balance we had always dreamed of." }
+    beforeImg: "images/IMG_2702.JPG",
+    afterImg: "images/IMG_2705.JPG",
+    testimonial: { name: "Rajiv Oberoi", role: "Homeowner", text: "OS Interiors transformed our vision into something beyond imagination. Every detail speaks of luxury and restraint — the perfect balance we had always dreamed of." }
   },
   {
     id: 2, title: "Nexus Corporate HQ", category: "Corporate",
@@ -51,7 +51,7 @@ const PROJECTS = [
     id: 3, title: "Ritz Turnkey Villa", category: "Turnkey",
     location: "Lonavala, Maharashtra", budget: "₹80–95 Lakhs",
     area: "6,800 sq ft", date: "November 2023",
-    description: "Complete turnkey execution of a hillside villa from bare walls to move-in ready in 90 days. Custom joinery, imported Portuguese stone, smart home automation throughout, and landscape design with a vanishing pool. Every specification was managed by Elara — one contract, zero stress.",
+    description: "Complete turnkey execution of a hillside villa from bare walls to move-in ready in 90 days. Custom joinery, imported Portuguese stone, smart home automation throughout, and landscape design with a vanishing pool. Every specification was managed by OS Interiors — one contract, zero stress.",
     tags: ["Turnkey", "Villa", "Smart Home"], views: 4201,
     cover: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1200&q=90",
     gallery: [
@@ -61,7 +61,7 @@ const PROJECTS = [
     ],
     beforeImg: "https://images.unsplash.com/photo-1590912551009-f7a1d43cc6bd?w=800&q=80",
     afterImg: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=800&q=90",
-    testimonial: { name: "Anand & Priya Shah", role: "Homeowners", text: "From empty plot to dream home in 90 days. Elara's execution was flawless — we moved in and everything was perfect. Worth every rupee." }
+    testimonial: { name: "Anand & Priya Shah", role: "Homeowners", text: "From empty plot to dream home in 90 days. OS Interiors' execution was flawless — we moved in and everything was perfect. Worth every rupee." }
   },
   {
     id: 4, title: "Meridian Boutique Hotel", category: "Corporate",
@@ -91,7 +91,7 @@ const PROJECTS = [
     ],
     beforeImg: "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80",
     afterImg: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=90",
-    testimonial: { name: "Sunita Arora", role: "Homeowner", text: "Elara understood our culture, our family dynamics, and our aspirations. They created a home that truly feels like us — rooted yet modern." }
+    testimonial: { name: "Sunita Arora", role: "Homeowner", text: "OS Interiors understood our culture, our family dynamics, and our aspirations. They created a home that truly feels like us — rooted yet modern." }
   },
   {
     id: 6, title: "Cognizant Innovation Lab", category: "Corporate",
@@ -111,10 +111,10 @@ const PROJECTS = [
 ];
 
 const TESTIMONIALS = [
-  { name: "Aditya Birla", role: "CEO, Birla Estates", text: "Elara didn't just design our office — they designed a culture. The space communicates our values better than any brand campaign ever could.", initials: "AB" },
-  { name: "Nisha Malhotra", role: "Homeowner, Mumbai", text: "I've worked with designers across Europe and nothing compares to Elara's attention to detail. My penthouse is my most prized possession in the world.", initials: "NM" },
-  { name: "Rajan Tata", role: "Director, Tata Realty", text: "We've commissioned Elara for six projects across India. They consistently deliver beyond brief. They are our benchmark partner for all premium developments.", initials: "RT" },
-  { name: "Pooja Hegde", role: "Film Producer", text: "My farmhouse became a cover story in Architectural Digest after Elara worked their magic. The design is timeless — it will never feel dated.", initials: "PH" }
+  { name: "Aditya Birla", role: "CEO, Birla Estates", text: "OS Interiors didn't just design our office — they designed a culture. The space communicates our values better than any brand campaign ever could.", initials: "AB" },
+  { name: "Nisha Malhotra", role: "Homeowner, Mumbai", text: "I've worked with designers across Europe and nothing compares to OS Interiors' attention to detail. My penthouse is my most prized possession in the world.", initials: "NM" },
+  { name: "Rajan Tata", role: "Director, Tata Realty", text: "We've commissioned OS Interiors for six projects across India. They consistently deliver beyond brief. They are our benchmark partner for all premium developments.", initials: "RT" },
+  { name: "Pooja Hegde", role: "Film Producer", text: "My farmhouse became a cover story in Architectural Digest after OS Interiors worked their magic. The design is timeless — it will never feel dated.", initials: "PH" }
 ];
 
 let leads = [];
@@ -191,10 +191,10 @@ function closeMobileMenu() {
 // ── HERO SLIDER ───────────────────────────────────────────────
 let heroSlideIndex = 0;
 const heroSlides = [
-  "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1800&q=90",
-  "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1800&q=90",
-  "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1800&q=90",
-  "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1800&q=90"
+  "images/IMG_2695.JPG",
+  "images/IMG_2696.JPG",
+  "images/IMG_2705.JPG",
+  "images/IMG_2706.JPG"
 ];
 
 function initHeroSlider() {
@@ -263,7 +263,7 @@ function renderFeaturedProjects(filter = 'All') {
     const isWide = i === 3;
     const cls = isLarge ? 'project-card large reveal' : (isWide ? 'project-card wide reveal' : 'project-card reveal');
     return `
-      <div class="${cls}" onclick="openProject(${p.id})" style="animation-delay:${i*0.1}s">
+      <div class="${cls}" onclick="openProject(${p.id})" style="animation-delay:${i * 0.1}s">
         <img src="${p.cover}" alt="${p.title}" loading="lazy">
         <div class="project-card-info">
           <div class="project-card-meta">
@@ -348,12 +348,12 @@ function renderProjectsPage() {
   }
 
   container.innerHTML = filtered.map((p, i) => `
-    <div class="project-card reveal" onclick="openProject(${p.id})" style="animation-delay:${i*0.08}s">
+    <div class="project-card reveal" onclick="openProject(${p.id})" style="animation-delay:${i * 0.08}s">
       <img src="${p.cover}" alt="${p.title}" loading="lazy">
       <div class="project-card-info">
         <div class="project-card-meta">
           <span class="project-tag">${p.category}</span>
-          ${p.tags.slice(0,1).map(t => `<span class="project-tag">${t}</span>`).join('')}
+          ${p.tags.slice(0, 1).map(t => `<span class="project-tag">${t}</span>`).join('')}
         </div>
         <h3>${p.title}</h3>
         <p class="project-card-location">📍 ${p.location}</p>
@@ -569,7 +569,7 @@ function renderTopProjects() {
   container.innerHTML = sorted.map(p => `
     <div class="chart-bar-item">
       <span class="chart-bar-label">${p.title}</span>
-      <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round(p.views/sorted[0].views*100)}%"></div></div>
+      <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round(p.views / sorted[0].views * 100)}%"></div></div>
       <span class="chart-bar-value">${p.views.toLocaleString()}</span>
     </div>
   `).join('');
@@ -630,7 +630,7 @@ function exportLeads() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'elara-leads.csv';
+  a.download = 'os-leads.csv';
   a.click();
   showToast('Leads exported to CSV.');
 }
@@ -697,7 +697,7 @@ function handleAddProject(e) {
     gallery: ["https://images.unsplash.com/photo-1615529328331-f8917597711f?w=1200&q=90"],
     beforeImg: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800",
     afterImg: "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=1200",
-    testimonial: { name: "Client", role: "Homeowner", text: "Exceptional work by the Elara team." }
+    testimonial: { name: "Client", role: "Homeowner", text: "Exceptional work by the OS Interiors team." }
   };
   adminProjects.unshift(newProject);
   e.target.reset();
@@ -719,7 +719,7 @@ function renderAnalytics() {
   container.innerHTML = sorted.map(p => `
     <div class="chart-bar-item">
       <span class="chart-bar-label">${p.title}</span>
-      <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round(p.views/sorted[0].views*100)}%"></div></div>
+      <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round(p.views / sorted[0].views * 100)}%"></div></div>
       <span class="chart-bar-value">${p.views.toLocaleString()}</span>
     </div>
   `).join('');
@@ -731,7 +731,7 @@ function renderAnalytics() {
   catContainer.innerHTML = Object.entries(cats).map(([cat, views]) => `
     <div class="chart-bar-item">
       <span class="chart-bar-label">${cat}</span>
-      <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round(views/maxCat*100)}%"></div></div>
+      <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round(views / maxCat * 100)}%"></div></div>
       <span class="chart-bar-value">${views.toLocaleString()}</span>
     </div>
   `).join('');
