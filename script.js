@@ -5,7 +5,7 @@
 // ── DATA ─────────────────────────────────────────────────────
 const PROJECTS = [
   {
-    id: 1, title: "The Oberoi Penthouse", category: "Residential",
+    id: 1, title: "Lakhani Centrium", category: "Residential",
     location: "Mumbai, Maharashtra", budget: "₹45–60 Lakhs",
     area: "4,200 sq ft", date: "March 2024",
     description: "A breathtaking sky-level residence blending Mughal grandeur with contemporary minimalism. Gold-leaf ceiling panels, custom Italian marble floors, and bespoke handcrafted furniture define every corner of this masterpiece. The design philosophy centered on creating spaces that feel both intimate and grand — each room is a curated experience.",
