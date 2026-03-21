@@ -1,5 +1,9 @@
 /* ============================================================
+<<<<<<< HEAD
    OS INTERIORS — ADMIN DASHBOARD (Light Theme)
+=======
+   ELARA INTERIORS — ADMIN DASHBOARD (Light Theme)
+>>>>>>> 35b0be2ee65dafa2846d8e1a9904cea624e3df99
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
@@ -223,6 +227,7 @@ textarea.form-control { resize: vertical; min-height: 120px; }
 .chart-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 4px; transition: width 1s var(--transition); }
 .chart-bar-value { font-size: 0.72rem; color: var(--text-muted); text-align: right; }
 
+<<<<<<< HEAD
 .empty-state {
   padding: 20px 16px;
   border: 1px dashed var(--border);
@@ -268,6 +273,8 @@ textarea.form-control { resize: vertical; min-height: 120px; }
   line-height: 1.7;
 }
 
+=======
+>>>>>>> 35b0be2ee65dafa2846d8e1a9904cea624e3df99
 /* ── TOAST ────────────────────────────────────────────── */
 .toast {
   position: fixed; bottom: 32px; right: 32px;
