@@ -12,9 +12,9 @@ const PROJECTS = [
     tags: ["Luxury", "Penthouse", "Contemporary"], views: 3842,
     cover: "images/IMG_2695.JPG",
     gallery: [
-      "images/IMG_2696.JPG",
-      "images/IMG_2697.JPG",
-      "images/IMG_2698.JPG",
+      "images/hall.jpeg",
+      "images/kitchen.jpeg",
+      "images/bedroom 1.jpeg",
       "images/IMG_2701.JPG"
     ],
     beforeImg: "images/IMG_2702.JPG",
