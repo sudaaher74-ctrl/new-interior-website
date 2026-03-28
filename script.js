@@ -27,11 +27,12 @@ const PROJECTS = [
     area: "18,500 sq ft", date: "January 2024",
     description: "A 180-person tech company headquarters designed for creativity and collaboration. Biophilic design elements, acoustic pods, focus zones, and an open atrium create a workplace that inspires innovation. The open floor plan encourages organic interaction while dedicated quiet zones maintain deep work capability.",
     tags: ["Corporate", "Tech", "Biophilic"], views: 2910,
-    cover: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=90",
+    cover: "images/hall.jpeg",
     gallery: [
-      "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=90",
-      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1200&q=90",
-      "https://images.unsplash.com/photo-1497366412874-3415097a27e7?w=1200&q=90"
+      "images/IMG_2695.JPG",
+      "images/IMG_2696.JPG",
+      "images/IMG_2697.JPG",
+      "images/IMG_2698.JPG"
     ],
     beforeImg: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=800&q=80",
     afterImg: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=90",
@@ -43,11 +44,11 @@ const PROJECTS = [
     area: "6,800 sq ft", date: "November 2023",
     description: "Complete turnkey execution of a hillside villa from bare walls to move-in ready in 90 days. Custom joinery, imported Portuguese stone, smart home automation throughout, and landscape design with a vanishing pool. Every specification was managed by OS Interiors — one contract, zero stress.",
     tags: ["Turnkey", "Villa", "Smart Home"], views: 4201,
-    cover: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1200&q=90",
+    cover: "images/IMG_2701.JPG",
     gallery: [
-      "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1200&q=90",
-      "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1200&q=90",
-      "https://images.unsplash.com/photo-1613977257592-4871e5fcd7c4?w=1200&q=90"
+      "images/IMG_2701.JPG",
+      "images/kitchen 2.jpeg",
+      "images/IMG_2702.JPG"
     ],
     beforeImg: "https://images.unsplash.com/photo-1590912551009-f7a1d43cc6bd?w=800&q=80",
     afterImg: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=800&q=90",
@@ -59,10 +60,11 @@ const PROJECTS = [
     area: "22,000 sq ft", date: "August 2023",
     description: "A 32-room boutique hotel redefined with tropical luxury. Each room tells a different story through custom art, handwoven textiles, and natural materials sourced from across India. The property achieved a 94% occupancy rate within six months of reopening.",
     tags: ["Hospitality", "Boutique", "Luxury"], views: 5130,
-    cover: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&q=90",
+    cover: "images/hall2 .jpeg",
     gallery: [
-      "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&q=90",
-      "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&q=90"
+      "images/bedroom 3.jpeg",
+      "images/kitchen 3.jpeg",
+      "images/bedroom 4.jpeg"
     ],
     beforeImg: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80",
     afterImg: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=90",
