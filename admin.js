@@ -2,25 +2,13 @@
    OS INTERIORS — ADMIN DASHBOARD JS
    ============================================================ */
 
-const PROJECTS = [
-  { id:1, title:"The Oberoi Penthouse", category:"Residential", location:"Mumbai, Maharashtra", budget:"₹45–60 Lakhs", area:"4,200 sq ft", date:"March 2024", description:"A breathtaking sky-level residence.", tags:["Luxury","Penthouse"], views:3842, cover:"https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=90", gallery:[], beforeImg:"", afterImg:"", testimonial:{name:"Rajiv Oberoi",role:"Homeowner",text:"Beyond imagination."} },
-  { id:2, title:"Nexus Corporate HQ", category:"Corporate", location:"Pune, Maharashtra", budget:"₹1.2–1.8 Cr", area:"18,500 sq ft", date:"January 2024", description:"Tech company HQ for creativity.", tags:["Corporate","Tech"], views:2910, cover:"https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=90", gallery:[], beforeImg:"", afterImg:"", testimonial:{name:"Shreya Kapoor",role:"COO",text:"Productivity soared."} },
-  { id:3, title:"Ritz Turnkey Villa", category:"Turnkey", location:"Lonavala, Maharashtra", budget:"₹80–95 Lakhs", area:"6,800 sq ft", date:"November 2023", description:"Complete turnkey hillside villa.", tags:["Turnkey","Villa"], views:4201, cover:"https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1200&q=90", gallery:[], beforeImg:"", afterImg:"", testimonial:{name:"Anand & Priya Shah",role:"Homeowners",text:"Flawless execution."} },
-  { id:4, title:"Meridian Boutique Hotel", category:"Corporate", location:"Goa", budget:"₹2.4 Cr", area:"22,000 sq ft", date:"August 2023", description:"32-room boutique hotel.", tags:["Hospitality","Boutique"], views:5130, cover:"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&q=90", gallery:[], beforeImg:"", afterImg:"", testimonial:{name:"Vikram Nair",role:"Owner",text:"Pure magic."} },
-  { id:5, title:"Arora Family Residence", category:"Residential", location:"Delhi NCR", budget:"₹35–45 Lakhs", area:"3,100 sq ft", date:"June 2023", description:"Multigenerational family home.", tags:["Residential","Traditional"], views:2340, cover:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=90", gallery:[], beforeImg:"", afterImg:"", testimonial:{name:"Sunita Arora",role:"Homeowner",text:"Truly feels like us."} },
-  { id:6, title:"Cognizant Innovation Lab", category:"Corporate", location:"Hyderabad", budget:"₹3.1 Cr", area:"35,000 sq ft", date:"February 2024", description:"Innovation center for 400+ employees.", tags:["Corporate","Innovation"], views:3677, cover:"https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&q=90", gallery:[], beforeImg:"", afterImg:"", testimonial:{name:"Deepak Menon",role:"VP, Cognizant",text:"Talent magnet."} }
-];
+const PROJECTS = [];
 
-let leads = [
-  { id:1, name:"Kiran Mehta", phone:"+91 98765 43210", email:"kiran@example.com", projectType:"Residential", message:"Looking for a complete home renovation for 2500 sqft apartment in Bandra.", status:"new", createdAt:"2024-03-15" },
-  { id:2, name:"Tech Corp Ltd", phone:"+91 22 4455 6677", email:"facilities@techcorp.com", projectType:"Corporate", message:"New office space 8000 sqft in BKC. Need turnkey solution.", status:"contacted", createdAt:"2024-03-14" },
-  { id:3, name:"Priya & Rohan Joshi", phone:"+91 91234 56789", email:"joshibungalow@gmail.com", projectType:"Turnkey", message:"New villa in Alibaug. Need complete design and execution.", status:"new", createdAt:"2024-03-13" },
-  { id:4, name:"Sahil Aggarwal", phone:"+91 80000 11222", email:"sahil.a@business.in", projectType:"Corporate", message:"Restaurant interior design for 120-cover fine dining.", status:"contacted", createdAt:"2024-03-12" }
-];
+let leads = [];
 
 let adminProjects = [...PROJECTS];
-let nextLeadId = 5;
-let nextProjectId = 7;
+let nextLeadId = 1;
+let nextProjectId = 1;
 
 // ── LOGIN ─────────────────────────────────────────────
 function handleAdminLogin(e) {
@@ -35,7 +23,7 @@ function handleAdminLogin(e) {
     showAdminPanel('overview');
   } else {
     error.style.display = 'block';
-    error.textContent = 'Invalid credentials. Try admin@osinteriors.com / os@2024';
+    error.textContent = 'Invalid credentials.';
   }
 }
 
@@ -63,7 +51,10 @@ function renderAdminDashboard() {
   document.getElementById('stat-visitors').textContent = '12,847';
   document.getElementById('stat-projects').textContent = adminProjects.length;
   document.getElementById('stat-leads').textContent = leads.length;
-  document.getElementById('stat-conversion').textContent = Math.round((leads.filter(l => l.status === 'contacted').length / leads.length) * 100) + '%';
+  const conversion = leads.length
+    ? Math.round((leads.filter(l => l.status === 'contacted').length / leads.length) * 100)
+    : 0;
+  document.getElementById('stat-conversion').textContent = conversion + '%';
   renderRecentLeads();
   renderTopProjects();
 }
@@ -71,6 +62,10 @@ function renderAdminDashboard() {
 function renderRecentLeads() {
   const c = document.getElementById('recent-leads-list');
   if (!c) return;
+  if (!leads.length) {
+    c.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">No leads yet.</td></tr>';
+    return;
+  }
   c.innerHTML = leads.slice(0,4).map(l => `
     <tr>
       <td><strong style="color:var(--text-primary)">${l.name}</strong></td>
@@ -83,6 +78,10 @@ function renderTopProjects() {
   const c = document.getElementById('top-projects-list');
   if (!c) return;
   const sorted = [...adminProjects].sort((a,b) => b.views - a.views).slice(0,5);
+  if (!sorted.length) {
+    c.innerHTML = '<div style="color:var(--text-muted);text-align:center;">No project data available.</div>';
+    return;
+  }
   c.innerHTML = sorted.map(p => `
     <div class="chart-bar-item">
       <span class="chart-bar-label">${p.title}</span>
@@ -94,6 +93,10 @@ function renderTopProjects() {
 function renderLeadsTable() {
   const tbody = document.getElementById('leads-tbody');
   if (!tbody) return;
+  if (!leads.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No leads found.</td></tr>';
+    return;
+  }
   tbody.innerHTML = leads.map(l => `
     <tr>
       <td><strong style="color:var(--text-primary)">${l.name}</strong></td>
@@ -133,6 +136,10 @@ function exportLeads() {
 function renderAdminProjectsTable() {
   const tbody = document.getElementById('admin-projects-tbody');
   if (!tbody) return;
+  if (!adminProjects.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">No projects added yet.</td></tr>';
+    return;
+  }
   tbody.innerHTML = adminProjects.map(p => `
     <tr>
       <td><img src="${p.cover}" style="width:56px;height:40px;object-fit:cover;display:block;border-radius:4px;"></td>
@@ -194,18 +201,27 @@ function renderAnalytics() {
   const c = document.getElementById('analytics-projects-chart');
   if (!c) return;
   const sorted = [...adminProjects].sort((a,b) => b.views - a.views);
-  c.innerHTML = sorted.map(p => `
-    <div class="chart-bar-item">
-      <span class="chart-bar-label">${p.title}</span>
-      <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round(p.views/sorted[0].views*100)}%"></div></div>
-      <span class="chart-bar-value">${p.views.toLocaleString()}</span>
-    </div>`).join('');
+  if (!sorted.length) {
+    c.innerHTML = '<div style="color:var(--text-muted);text-align:center;">No project analytics available.</div>';
+  } else {
+    c.innerHTML = sorted.map(p => `
+      <div class="chart-bar-item">
+        <span class="chart-bar-label">${p.title}</span>
+        <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round(p.views/sorted[0].views*100)}%"></div></div>
+        <span class="chart-bar-value">${p.views.toLocaleString()}</span>
+      </div>`).join('');
+  }
 
   const catC = document.getElementById('analytics-category-chart');
   const cats = {};
   PROJECTS.forEach(p => { cats[p.category] = (cats[p.category]||0) + p.views; });
+  const catEntries = Object.entries(cats);
+  if (!catEntries.length) {
+    catC.innerHTML = '<div style="color:var(--text-muted);text-align:center;">No category analytics available.</div>';
+    return;
+  }
   const maxCat = Math.max(...Object.values(cats));
-  catC.innerHTML = Object.entries(cats).map(([cat,views]) => `
+  catC.innerHTML = catEntries.map(([cat,views]) => `
     <div class="chart-bar-item">
       <span class="chart-bar-label">${cat}</span>
       <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round(views/maxCat*100)}%"></div></div>
@@ -219,3 +235,4 @@ function showToast(msg) {
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 4000);
 }
+
