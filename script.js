@@ -445,17 +445,25 @@ function handleContactSubmit(e) {
   btn.textContent = 'Sending...';
   btn.disabled = true;
 
+  // Create lead object
   const newLead = {
-    id: nextLeadId++,
+    id: Date.now(), // Unique ID based on timestamp
     name: document.getElementById('cf-name').value,
     phone: document.getElementById('cf-phone').value,
     email: document.getElementById('cf-email').value,
     projectType: document.getElementById('cf-type').value,
     message: document.getElementById('cf-message').value,
     status: 'new',
+    priority: 'none',
+    source: 'Website Form',
+    notes: [{ text: 'Lead received from website contact form.', date: new Date().toLocaleString(), system: true }],
     createdAt: new Date().toISOString().split('T')[0]
   };
-  leads.unshift(newLead);
+
+  // Save to localStorage (Lead Pipeline Integration)
+  const existingLeads = JSON.parse(localStorage.getItem('os_interiors_leads') || '[]');
+  existingLeads.push(newLead);
+  localStorage.setItem('os_interiors_leads', JSON.stringify(existingLeads));
 
   setTimeout(() => {
     form.style.display = 'none';

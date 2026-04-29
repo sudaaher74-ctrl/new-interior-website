@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <title>OS Interiors — Admin Dashboard</title>
   <link rel="stylesheet" href="admin.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,7 +18,7 @@
 <!-- Login -->
 <div id="admin-login">
   <div class="admin-login-box">
-    <div class="admin-logo">ELAR<span>A</span></div>
+    <div class="admin-logo">OS <span>Interiors</span></div>
     <p class="admin-login-subtitle">Admin Dashboard</p>
     <form onsubmit="handleAdminLogin(event)">
       <div class="admin-form-group">
@@ -42,19 +43,20 @@
 
     <!-- Sidebar -->
     <aside class="admin-sidebar">
-      <div class="admin-sidebar-logo">ELAR<span>A</span><div class="admin-sidebar-subtitle">Design Studio</div></div>
+      <div class="admin-sidebar-logo">OS <span>Interiors</span><div class="admin-sidebar-subtitle">Design Studio</div></div>
       <nav class="admin-nav">
         <button class="admin-nav-item active" data-panel="overview" onclick="showAdminPanel('overview')">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
           Overview
         </button>
-        <button class="admin-nav-item" data-panel="projects" onclick="showAdminPanel('projects')">
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-          Projects
-        </button>
         <button class="admin-nav-item" data-panel="leads" onclick="showAdminPanel('leads')">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           Leads
+          <span class="nav-badge" id="nav-leads-badge" style="display:none;"></span>
+        </button>
+        <button class="admin-nav-item" data-panel="projects" onclick="showAdminPanel('projects')">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Projects
         </button>
         <button class="admin-nav-item" data-panel="analytics" onclick="showAdminPanel('analytics')">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -68,10 +70,10 @@
     <div class="admin-mobile-nav">
       <div class="admin-mobile-nav-inner">
         <button class="admin-nav-item active" data-panel="overview" onclick="showAdminPanel('overview')">Overview</button>
-        <button class="admin-nav-item" data-panel="projects" onclick="showAdminPanel('projects')">Projects</button>
         <button class="admin-nav-item" data-panel="leads" onclick="showAdminPanel('leads')">Leads</button>
+        <button class="admin-nav-item" data-panel="projects" onclick="showAdminPanel('projects')">Projects</button>
         <button class="admin-nav-item" data-panel="analytics" onclick="showAdminPanel('analytics')">Analytics</button>
-        <button class="admin-nav-item" onclick="adminLogout()" style="color:#ef4444;">Sign Out</button>
+        <button class="admin-nav-item" onclick="adminLogout()" style="color:#dc2626;">Sign Out</button>
       </div>
     </div>
 
@@ -87,14 +89,23 @@
         </a>
       </div>
 
-      <!-- Panel: Overview -->
+      <!-- ═══════════════════════════════════════════════════════
+           Panel: Overview
+           ═══════════════════════════════════════════════════════ -->
       <div class="admin-panel active" id="panel-overview">
         <div class="stats-grid">
-          <div class="stat-card"><div class="stat-label">Total Visitors</div><div class="stat-number" id="stat-visitors">—</div><div class="stat-change">↑ 18% this month</div></div>
-          <div class="stat-card"><div class="stat-label">Total Projects</div><div class="stat-number" id="stat-projects">—</div><div class="stat-change">↑ 2 this quarter</div></div>
-          <div class="stat-card"><div class="stat-label">Total Leads</div><div class="stat-number" id="stat-leads">—</div><div class="stat-change">↑ 35% this month</div></div>
-          <div class="stat-card"><div class="stat-label">Conversion Rate</div><div class="stat-number" id="stat-conversion">—</div><div class="stat-change negative">↓ 4% vs last month</div></div>
+          <div class="stat-card"><div class="stat-label">Total Leads</div><div class="stat-number" id="stat-total-leads">0</div><div class="stat-change" id="stat-total-leads-change">—</div></div>
+          <div class="stat-card"><div class="stat-label">New (Uncontacted)</div><div class="stat-number" id="stat-new-leads">0</div><div class="stat-change">Needs attention</div></div>
+          <div class="stat-card"><div class="stat-label">In Pipeline</div><div class="stat-number" id="stat-pipeline">0</div><div class="stat-change">Active leads</div></div>
+          <div class="stat-card"><div class="stat-label">Conversion Rate</div><div class="stat-number" id="stat-conversion">0%</div><div class="stat-change" id="stat-conversion-change">Won / Total</div></div>
         </div>
+
+        <!-- Lead Pipeline Funnel -->
+        <div class="admin-card">
+          <div class="admin-card-title">Lead Pipeline</div>
+          <div class="pipeline-funnel" id="pipeline-funnel"></div>
+        </div>
+
         <div class="admin-two-col">
           <div class="admin-card">
             <div class="admin-card-title">
@@ -103,7 +114,7 @@
             </div>
             <div class="admin-table-wrap">
               <table class="admin-table">
-                <thead><tr><th>Name</th><th>Type</th><th>Date</th><th>Status</th></tr></thead>
+                <thead><tr><th>Name</th><th>Type</th><th>Date</th><th>Status</th><th>Priority</th></tr></thead>
                 <tbody id="recent-leads-list"></tbody>
               </table>
             </div>
@@ -115,7 +126,53 @@
         </div>
       </div>
 
-      <!-- Panel: Projects -->
+      <!-- ═══════════════════════════════════════════════════════
+           Panel: Leads (Full Management)
+           ═══════════════════════════════════════════════════════ -->
+      <div class="admin-panel" id="panel-leads">
+        <!-- Lead Stats Row -->
+        <div class="lead-stats-row" id="lead-stats-row"></div>
+
+        <!-- Filters & Search -->
+        <div class="admin-card" style="margin-bottom:16px;">
+          <div class="lead-filters">
+            <div class="lead-search-wrap">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="lead-search" class="form-control" placeholder="Search by name, phone, email..." oninput="renderLeadsTable()">
+            </div>
+            <div class="lead-filter-btns">
+              <button class="filter-chip active" data-filter="all" onclick="setLeadFilter('all')">All</button>
+              <button class="filter-chip" data-filter="new" onclick="setLeadFilter('new')">New</button>
+              <button class="filter-chip" data-filter="contacted" onclick="setLeadFilter('contacted')">Contacted</button>
+              <button class="filter-chip" data-filter="meeting" onclick="setLeadFilter('meeting')">Meeting</button>
+              <button class="filter-chip" data-filter="quoted" onclick="setLeadFilter('quoted')">Quoted</button>
+              <button class="filter-chip" data-filter="won" onclick="setLeadFilter('won')">Won</button>
+              <button class="filter-chip" data-filter="lost" onclick="setLeadFilter('lost')">Lost</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leads Table -->
+        <div class="admin-card">
+          <div class="admin-card-title">
+            All Leads <span style="font-size:0.75rem;color:var(--text-secondary)" id="leads-count"></span>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-outline" onclick="showAddLeadModal()" style="font-size:0.6rem;padding:6px 16px;">+ Add Lead</button>
+              <button class="btn-outline" onclick="exportLeads()" style="font-size:0.6rem;padding:6px 16px;">Export CSV</button>
+            </div>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>Name</th><th>Phone</th><th>Type</th><th>Source</th><th>Date</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="leads-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════
+           Panel: Projects
+           ═══════════════════════════════════════════════════════ -->
       <div class="admin-panel" id="panel-projects">
         <div class="admin-card">
           <div class="admin-card-title">
@@ -171,29 +228,25 @@
         </div>
       </div>
 
-      <!-- Panel: Leads -->
-      <div class="admin-panel" id="panel-leads">
-        <div class="admin-card">
-          <div class="admin-card-title">
-            All Leads
-            <button class="btn-outline" onclick="exportLeads()" style="font-size:0.6rem;padding:6px 16px;">Export CSV</button>
-          </div>
-          <div class="admin-table-wrap">
-            <table class="admin-table">
-              <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Type</th><th>Message</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
-              <tbody id="leads-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Panel: Analytics -->
+      <!-- ═══════════════════════════════════════════════════════
+           Panel: Analytics
+           ═══════════════════════════════════════════════════════ -->
       <div class="admin-panel" id="panel-analytics">
         <div class="stats-grid">
-          <div class="stat-card"><div class="stat-label">Page Views (Month)</div><div class="stat-number">48,291</div><div class="stat-change">↑ 22% vs last month</div></div>
-          <div class="stat-card"><div class="stat-label">Avg. Session</div><div class="stat-number">4:32</div><div class="stat-change">↑ 12s improvement</div></div>
-          <div class="stat-card"><div class="stat-label">Bounce Rate</div><div class="stat-number">31%</div><div class="stat-change negative">↓ 3% improvement</div></div>
-          <div class="stat-card"><div class="stat-label">New Visitors</div><div class="stat-number">68%</div><div class="stat-change">↑ 5% this month</div></div>
+          <div class="stat-card"><div class="stat-label">Total Leads</div><div class="stat-number" id="analytics-total">0</div><div class="stat-change">All time</div></div>
+          <div class="stat-card"><div class="stat-label">Leads This Month</div><div class="stat-number" id="analytics-month">0</div><div class="stat-change" id="analytics-month-change">—</div></div>
+          <div class="stat-card"><div class="stat-label">Won Rate</div><div class="stat-number" id="analytics-won">0%</div><div class="stat-change">Closed deals</div></div>
+          <div class="stat-card"><div class="stat-label">Avg Response</div><div class="stat-number" id="analytics-response">—</div><div class="stat-change">Days to contact</div></div>
+        </div>
+        <div class="admin-two-col">
+          <div class="admin-card">
+            <div class="admin-card-title">Leads by Source</div>
+            <div class="chart-bar-container" id="analytics-source-chart"></div>
+          </div>
+          <div class="admin-card">
+            <div class="admin-card-title">Leads by Project Type</div>
+            <div class="chart-bar-container" id="analytics-type-chart"></div>
+          </div>
         </div>
         <div class="admin-two-col">
           <div class="admin-card">
@@ -205,18 +258,159 @@
             <div class="chart-bar-container" id="analytics-category-chart"></div>
           </div>
         </div>
-        <div class="admin-card" style="margin-top:0;">
-          <div class="admin-card-title">Traffic Sources</div>
-          <div class="chart-bar-container">
-            <div class="chart-bar-item"><span class="chart-bar-label">Organic Search</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:68%"></div></div><span class="chart-bar-value">68%</span></div>
-            <div class="chart-bar-item"><span class="chart-bar-label">Direct</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:18%"></div></div><span class="chart-bar-value">18%</span></div>
-            <div class="chart-bar-item"><span class="chart-bar-label">Social Media</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:10%"></div></div><span class="chart-bar-value">10%</span></div>
-            <div class="chart-bar-item"><span class="chart-bar-label">Referrals</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:4%"></div></div><span class="chart-bar-value">4%</span></div>
-          </div>
-        </div>
       </div>
 
     </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     Lead Detail Modal (Slide-in Panel)
+     ═══════════════════════════════════════════════════════ -->
+<div class="lead-modal-overlay" id="lead-modal-overlay" onclick="closeLeadModal()"></div>
+<div class="lead-modal" id="lead-modal">
+  <div class="lead-modal-header">
+    <div>
+      <h2 id="modal-lead-name">Lead Name</h2>
+      <p id="modal-lead-date" style="font-size:0.7rem;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;"></p>
+    </div>
+    <button class="action-btn" onclick="closeLeadModal()" style="width:36px;height:36px;">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div class="lead-modal-body">
+    <!-- Lead Info Grid -->
+    <div class="lead-info-grid">
+      <div class="lead-info-item">
+        <div class="lead-info-label">Phone</div>
+        <div class="lead-info-value" id="modal-lead-phone"></div>
+      </div>
+      <div class="lead-info-item">
+        <div class="lead-info-label">Email</div>
+        <div class="lead-info-value" id="modal-lead-email"></div>
+      </div>
+      <div class="lead-info-item">
+        <div class="lead-info-label">Project Type</div>
+        <div class="lead-info-value" id="modal-lead-type"></div>
+      </div>
+      <div class="lead-info-item">
+        <div class="lead-info-label">Source</div>
+        <div class="lead-info-value" id="modal-lead-source"></div>
+      </div>
+    </div>
+
+    <!-- Message -->
+    <div style="margin-bottom:24px;">
+      <div class="lead-info-label" style="margin-bottom:8px;">Message</div>
+      <div class="lead-message-box" id="modal-lead-message"></div>
+    </div>
+
+    <!-- Status & Priority -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+      <div>
+        <div class="lead-info-label" style="margin-bottom:8px;">Status</div>
+        <select id="modal-lead-status" class="form-control" onchange="updateLeadFromModal('status')">
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="meeting">Meeting Scheduled</option>
+          <option value="quoted">Quoted</option>
+          <option value="won">Won ✓</option>
+          <option value="lost">Lost ✗</option>
+        </select>
+      </div>
+      <div>
+        <div class="lead-info-label" style="margin-bottom:8px;">Priority</div>
+        <select id="modal-lead-priority" class="form-control" onchange="updateLeadFromModal('priority')">
+          <option value="none">—</option>
+          <option value="hot">🔥 Hot</option>
+          <option value="warm">🌤 Warm</option>
+          <option value="cold">❄️ Cold</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div style="margin-bottom:24px;">
+      <div class="lead-info-label" style="margin-bottom:8px;">Add Note / Follow-up</div>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="modal-note-input" class="form-control" placeholder="Type a note...">
+        <button class="btn-primary" onclick="addLeadNote()" style="white-space:nowrap;padding:12px 20px;">Add</button>
+      </div>
+    </div>
+
+    <!-- Notes Timeline -->
+    <div class="lead-info-label" style="margin-bottom:12px;">Activity Log</div>
+    <div class="notes-timeline" id="modal-notes-timeline"></div>
+  </div>
+
+  <div class="lead-modal-footer">
+    <a id="modal-whatsapp-btn" href="#" target="_blank" class="btn-primary" style="text-decoration:none;background:#25d366;">
+      WhatsApp
+    </a>
+    <a id="modal-call-btn" href="#" class="btn-outline" style="text-decoration:none;">
+      Call
+    </a>
+    <button class="btn-outline" onclick="closeLeadModal()">Close</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     Add Lead Modal
+     ═══════════════════════════════════════════════════════ -->
+<div class="lead-modal-overlay" id="add-lead-overlay" onclick="closeAddLeadModal()"></div>
+<div class="lead-modal" id="add-lead-modal" style="max-width:520px;">
+  <div class="lead-modal-header">
+    <h2>Add New Lead</h2>
+    <button class="action-btn" onclick="closeAddLeadModal()" style="width:36px;height:36px;">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="lead-modal-body">
+    <form id="add-lead-form" onsubmit="handleAddLead(event)">
+      <div class="admin-form-group">
+        <label>Full Name *</label>
+        <input type="text" id="add-lead-name" class="form-control" required>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="admin-form-group">
+          <label>Phone *</label>
+          <input type="tel" id="add-lead-phone" class="form-control" required>
+        </div>
+        <div class="admin-form-group">
+          <label>Email</label>
+          <input type="email" id="add-lead-email" class="form-control">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="admin-form-group">
+          <label>Project Type</label>
+          <select id="add-lead-type" class="form-control">
+            <option value="Residential">Residential</option>
+            <option value="Corporate">Corporate</option>
+            <option value="Turnkey">Turnkey</option>
+            <option value="Renovation">Renovation</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="admin-form-group">
+          <label>Source</label>
+          <select id="add-lead-source" class="form-control">
+            <option value="Phone Call">Phone Call</option>
+            <option value="WhatsApp">WhatsApp</option>
+            <option value="Referral">Referral</option>
+            <option value="Walk-in">Walk-in</option>
+            <option value="Website">Website</option>
+            <option value="Social Media">Social Media</option>
+          </select>
+        </div>
+      </div>
+      <div class="admin-form-group">
+        <label>Message / Notes</label>
+        <textarea id="add-lead-message" class="form-control" rows="3"></textarea>
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">Add Lead</button>
+    </form>
   </div>
 </div>
 
