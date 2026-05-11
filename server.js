@@ -5,11 +5,22 @@ const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
 dotenv.config();
 
 const app = express();
+app.use(helmet()); // Basic security headers
 app.use(cors());
 app.use(express.json());
+
+// Rate limiting for login
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // limit each IP to 10 login attempts per windowMs
+    message: { msg: 'Too many login attempts, please try again later' }
+});
 
 const PORT = process.env.PORT || 5001;
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -86,7 +97,7 @@ const auth = (req, res, next) => {
 // ── ROUTES ──────────────────────────────────────────────────
 
 // 1. Auth Routes
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', loginLimiter, async (req, res) => {
   const { email, password } = req.body;
   try {
     let admin = await Admin.findOne({ email });
@@ -190,6 +201,12 @@ app.delete('/api/projects/:id', auth, async (req, res) => {
   } catch (err) {
     res.status(500).send('Server error');
   }
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ msg: 'Something went wrong on the server' });
 });
 
 // ── START SERVER ────────────────────────────────────────────
