@@ -442,36 +442,42 @@ function handleContactSubmit(e) {
   const success = document.getElementById('form-success');
   const btn = form.querySelector('button[type="submit"]');
 
+  if (!btn) return;
   btn.textContent = 'Sending...';
   btn.disabled = true;
 
-  // Create lead object
   const newLead = {
-    id: Date.now(), // Unique ID based on timestamp
     name: document.getElementById('cf-name').value,
     phone: document.getElementById('cf-phone').value,
     email: document.getElementById('cf-email').value,
     projectType: document.getElementById('cf-type').value,
     message: document.getElementById('cf-message').value,
-    status: 'new',
-    priority: 'none',
     source: 'Website Form',
-    notes: [{ text: 'Lead received from website contact form.', date: new Date().toLocaleString(), system: true }],
-    createdAt: new Date().toISOString().split('T')[0]
+    notes: [{ text: 'Lead received from website contact form.', system: true }]
   };
 
-  // Save to localStorage (Lead Pipeline Integration)
-  const existingLeads = JSON.parse(localStorage.getItem('os_interiors_leads') || '[]');
-  existingLeads.push(newLead);
-  localStorage.setItem('os_interiors_leads', JSON.stringify(existingLeads));
-
-  setTimeout(() => {
+  fetch(window.API_CONFIG.ENDPOINTS.LEADS, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newLead)
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Failed to send');
+    return res.json();
+  })
+  .then(() => {
     form.style.display = 'none';
-    success.style.display = 'block';
+    if (success) success.style.display = 'block';
     showToast('✓ Your inquiry has been received. We will contact you within 24 hours.');
+  })
+  .catch(err => {
+    console.error(err);
+    showToast('❌ Failed to send inquiry. Please try again.');
+  })
+  .finally(() => {
     btn.textContent = 'Send Inquiry';
     btn.disabled = false;
-  }, 1200);
+  });
 }
 
 // ── HOME FILTER BUTTONS ───────────────────────────────────────
