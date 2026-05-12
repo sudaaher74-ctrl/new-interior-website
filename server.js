@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -203,11 +204,29 @@ app.delete('/api/projects/:id', auth, async (req, res) => {
   }
 });
 
-// Global Error Handler
+// Serve static files from the root directory
+app.use(express.static(path.join(__dirname, '.')));
+
+// Fallback for any other routes to serve index.html (SPA style or just safety)
+app.get('*', (req, res) => {
+    // If it's an API route that wasn't caught, return 404
+    if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ msg: 'API route not found' });
+    }
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Global Error Handler (should be last)
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ msg: 'Something went wrong on the server' });
 });
 
 // ── START SERVER ────────────────────────────────────────────
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Only start the server if we're running locally (not as a Vercel function)
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+// Export the app for Vercel
+module.exports = app;
