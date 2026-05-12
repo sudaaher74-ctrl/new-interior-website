@@ -204,19 +204,7 @@ app.delete('/api/projects/:id', auth, async (req, res) => {
   }
 });
 
-// Serve static files from the root directory
-app.use(express.static(path.join(__dirname, '.')));
-
-// Fallback for any other routes to serve index.html (SPA style or just safety)
-app.get('*', (req, res) => {
-    // If it's an API route that wasn't caught, return 404
-    if (req.path.startsWith('/api/')) {
-        return res.status(404).json({ msg: 'API route not found' });
-    }
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Global Error Handler (should be last)
+// Global Error Handler
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ msg: 'Something went wrong on the server' });
