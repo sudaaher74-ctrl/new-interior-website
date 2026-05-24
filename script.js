@@ -5,81 +5,81 @@
 // ── DATA ─────────────────────────────────────────────────────
 const PROJECTS = [
   {
-    id: 1, title: "Lakhani Centrium", category: "Residential",
-    location: "Mumbai, Maharashtra", budget: "₹45–60 Lakhs",
+    id: 1, title: "Lakhani Centrium", category: "Corporate",
+    location: "Navi Mumbai, Maharashtra", budget: "₹45–60 Lakhs",
     area: "4,200 sq ft", date: "March 2024",
-    description: "A breathtaking sky-level residence blending Mughal grandeur with contemporary minimalism. Gold-leaf ceiling panels, custom Italian marble floors, and bespoke handcrafted furniture define every corner of this masterpiece. The design philosophy centered on creating spaces that feel both intimate and grand — each room is a curated experience.",
+    description: "A breathtaking sky-level corporate office  blending Mughal grandeur with contemporary minimalism. Gold-leaf ceiling panels, custom Italian marble floors, and bespoke handcrafted furniture define every corner of this masterpiece. The design philosophy centered on creating spaces that feel both intimate and grand — each room is a curated experience.",
     tags: ["Luxury", "Penthouse", "Contemporary"], views: 3842,
     cover: "images/IMG_2695.JPG",
     gallery: [
-      "images/hall.jpeg",
-      "images/kitchen.jpeg",
-      "images/bedroom 1.jpeg",
-      "images/IMG_2701.JPG"
+      "images/IMG_2695.JPG",
+      "images/IMG_2697.JPG",
+      "images/IMG_2698.JPG",
+      "images/IMG_2706.JPG"
     ],
     beforeImg: "images/IMG_2702.JPG",
     afterImg: "images/IMG_2705.JPG",
     testimonial: { name: "Rajiv Oberoi", role: "Homeowner", text: "OS Interiors transformed our vision into something beyond imagination. Every detail speaks of luxury and restraint — the perfect balance we had always dreamed of." }
   },
   {
-    id: 2, title: "Nexus Corporate HQ", category: "Corporate",
-    location: "Pune, Maharashtra", budget: "₹1.2–1.8 Cr",
-    area: "18,500 sq ft", date: "January 2024",
+    id: 2, title: "Juice Center", category: "Corporate",
+    location: "kandivali, Mumbai", budget: "₹30-40 lakhs",
+    area: "1200 sq ft", date: "January 2024",
     description: "A 180-person tech company headquarters designed for creativity and collaboration. Biophilic design elements, acoustic pods, focus zones, and an open atrium create a workplace that inspires innovation. The open floor plan encourages organic interaction while dedicated quiet zones maintain deep work capability.",
     tags: ["Corporate", "Tech", "Biophilic"], views: 2910,
-    cover: "images/hall.jpeg",
+    cover: "images/juice1.jpeg",
     gallery: [
-      "images/IMG_2695.JPG",
-      "images/IMG_2696.JPG",
-      "images/IMG_2697.JPG",
-      "images/IMG_2698.JPG"
+      "images/juice1.jpeg",
+      "images/juice2.jpeg",
+      "images/juice3.jpeg",
+
     ],
     beforeImg: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=800&q=80",
     afterImg: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=90",
     testimonial: { name: "Shreya Kapoor", role: "COO, Nexus Technologies", text: "Our team productivity soared after the redesign. The space truly reflects our brand values and has become a powerful tool for talent acquisition." }
   },
   {
-    id: 3, title: "Ritz Turnkey Villa", category: "Turnkey",
-    location: "Lonavala, Maharashtra", budget: "₹80–95 Lakhs",
+    id: 3, title: "Bomby Barbique", category: "trunky",
+    location: "mumbai, Maharashtra", budget: "₹80–95 Lakhs",
     area: "6,800 sq ft", date: "November 2023",
-    description: "Complete turnkey execution of a hillside villa from bare walls to move-in ready in 90 days. Custom joinery, imported Portuguese stone, smart home automation throughout, and landscape design with a vanishing pool. Every specification was managed by OS Interiors — one contract, zero stress.",
-    tags: ["Turnkey", "Villa", "Smart Home"], views: 4201,
-    cover: "images/IMG_2701.JPG",
+    description: "Complete turnkey execution of a premium dining space in Mumbai from raw structure to grand opening in record time. Custom interiors, luxury finishes, ambient lighting design, smart kitchen integration, and signature themed décor inspired by the vibrant spirit of Mumbai. Every detail — from furniture and branding elements to guest experience and atmosphere — was managed by OS Interiors under one seamless contract, delivering a stress-free journey from concept to launch..",
+    tags: ["Turnkey", "barbique", "Restoruent"], views: 4201,
+    cover: "images/bombayB1.jpeg",
     gallery: [
-      "images/IMG_2701.JPG",
-      "images/kitchen 2.jpeg",
-      "images/IMG_2702.JPG"
+      "images/bombayB1.jpeg",
+      "images/bombayB2.jpeg",
+
     ],
     beforeImg: "https://images.unsplash.com/photo-1590912551009-f7a1d43cc6bd?w=800&q=80",
     afterImg: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=800&q=90",
     testimonial: { name: "Anand & Priya Shah", role: "Homeowners", text: "From empty plot to dream home in 90 days. OS Interiors' execution was flawless — we moved in and everything was perfect. Worth every rupee." }
   },
   {
-    id: 4, title: "Meridian Boutique Hotel", category: "Corporate",
-    location: "Goa", budget: "₹2.4 Cr",
+    id: 4, title: "Hotel", category: "Corporate",
+    location: "mumbai", budget: "₹2.4 Cr",
     area: "22,000 sq ft", date: "August 2023",
     description: "A 32-room boutique hotel redefined with tropical luxury. Each room tells a different story through custom art, handwoven textiles, and natural materials sourced from across India. The property achieved a 94% occupancy rate within six months of reopening.",
     tags: ["Hospitality", "Boutique", "Luxury"], views: 5130,
-    cover: "images/hall2 .jpeg",
+    cover: "images/caravab1.jpeg",
     gallery: [
-      "images/bedroom 3.jpeg",
-      "images/kitchen 3.jpeg",
-      "images/bedroom 4.jpeg"
+      "images/caravab1.jpeg",
+      "images/carvan2.jpeg",
+      "images/carvan3.jpeg"
     ],
     beforeImg: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80",
     afterImg: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=90",
     testimonial: { name: "Vikram Nair", role: "Owner, Meridian Hotels", text: "Our hotel went from 60% to 94% occupancy after the redesign. Guests specifically mention the design as a reason to return. Pure magic." }
   },
   {
-    id: 5, title: "Arora Family Residence", category: "Residential",
+    id: 5, title: "caffe ", category: "Corporate",
     location: "Delhi NCR", budget: "₹35–45 Lakhs",
-    area: "3,100 sq ft", date: "June 2023",
+    area: "1500sq ft", date: "June 2023",
     description: "A multigenerational family home balancing traditional Indian aesthetics with modern comfort. Jali screens, terracotta accents, and courtyard-inspired spaces create warmth and identity. The home celebrates Indian craft without feeling nostalgic — it is deeply contemporary.",
-    tags: ["Residential", "Traditional", "Family"], views: 2340,
-    cover: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=90",
+    tags: ["corporate", "Traditional", "hotel"], views: 2340,
+    cover: "images/caffe.jpeg",
     gallery: [
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=90",
-      "https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=1200&q=90"
+      "images/caffe.jpeg",
+      "images/caffe.jpeg"
     ],
     beforeImg: "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80",
     afterImg: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=90",
@@ -461,23 +461,23 @@ function handleContactSubmit(e) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(newLead)
   })
-  .then(res => {
-    if (!res.ok) throw new Error('Failed to send');
-    return res.json();
-  })
-  .then(() => {
-    form.style.display = 'none';
-    if (success) success.style.display = 'block';
-    showToast('✓ Your inquiry has been received. We will contact you within 24 hours.');
-  })
-  .catch(err => {
-    console.error(err);
-    showToast('❌ Failed to send inquiry. Please try again.');
-  })
-  .finally(() => {
-    btn.textContent = 'Send Inquiry';
-    btn.disabled = false;
-  });
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to send');
+      return res.json();
+    })
+    .then(() => {
+      form.style.display = 'none';
+      if (success) success.style.display = 'block';
+      showToast('✓ Your inquiry has been received. We will contact you within 24 hours.');
+    })
+    .catch(err => {
+      console.error(err);
+      showToast('❌ Failed to send inquiry. Please try again.');
+    })
+    .finally(() => {
+      btn.textContent = 'Send Inquiry';
+      btn.disabled = false;
+    });
 }
 
 // ── HOME FILTER BUTTONS ───────────────────────────────────────
