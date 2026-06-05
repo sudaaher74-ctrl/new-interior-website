@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AIVA ERP - Admin Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Leaflet Map CSS and JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <style>
     :root {
       --primary: #2563eb;
@@ -175,6 +178,48 @@
       font-weight: 500;
     }
 
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 800px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      right: 1.5rem;
+      top: 1rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    #map {
+      height: 450px;
+      border-radius: 8px;
+      margin-top: 1rem;
+      border: 1px solid var(--border-color);
+      z-index: 1;
+    }
+
   </style>
 </head>
 <body>
@@ -219,7 +264,7 @@
       <div class="table-container">
         <div class="table-header">
           <h2>Live Employee Tracking</h2>
-          <button class="btn">View Map</button>
+          <button class="btn" onclick="openMapModal()">View Map</button>
         </div>
         <table>
           <thead>
@@ -258,6 +303,16 @@
     </div>
   </main>
 
+  <!-- Map Modal -->
+  <div id="mapModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeMapModal()">&times;</span>
+      <h3>Employee Photo Locations Map</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">Click on any marker to view employee check-in selfie and details.</p>
+      <div id="map"></div>
+    </div>
+  </div>
+
   <script>
     const token = localStorage.getItem('erpToken');
     const userStr = localStorage.getItem('erpUser');
@@ -276,6 +331,10 @@
       localStorage.removeItem('erpUser');
       window.location.href = '/login.html';
     }
+
+    let map = null;
+    let markersGroup = null;
+    let rawTrackingData = [];
 
     async function loadDashboard() {
       try {
@@ -297,12 +356,12 @@
         });
         const trackBody = document.getElementById('trackingTableBody');
         if (trackRes.ok) {
-          const trackData = await trackRes.json();
+          rawTrackingData = await trackRes.json();
           trackBody.innerHTML = '';
-          if (trackData.length === 0) {
+          if (rawTrackingData.length === 0) {
               trackBody.innerHTML = '<tr><td colspan="4" style="text-align:center">No employees on site today.</td></tr>';
           } else {
-              trackData.forEach(t => {
+              rawTrackingData.forEach(t => {
                   trackBody.innerHTML += `
                     <tr>
                       <td>${t.user.fullName}</td>
@@ -339,6 +398,68 @@
         }
       } catch (err) {
         console.error(err);
+      }
+    }
+
+    function openMapModal() {
+      const modal = document.getElementById('mapModal');
+      modal.style.display = 'flex';
+      
+      // Initialize Map
+      if (!map) {
+        // Center at general default (e.g. 0, 0 or first user's location)
+        map = L.map('map').setView([20.5937, 78.9629], 5); // India center default
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        markersGroup = L.layerGroup().addTo(map);
+      }
+
+      markersGroup.clearLayers();
+      let bounds = [];
+
+      rawTrackingData.forEach(t => {
+        if (t.checkIn && t.checkIn.location && t.checkIn.location.lat && t.checkIn.location.lng) {
+          const lat = t.checkIn.location.lat;
+          const lng = t.checkIn.location.lng;
+          
+          bounds.push([lat, lng]);
+
+          const popupContent = `
+            <div style="font-family: 'Inter', sans-serif; max-width: 220px; font-size: 13px;">
+              <h4 style="margin: 0 0 4px 0; font-weight: 600;">${t.user.fullName}</h4>
+              <p style="margin: 0 0 4px 0; color: var(--text-muted);">Site: ${t.project ? t.project.name : 'Unknown'}</p>
+              <p style="margin: 0 0 8px 0; color: var(--text-muted); font-size: 11px;">Time: ${new Date(t.checkIn.time).toLocaleTimeString()}</p>
+              ${t.checkIn.selfieUrl ? `<img src="${t.checkIn.selfieUrl}" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 4px;" />` : '<p style="color: var(--danger); font-size: 11px;">No photo captured</p>'}
+            </div>
+          `;
+
+          const marker = L.marker([lat, lng]).bindPopup(popupContent);
+          markersGroup.addLayer(marker);
+        }
+      });
+
+      // Recalculate view if there are markers
+      if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [50, 50] });
+      }
+
+      // Important: fix map sizing bug inside hidden div modal
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 200);
+    }
+
+    function closeMapModal() {
+      document.getElementById('mapModal').style.display = 'none';
+    }
+
+    // Close on click outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('mapModal');
+      if (event.target === modal) {
+        modal.style.display = 'none';
       }
     }
 
