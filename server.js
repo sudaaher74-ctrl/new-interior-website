@@ -12,9 +12,12 @@ const rateLimit = require('express-rate-limit');
 dotenv.config();
 
 const app = express();
-app.use(helmet()); // Basic security headers
+app.use(helmet({
+    contentSecurityPolicy: false // Allow external CDNs (Leaflet, Google Fonts)
+}));
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname))); // Serve HTML pages locally
 
 // Rate limiting for login
 const loginLimiter = rateLimit({

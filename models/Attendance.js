@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const AttendanceSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
+  project: { type: mongoose.Schema.Types.ObjectId, ref: 'ErpProject' },
   date: { type: Date, required: true, default: Date.now },
   checkIn: {
     time: { type: Date },
@@ -28,4 +28,4 @@ const AttendanceSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Attendance', AttendanceSchema);
+module.exports = mongoose.models.Attendance || mongoose.model('Attendance', AttendanceSchema);

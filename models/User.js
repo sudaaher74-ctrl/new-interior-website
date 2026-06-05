@@ -13,9 +13,9 @@ const UserSchema = new mongoose.Schema({
     enum: ['Super Admin', 'Owner', 'Project Manager', 'Site Supervisor', 'Employee'], 
     default: 'Employee' 
   },
-  assignedSites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }],
+  assignedSites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ErpProject' }],
   profilePhoto: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.models.User || mongoose.model('User', UserSchema);
