@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIVA ERP - Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-color: #f8fafc;
+      --sidebar-bg: #1e293b;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #f1f5f9;
+      --border-color: #e2e8f0;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: var(--sidebar-bg);
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand {
+      padding: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .nav-links {
+      flex: 1;
+      padding: 1rem 0;
+      list-style: none;
+    }
+
+    .nav-links li a {
+      display: block;
+      padding: 0.85rem 1.5rem;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+
+    .nav-links li a:hover, .nav-links li a.active {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .topbar {
+      background: white;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      color: var(--danger);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .dashboard-container {
+      padding: 2rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid var(--border-color);
+    }
+
+    .stat-title {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-top: 0.5rem;
+      color: var(--primary);
+    }
+
+    /* Tables */
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .table-header h2 { font-size: 1.2rem; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="brand">AIVA ERP</div>
+    <ul class="nav-links">
+      <li><a href="#" class="active">Dashboard</a></li>
+      <li><a href="#">Live Tracking</a></li>
+      <li><a href="#">Projects</a></li>
+      <li><a href="#">Employees</a></li>
+      <li><a href="#">AI Reports</a></li>
+    </ul>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <h2>Welcome, Admin</h2>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </header>
+
+    <div class="dashboard-container">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Total Projects</div>
+          <div class="stat-value" id="statProjects">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Active Projects</div>
+          <div class="stat-value" id="statActiveProjects">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">On Site Today</div>
+          <div class="stat-value" id="statOnSite">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Absent Today</div>
+          <div class="stat-value" style="color: var(--danger)" id="statAbsent">-</div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div class="table-header">
+          <h2>Live Employee Tracking</h2>
+          <button class="btn">View Map</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Site</th>
+              <th>Check-In Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="trackingTableBody">
+            <tr><td colspan="4" style="text-align:center">Loading data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="table-container">
+        <div class="table-header">
+          <h2>Active Projects</h2>
+          <button class="btn">Add Project</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Client</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="projectsTableBody">
+            <tr><td colspan="3" style="text-align:center">Loading data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const token = localStorage.getItem('erpToken');
+    const userStr = localStorage.getItem('erpUser');
+    
+    if (!token || !userStr) {
+      window.location.href = '/login.html';
+    }
+
+    const user = JSON.parse(userStr);
+    if (user.role !== 'Super Admin' && user.role !== 'Owner') {
+      window.location.href = '/employee-dashboard.html';
+    }
+
+    function logout() {
+      localStorage.removeItem('erpToken');
+      localStorage.removeItem('erpUser');
+      window.location.href = '/login.html';
+    }
+
+    async function loadDashboard() {
+      try {
+        // Fetch Stats
+        const statsRes = await fetch('/api/v2/admin/stats', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (statsRes.ok) {
+          const stats = await statsRes.json();
+          document.getElementById('statProjects').textContent = stats.totalProjects;
+          document.getElementById('statActiveProjects').textContent = stats.activeProjects;
+          document.getElementById('statOnSite').textContent = stats.employeesOnSite;
+          document.getElementById('statAbsent').textContent = stats.employeesAbsent;
+        }
+
+        // Fetch Tracking Data
+        const trackRes = await fetch('/api/v2/admin/live-tracking', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const trackBody = document.getElementById('trackingTableBody');
+        if (trackRes.ok) {
+          const trackData = await trackRes.json();
+          trackBody.innerHTML = '';
+          if (trackData.length === 0) {
+              trackBody.innerHTML = '<tr><td colspan="4" style="text-align:center">No employees on site today.</td></tr>';
+          } else {
+              trackData.forEach(t => {
+                  trackBody.innerHTML += `
+                    <tr>
+                      <td>${t.user.fullName}</td>
+                      <td>${t.project ? t.project.name : 'Unknown'}</td>
+                      <td>${new Date(t.checkIn.time).toLocaleTimeString()}</td>
+                      <td><span style="color: var(--success); font-weight: 500;">On Site</span></td>
+                    </tr>
+                  `;
+              });
+          }
+        }
+
+        // Fetch Projects
+        const projRes = await fetch('/api/v2/projects', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const projBody = document.getElementById('projectsTableBody');
+        if (projRes.ok) {
+          const projData = await projRes.json();
+          projBody.innerHTML = '';
+          if (projData.length === 0) {
+              projBody.innerHTML = '<tr><td colspan="3" style="text-align:center">No projects found.</td></tr>';
+          } else {
+              projData.forEach(p => {
+                  projBody.innerHTML += `
+                    <tr>
+                      <td><strong>${p.name}</strong></td>
+                      <td>${p.clientName || 'N/A'}</td>
+                      <td>${p.status}</td>
+                    </tr>
+                  `;
+              });
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

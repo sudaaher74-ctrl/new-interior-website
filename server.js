@@ -97,6 +97,13 @@ const auth = (req, res, next) => {
 
 // ── ROUTES ──────────────────────────────────────────────────
 
+// ERP API Routes (v2)
+app.use('/api/v2/auth', require('./routes/auth'));
+app.use('/api/v2/attendance', require('./routes/attendance'));
+app.use('/api/v2/projects', require('./routes/projects'));
+app.use('/api/v2/admin', require('./routes/admin'));
+app.use('/api/v2/reports', require('./routes/reports'));
+
 // 1. Auth Routes
 app.post('/api/auth/login', loginLimiter, async (req, res) => {
   const { email, password } = req.body;

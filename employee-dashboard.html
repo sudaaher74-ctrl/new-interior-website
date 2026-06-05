@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIVA ERP - Employee Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-color: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: white;
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--primary);
+    }
+
+    .nav-profile {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-profile img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #eee;
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      font-weight: 500;
+      font-family: 'Inter';
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .container { grid-template-columns: 1fr; }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .status-absent { background: #fee2e2; color: var(--danger); }
+    .status-present { background: #d1fae5; color: var(--success); }
+    
+    /* Info Grid */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .info-item p.label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .info-item p.value {
+      font-weight: 500;
+    }
+
+    /* Action Section */
+    .action-section { text-align: center; }
+    
+    #videoContainer {
+      width: 100%;
+      max-width: 400px;
+      margin: 1rem auto;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #000;
+      position: relative;
+      display: none;
+    }
+
+    video { width: 100%; display: block; }
+    canvas { display: none; }
+
+    .btn {
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Inter';
+      transition: background 0.2s;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-secondary { background: #e5e7eb; color: var(--text-main); }
+    .btn-secondary:hover { background: #d1d5db; }
+
+    .msg-box {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .msg-error { background: #fee2e2; color: var(--danger); }
+    .msg-success { background: #d1fae5; color: var(--success); }
+
+    /* Form Elements */
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-family: 'Inter';
+      resize: vertical;
+      min-height: 100px;
+      margin-bottom: 1rem;
+    }
+
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">AIVA ERP</div>
+    <div class="nav-profile">
+      <span id="userName">Loading...</span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="main-content">
+      <div class="card">
+        <div class="card-title">
+          Today's Status
+          <span id="statusBadge" class="status-badge status-absent">Not Checked In</span>
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <p class="label">Date</p>
+            <p class="value" id="currentDate">-</p>
+          </div>
+          <div class="info-item">
+            <p class="label">Current Site</p>
+            <p class="value" id="currentSite">Select Project</p>
+          </div>
+          <div class="info-item">
+            <p class="label">Check-In Time</p>
+            <p class="value" id="checkInTime">--:--</p>
+          </div>
+          <div class="info-item">
+            <p class="label">Working Hours</p>
+            <p class="value" id="workHours">0h 0m</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="actionCard">
+        <h3 class="card-title" id="actionTitle">Check In</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+          Please select your project, enable GPS, and capture a live selfie.
+        </p>
+        
+        <select id="projectSelect" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+          <option value="">Select Assigned Project</option>
+          <!-- Will be populated dynamically -->
+        </select>
+
+        <div id="videoContainer">
+          <video id="videoElement" autoplay playsinline></video>
+          <canvas id="canvasElement"></canvas>
+        </div>
+        
+        <button id="startCamBtn" class="btn btn-secondary" style="margin-bottom: 1rem;" onclick="startCamera()">Open Camera</button>
+        <button id="checkInBtn" class="btn btn-primary" style="display: none;" onclick="performCheckIn()">Capture & Check In</button>
+
+        <div id="checkOutSection" style="display: none;">
+          <textarea id="workSummary" placeholder="Enter work summary for today..."></textarea>
+          <button class="btn btn-danger" onclick="performCheckOut()">Submit & Check Out</button>
+        </div>
+
+        <div id="actionMsg" class="msg-box"></div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="card">
+        <h3 class="card-title">Quick Actions</h3>
+        <button class="btn btn-secondary" style="margin-bottom: 0.5rem;">Upload Site Photos</button>
+        <button class="btn btn-secondary">Submit Daily Report</button>
+      </div>
+      <div class="card">
+        <h3 class="card-title">Assigned Projects</h3>
+        <div id="assignedProjectsList">
+          <p style="font-size: 0.9rem; color: var(--text-muted);">Loading projects...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('erpToken');
+    const userStr = localStorage.getItem('erpUser');
+    
+    if (!token || !userStr) {
+      window.location.href = '/login.html';
+    }
+
+    const user = JSON.parse(userStr);
+    document.getElementById('userName').textContent = user.fullName;
+    document.getElementById('currentDate').textContent = new Date().toLocaleDateString();
+
+    let stream = null;
+    let locationData = null;
+
+    function logout() {
+      localStorage.removeItem('erpToken');
+      localStorage.removeItem('erpUser');
+      window.location.href = '/login.html';
+    }
+
+    function showMsg(text, isError = false) {
+      const msgBox = document.getElementById('actionMsg');
+      msgBox.textContent = text;
+      msgBox.className = 'msg-box ' + (isError ? 'msg-error' : 'msg-success');
+      msgBox.style.display = 'block';
+      setTimeout(() => msgBox.style.display = 'none', 5000);
+    }
+
+    async function loadDashboard() {
+      try {
+        // Fetch Projects (mocking list for now since we don't have project assignments API built yet)
+        // In real scenario, fetch from /api/v2/users/projects
+        const projectSelect = document.getElementById('projectSelect');
+        const projList = document.getElementById('assignedProjectsList');
+        
+        // Mocking a project for testing
+        const mockProject = { _id: 'mock123', name: 'Downtown Renovation' };
+        projectSelect.innerHTML = `<option value="">Select Assigned Project</option><option value="${mockProject._id}">${mockProject.name}</option>`;
+        projList.innerHTML = `<p style="font-size:0.9rem;">1. ${mockProject.name}</p>`;
+
+        // Fetch Today's Attendance
+        const res = await fetch('/api/v2/attendance/today', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        
+        updateUIBasedOnAttendance(data);
+
+      } catch (err) {
+        console.error(err);
+        showMsg('Failed to load dashboard data', true);
+      }
+    }
+
+    function updateUIBasedOnAttendance(data) {
+      const statusBadge = document.getElementById('statusBadge');
+      const actionTitle = document.getElementById('actionTitle');
+      const projectSelect = document.getElementById('projectSelect');
+      const startCamBtn = document.getElementById('startCamBtn');
+      const videoContainer = document.getElementById('videoContainer');
+      const checkInBtn = document.getElementById('checkInBtn');
+      const checkOutSection = document.getElementById('checkOutSection');
+
+      if (data.status === 'Present') {
+        statusBadge.textContent = 'Checked In';
+        statusBadge.className = 'status-badge status-present';
+        document.getElementById('checkInTime').textContent = new Date(data.checkIn.time).toLocaleTimeString();
+        document.getElementById('currentSite').textContent = data.project ? data.project.name : 'Unknown';
+
+        if (!data.checkOut || !data.checkOut.time) {
+          // Checked in, but not checked out
+          actionTitle.textContent = 'Check Out';
+          projectSelect.style.display = 'none';
+          startCamBtn.style.display = 'none';
+          videoContainer.style.display = 'none';
+          checkInBtn.style.display = 'none';
+          checkOutSection.style.display = 'block';
+        } else {
+          // Checked out
+          statusBadge.textContent = 'Completed Day';
+          document.getElementById('actionCard').innerHTML = '<p style="text-align:center; color: var(--success); font-weight: 500;">You have completed your work for today.</p>';
+        }
+      }
+    }
+
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+        const video = document.getElementById('videoElement');
+        video.srcObject = stream;
+        document.getElementById('videoContainer').style.display = 'block';
+        document.getElementById('startCamBtn').style.display = 'none';
+        document.getElementById('checkInBtn').style.display = 'block';
+
+        // Get Location
+        navigator.geolocation.getCurrentPosition(
+          pos => { locationData = pos.coords; },
+          err => { showMsg('Please enable location services.', true); }
+        );
+
+      } catch (err) {
+        showMsg('Camera access denied or unavailable.', true);
+      }
+    }
+
+    async function performCheckIn() {
+      const projectId = document.getElementById('projectSelect').value;
+      if (!projectId) return showMsg('Please select a project.', true);
+      if (!locationData) return showMsg('Waiting for location data. Please ensure GPS is enabled.', true);
+
+      const video = document.getElementById('videoElement');
+      const canvas = document.getElementById('canvasElement');
+      
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      const selfieUrl = canvas.toDataURL('image/jpeg'); // Base64 image
+
+      // Stop camera
+      stream.getTracks().forEach(track => track.stop());
+      document.getElementById('videoContainer').style.display = 'none';
+      
+      document.getElementById('checkInBtn').disabled = true;
+      document.getElementById('checkInBtn').textContent = 'Processing...';
+
+      try {
+        const res = await fetch('/api/v2/attendance/check-in', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            projectId: projectId, // Sending mock project for now
+            lat: locationData.latitude,
+            lng: locationData.longitude,
+            accuracy: locationData.accuracy,
+            selfieUrl: selfieUrl,
+            deviceInfo: navigator.userAgent
+          })
+        });
+
+        const data = await res.json();
+        
+        if (res.ok) {
+          showMsg('Checked in successfully!');
+          // Quick hack: mock population since we didn't populate in the post return
+          data.project = { name: 'Downtown Renovation' }; 
+          updateUIBasedOnAttendance(data);
+        } else {
+          showMsg(data.msg || 'Check-in failed', true);
+          document.getElementById('startCamBtn').style.display = 'block';
+          document.getElementById('checkInBtn').style.display = 'none';
+        }
+      } catch (err) {
+        console.error(err);
+        showMsg('Network error.', true);
+      } finally {
+        document.getElementById('checkInBtn').disabled = false;
+        document.getElementById('checkInBtn').textContent = 'Capture & Check In';
+      }
+    }
+
+    async function performCheckOut() {
+      const summary = document.getElementById('workSummary').value;
+      if (!summary) return showMsg('Please provide a work summary.', true);
+
+      try {
+        const res = await fetch('/api/v2/attendance/check-out', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            workSummary: summary,
+            progressPhotos: [] // Skipping photos for MVP check-out
+          })
+        });
+
+        const data = await res.json();
+        
+        if (res.ok) {
+          showMsg('Checked out successfully!');
+          loadDashboard(); // reload to show completed state
+        } else {
+          showMsg(data.msg || 'Check-out failed', true);
+        }
+      } catch (err) {
+        console.error(err);
+        showMsg('Network error.', true);
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>
