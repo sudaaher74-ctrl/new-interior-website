@@ -347,11 +347,27 @@
         </div>
       </div>
 
-      <!-- PROJECTS TAB (Placeholder) -->
+      <!-- PROJECTS TAB -->
       <div id="panel-projects" class="tab-panel">
         <div class="table-container">
-          <h2>Projects Management</h2>
-          <p style="color: var(--text-muted); margin-top: 1rem;">Coming soon...</p>
+          <div class="table-header">
+            <h2>Projects Management</h2>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Cover</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Location</th>
+                <th>Budget</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminProjectsTableBody">
+              <tr><td colspan="6" style="text-align:center">Loading projects...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -367,6 +383,50 @@
   </main>
 
   <!-- Map Modal Removed (Moved to Live Tracking Tab) -->
+
+  <!-- Edit Project Modal -->
+  <div id="editProjectModal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <span class="close-btn" onclick="closeProjectModal()">&times;</span>
+      <h3>Edit Project</h3>
+      <form id="editProjectForm" onsubmit="saveProject(event)" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+        <input type="hidden" id="editProjectId">
+        
+        <div>
+          <label style="font-weight: 500; font-size: 0.9rem;">Title</label>
+          <input type="text" id="editProjectTitle" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; margin-top: 0.25rem;">
+        </div>
+        
+        <div style="display: flex; gap: 1rem;">
+          <div style="flex: 1;">
+            <label style="font-weight: 500; font-size: 0.9rem;">Category</label>
+            <input type="text" id="editProjectCategory" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; margin-top: 0.25rem;">
+          </div>
+          <div style="flex: 1;">
+            <label style="font-weight: 500; font-size: 0.9rem;">Budget</label>
+            <input type="text" id="editProjectBudget" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; margin-top: 0.25rem;">
+          </div>
+        </div>
+
+        <div>
+          <label style="font-weight: 500; font-size: 0.9rem;">Location</label>
+          <input type="text" id="editProjectLocation" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; margin-top: 0.25rem;">
+        </div>
+
+        <div>
+          <label style="font-weight: 500; font-size: 0.9rem;">Cover Image Path</label>
+          <input type="text" id="editProjectCover" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; margin-top: 0.25rem;">
+        </div>
+
+        <div>
+          <label style="font-weight: 500; font-size: 0.9rem;">Description</label>
+          <textarea id="editProjectDesc" rows="4" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; margin-top: 0.25rem;"></textarea>
+        </div>
+
+        <button type="submit" class="btn" style="margin-top: 0.5rem;">Save Changes</button>
+      </form>
+    </div>
+  </div>
 
   <script>
     const token = 'dummy_admin_token';
@@ -471,6 +531,84 @@
       // Specific panel logic
       if (panelId === 'panel-tracking') {
         initMap();
+      } else if (panelId === 'panel-projects') {
+        loadAdminProjects();
+      }
+    }
+
+    // --- PROJECTS MANAGEMENT LOGIC ---
+    let localProjects = [];
+
+    function loadAdminProjects() {
+      const stored = localStorage.getItem('os_projects');
+      if (stored) {
+        try {
+          localProjects = JSON.parse(stored);
+        } catch(e) { console.error("Error parsing projects from localStorage", e); }
+      }
+
+      const tbody = document.getElementById('adminProjectsTableBody');
+      tbody.innerHTML = '';
+      
+      if (localProjects.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No projects found. Open the main website to initialize them.</td></tr>';
+        return;
+      }
+
+      localProjects.forEach(p => {
+        tbody.innerHTML += `
+          <tr>
+            <td><img src="${p.cover}" alt="${p.title}" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;"></td>
+            <td><strong>${p.title}</strong></td>
+            <td>${p.category || '-'}</td>
+            <td>${p.location || '-'}</td>
+            <td>${p.budget || '-'}</td>
+            <td>
+              <button class="btn" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openEditProject(${p.id})">Edit</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function openEditProject(id) {
+      const project = localProjects.find(p => p.id === id);
+      if (!project) return;
+
+      document.getElementById('editProjectId').value = project.id;
+      document.getElementById('editProjectTitle').value = project.title || '';
+      document.getElementById('editProjectCategory').value = project.category || '';
+      document.getElementById('editProjectBudget').value = project.budget || '';
+      document.getElementById('editProjectLocation').value = project.location || '';
+      document.getElementById('editProjectCover').value = project.cover || '';
+      document.getElementById('editProjectDesc').value = project.description || '';
+
+      document.getElementById('editProjectModal').style.display = 'flex';
+    }
+
+    function closeProjectModal() {
+      document.getElementById('editProjectModal').style.display = 'none';
+    }
+
+    function saveProject(event) {
+      event.preventDefault();
+      const id = parseInt(document.getElementById('editProjectId').value);
+      const projectIndex = localProjects.findIndex(p => p.id === id);
+      
+      if (projectIndex > -1) {
+        localProjects[projectIndex].title = document.getElementById('editProjectTitle').value;
+        localProjects[projectIndex].category = document.getElementById('editProjectCategory').value;
+        localProjects[projectIndex].budget = document.getElementById('editProjectBudget').value;
+        localProjects[projectIndex].location = document.getElementById('editProjectLocation').value;
+        localProjects[projectIndex].cover = document.getElementById('editProjectCover').value;
+        localProjects[projectIndex].description = document.getElementById('editProjectDesc').value;
+
+        localStorage.setItem('os_projects', JSON.stringify(localProjects));
+        closeProjectModal();
+        loadAdminProjects(); // Refresh table
+        
+        // Update the dashboard summary stats if needed (just visual feedback)
+        alert('Project updated successfully! The main website will now reflect these changes.');
       }
     }
 
@@ -574,6 +712,14 @@
       setTimeout(() => {
         map.invalidateSize();
       }, 200);
+    }
+
+    // Close modal on click outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('editProjectModal');
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
     }
 
     loadDashboard();

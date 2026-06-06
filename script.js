@@ -3,7 +3,7 @@
    ============================================================ */
 
 // ── DATA ─────────────────────────────────────────────────────
-const PROJECTS = [
+const DEFAULT_PROJECTS = [
   {
     id: 1, title: "Lakhani Centrium", category: "Corporate",
     location: "Navi Mumbai, Maharashtra", budget: "₹45–60 Lakhs",
@@ -101,6 +101,20 @@ const PROJECTS = [
     testimonial: { name: "Deepak Menon", role: "VP Real Estate, Cognizant", text: "The innovation lab has become a talent magnet. We've seen a measurable increase in patent filings since the redesign. World-class design, world-class results." }
   }
 ];
+
+let PROJECTS = [];
+try {
+  const stored = localStorage.getItem('os_projects');
+  if (stored) {
+    PROJECTS = JSON.parse(stored);
+  } else {
+    PROJECTS = [...DEFAULT_PROJECTS];
+    localStorage.setItem('os_projects', JSON.stringify(PROJECTS));
+  }
+} catch (err) {
+  console.error("Local storage error:", err);
+  PROJECTS = [...DEFAULT_PROJECTS];
+}
 
 const TESTIMONIALS = [
   { name: "Aditya Birla", role: "CEO, Birla Estates", text: "OS Interiors didn't just design our office — they designed a culture. The space communicates our values better than any brand campaign ever could.", initials: "AB" },
