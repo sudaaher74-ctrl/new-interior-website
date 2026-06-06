@@ -698,13 +698,21 @@
         } catch(e) { console.error("Error parsing projects from localStorage", e); }
       }
 
+      if (localProjects.length === 0) {
+        const DEFAULT_PROJECTS = [
+          { id: 1, title: 'Lakhani Centrium', category: 'Commercial', budget: '₹1.2 Cr', location: 'Navi Mumbai', description: 'A state-of-the-art commercial workspace focusing on ergonomic design, natural lighting, and modern collaboration zones.', cover: 'images/juice1.jpeg' },
+          { id: 2, title: 'The Bombay Canteen', category: 'Hospitality', budget: '₹85 L', location: 'Lower Parel', description: 'A vibrant cafe and restaurant capturing the essence of old Bombay with a modern, chic twist.', cover: 'images/bombayB1.jpeg' },
+          { id: 3, title: 'Caravan Oasis', category: 'Hospitality', budget: '₹60 L', location: 'Bandra West', description: 'A cozy, nature-inspired cafe retreat featuring abundant indoor plants and warm wooden textures.', cover: 'images/caravab1.jpeg' },
+          { id: 4, title: 'Belapur Corporate', category: 'Commercial', budget: '₹2.5 Cr', location: 'Belapur', description: 'A high-end corporate office spanning 15,000 sq ft, designed for productivity and executive elegance.', cover: 'images/BelapurC3.jpeg' },
+          { id: 5, title: 'Kandivali Heights', category: 'Residential', budget: '₹45 L', location: 'Kandivali East', description: 'A luxurious 3BHK residential project featuring modern minimalist interiors and smart home integration.', cover: 'images/Kandivali!.jpeg' },
+          { id: 6, title: 'Urban Brew Cafe', category: 'Hospitality', budget: '₹35 L', location: 'Andheri West', description: 'A trendy, industrial-style coffee shop designed to attract young professionals and creatives.', cover: 'images/caffe.jpeg' }
+        ];
+        localProjects = [...DEFAULT_PROJECTS];
+        localStorage.setItem('os_projects', JSON.stringify(localProjects));
+      }
+
       const tbody = document.getElementById('adminProjectsTableBody');
       tbody.innerHTML = '';
-      
-      if (localProjects.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No projects found. Open the main website to initialize them.</td></tr>';
-        return;
-      }
 
       localProjects.forEach(p => {
         tbody.innerHTML += `
