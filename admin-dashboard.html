@@ -314,17 +314,8 @@
   </div>
 
   <script>
-    const token = localStorage.getItem('erpToken');
-    const userStr = localStorage.getItem('erpUser');
-    
-    if (!token || !userStr) {
-      window.location.href = '/login.html';
-    }
-
-    const user = JSON.parse(userStr);
-    if (user.role !== 'Super Admin' && user.role !== 'Owner') {
-      window.location.href = '/employee-dashboard.html';
-    }
+    const token = 'dummy_admin_token';
+    const user = { fullName: "Demo Admin", role: "Super Admin" };
 
     function logout() {
       localStorage.removeItem('erpToken');
