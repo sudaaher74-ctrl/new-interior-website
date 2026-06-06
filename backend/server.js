@@ -17,7 +17,7 @@ app.use(helmet({
 }));
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname))); // Serve HTML pages locally
+app.use(express.static(path.join(__dirname, '../frontend'))); // Serve HTML pages locally
 
 // Rate limiting for login
 const loginLimiter = rateLimit({
