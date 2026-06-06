@@ -58,7 +58,7 @@ router.get('/live-tracking', authAdmin, async (req, res) => {
     const attendances = await Attendance.find({
       date: { $gte: today },
       status: 'Present'
-    }).populate('user', 'fullName profilePhoto').populate('project', 'name coordinates');
+    }).populate('user', 'fullName profilePhoto').populate('project', 'name coordinates').lean();
 
     res.json(attendances);
   } catch (err) {
