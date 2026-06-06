@@ -522,16 +522,39 @@
         </div>
       </div>
 
-      <!-- EMPLOYEES TAB (Placeholder) -->
+      <!-- EMPLOYEES TAB -->
       <div id="panel-employees" class="tab-panel">
         <div class="table-container">
-          <h2>Employees Management</h2>
-          <p style="color: var(--text-muted); margin-top: 1rem;">Coming soon...</p>
+          <div class="table-header">
+            <h2>Employees Management</h2>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Employee Name</th>
+                <th>Role</th>
+                <th>Status Today</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="employeesTableBody">
+              <tr><td colspan="4" style="text-align:center">Loading employees...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
     </div>
   </main>
+
+  <!-- Employee Details Modal -->
+  <div id="employeeModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+      <span class="close-btn" onclick="document.getElementById('employeeModal').style.display='none'">&times;</span>
+      <h3 id="empModalName">Employee Details</h3>
+      <div id="empModalContent" style="margin-top: 1rem; font-size: 0.95rem;"></div>
+    </div>
+  </div>
 
   <!-- Map Modal Removed (Moved to Live Tracking Tab) -->
 
@@ -596,7 +619,7 @@
     async function loadDashboard() {
       try {
         // Fetch Stats
-        const statsRes = await fetch('/api/v2/admin/stats', {
+        const statsRes = await fetch(window.API_CONFIG.BASE_URL + '/v2/admin/stats', {
           headers: { 'Authorization': 'Bearer ' + token }
         });
         if (statsRes.ok) {
@@ -607,13 +630,13 @@
           document.getElementById('statAbsent').textContent = stats.employeesAbsent;
         }
 
-        // Fetch Tracking Data
-        const trackRes = await fetch('/api/v2/admin/live-tracking', {
+        // Fetch Tracking Data from API
+        const trackRes = await fetch(window.API_CONFIG.BASE_URL + '/v2/admin/live-tracking', {
           headers: { 'Authorization': 'Bearer ' + token }
         });
-        const trackBody = document.getElementById('trackingTableBody');
         if (trackRes.ok) {
           rawTrackingData = await trackRes.json();
+          const trackBody = document.getElementById('trackingTableBody');
           trackBody.innerHTML = '';
           if (rawTrackingData.length === 0) {
               trackBody.innerHTML = '<tr><td colspan="4" style="text-align:center">No employees on site today.</td></tr>';
@@ -630,9 +653,15 @@
               });
           }
         }
+        
+        // Update stats
+        if (rawTrackingData.length > 0) {
+            document.getElementById('statOnSite').textContent = rawTrackingData.length;
+            document.getElementById('statAbsent').textContent = document.getElementById('statEmployees') ? parseInt(document.getElementById('statEmployees').textContent) - rawTrackingData.length : 1;
+        }
 
         // Fetch Projects
-        const projRes = await fetch('/api/v2/projects', {
+        const projRes = await fetch(window.API_CONFIG.BASE_URL + '/v2/projects', {
           headers: { 'Authorization': 'Bearer ' + token }
         });
         const projBody = document.getElementById('projectsTableBody');
@@ -684,91 +713,147 @@
         initMap();
       } else if (panelId === 'panel-projects') {
         loadAdminProjects();
+      } else if (panelId === 'panel-employees') {
+        loadEmployeesTab();
       }
+    }
+
+    // --- EMPLOYEES LOGIC ---
+    const mockEmployees = [
+      { id: 1, name: "Demo Employee", role: "Employee" },
+      { id: 2, name: "Rahul Sharma", role: "Site Supervisor" },
+      { id: 3, name: "Anita Desai", role: "Interior Designer" }
+    ];
+
+    function loadEmployeesTab() {
+      const tbody = document.getElementById('employeesTableBody');
+      tbody.innerHTML = '';
+      
+      mockEmployees.forEach(emp => {
+        const tracking = rawTrackingData.find(t => t.user.fullName === emp.name);
+        const statusHTML = tracking ? `<span style="color: var(--success); font-weight: 500;">Checked In</span>` : `<span style="color: var(--text-muted);">Not Checked In</span>`;
+        
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${emp.name}</strong></td>
+            <td>${emp.role}</td>
+            <td>${statusHTML}</td>
+            <td><button class="btn" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="viewEmployeeDetails('${emp.name}')">View Status</button></td>
+          </tr>
+        `;
+      });
+    }
+
+    function viewEmployeeDetails(name) {
+      const tracking = rawTrackingData.find(t => t.user.fullName === name);
+      document.getElementById('empModalName').textContent = name + " - Today's Status";
+      const content = document.getElementById('empModalContent');
+      
+      if (tracking) {
+        content.innerHTML = `
+          <div style="margin-bottom: 1rem; line-height: 1.5;">
+            <p><strong>Project:</strong> ${tracking.project ? tracking.project.name : 'Unknown'}</p>
+            <p><strong>Check-In Time:</strong> ${new Date(tracking.checkIn.time).toLocaleTimeString()}</p>
+          </div>
+          ${tracking.checkIn.selfieUrl ? `<img src="${tracking.checkIn.selfieUrl}" style="width: 100%; border-radius: 8px; border: 1px solid var(--border-color);">` : '<p style="color: var(--text-muted);">No photo uploaded.</p>'}
+        `;
+      } else {
+        content.innerHTML = `<p style="color: var(--text-muted);">No activity recorded for today.</p>`;
+      }
+      
+      document.getElementById('employeeModal').style.display = 'flex';
     }
 
     // --- PROJECTS MANAGEMENT LOGIC ---
     let localProjects = [];
 
-    function loadAdminProjects() {
-      const stored = localStorage.getItem('os_projects');
-      if (stored) {
-        try {
-          localProjects = JSON.parse(stored);
-        } catch(e) { console.error("Error parsing projects from localStorage", e); }
+    async function loadAdminProjects() {
+      try {
+        const projRes = await fetch(window.API_CONFIG.BASE_URL + '/v2/projects', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (projRes.ok) {
+          localProjects = await projRes.json();
+          renderProjectsTable();
+        }
+      } catch (err) {
+        console.error("API error fetching projects");
       }
+    }
 
-      if (localProjects.length === 0) {
-        const DEFAULT_PROJECTS = [
-          { id: 1, title: 'Lakhani Centrium', category: 'Commercial', budget: '₹1.2 Cr', location: 'Navi Mumbai', description: 'A state-of-the-art commercial workspace focusing on ergonomic design, natural lighting, and modern collaboration zones.', cover: 'images/juice1.jpeg' },
-          { id: 2, title: 'The Bombay Canteen', category: 'Hospitality', budget: '₹85 L', location: 'Lower Parel', description: 'A vibrant cafe and restaurant capturing the essence of old Bombay with a modern, chic twist.', cover: 'images/bombayB1.jpeg' },
-          { id: 3, title: 'Caravan Oasis', category: 'Hospitality', budget: '₹60 L', location: 'Bandra West', description: 'A cozy, nature-inspired cafe retreat featuring abundant indoor plants and warm wooden textures.', cover: 'images/caravab1.jpeg' },
-          { id: 4, title: 'Belapur Corporate', category: 'Commercial', budget: '₹2.5 Cr', location: 'Belapur', description: 'A high-end corporate office spanning 15,000 sq ft, designed for productivity and executive elegance.', cover: 'images/BelapurC3.jpeg' },
-          { id: 5, title: 'Kandivali Heights', category: 'Residential', budget: '₹45 L', location: 'Kandivali East', description: 'A luxurious 3BHK residential project featuring modern minimalist interiors and smart home integration.', cover: 'images/Kandivali!.jpeg' },
-          { id: 6, title: 'Urban Brew Cafe', category: 'Hospitality', budget: '₹35 L', location: 'Andheri West', description: 'A trendy, industrial-style coffee shop designed to attract young professionals and creatives.', cover: 'images/caffe.jpeg' }
-        ];
-        localProjects = [...DEFAULT_PROJECTS];
-        localStorage.setItem('os_projects', JSON.stringify(localProjects));
-      }
-
+    function renderProjectsTable() {
       const tbody = document.getElementById('adminProjectsTableBody');
       tbody.innerHTML = '';
-
       localProjects.forEach(p => {
         tbody.innerHTML += `
           <tr>
-            <td><img src="${p.cover}" alt="${p.title}" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;"></td>
-            <td><strong>${p.title}</strong></td>
-            <td>${p.category || '-'}</td>
-            <td>${p.location || '-'}</td>
-            <td>${p.budget || '-'}</td>
             <td>
-              <button class="btn" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openEditProject(${p.id})">Edit</button>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <img src="${p.cover || ''}" style="width:40px;height:40px;border-radius:4px;object-fit:cover;">
+                <strong>${p.name || p.title || ''}</strong>
+              </div>
+            </td>
+            <td>${p.category || 'N/A'}</td>
+            <td>${p.budget || 'N/A'}</td>
+            <td><span class="status-badge status-ongoing">${p.status || 'Ongoing'}</span></td>
+            <td>
+              <button class="btn" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openProjectModal('${p._id}')">Edit</button>
             </td>
           </tr>
         `;
       });
     }
 
-    function openEditProject(id) {
-      const project = localProjects.find(p => p.id === id);
-      if (!project) return;
+    function openProjectModal(id) {
+      const p = localProjects.find(proj => proj._id === id);
+      if (p) {
+        document.getElementById('editProjectId').value = p._id;
+        document.getElementById('editProjectTitle').value = p.name || p.title || '';
+        document.getElementById('editProjectCategory').value = p.category || '';
+        document.getElementById('editProjectBudget').value = p.budget || '';
+        document.getElementById('editProjectLocation').value = p.location || p.siteAddress || '';
+        document.getElementById('editProjectCover').value = p.cover || '';
+        document.getElementById('editProjectDesc').value = p.description || '';
+        document.getElementById('editProjectModal').style.display = 'flex';
+      }
+    }
 
-      document.getElementById('editProjectId').value = project.id;
-      document.getElementById('editProjectTitle').value = project.title || '';
-      document.getElementById('editProjectCategory').value = project.category || '';
-      document.getElementById('editProjectBudget').value = project.budget || '';
-      document.getElementById('editProjectLocation').value = project.location || '';
-      document.getElementById('editProjectCover').value = project.cover || '';
-      document.getElementById('editProjectDesc').value = project.description || '';
+    async function saveProject(event) {
+      event.preventDefault();
+      const id = document.getElementById('editProjectId').value;
+      
+      const updatedData = {
+        name: document.getElementById('editProjectTitle').value,
+        title: document.getElementById('editProjectTitle').value,
+        category: document.getElementById('editProjectCategory').value,
+        budget: document.getElementById('editProjectBudget').value,
+        location: document.getElementById('editProjectLocation').value,
+        siteAddress: document.getElementById('editProjectLocation').value,
+        cover: document.getElementById('editProjectCover').value,
+        description: document.getElementById('editProjectDesc').value
+      };
 
-      document.getElementById('editProjectModal').style.display = 'flex';
+      try {
+        await fetch(window.API_CONFIG.BASE_URL + '/v2/projects/' + id, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(updatedData)
+        });
+        
+        closeProjectModal();
+        loadAdminProjects(); // Refresh table
+        
+        alert('Project updated successfully!');
+      } catch (err) {
+        console.error("Error saving project", err);
+      }
     }
 
     function closeProjectModal() {
       document.getElementById('editProjectModal').style.display = 'none';
-    }
-
-    function saveProject(event) {
-      event.preventDefault();
-      const id = parseInt(document.getElementById('editProjectId').value);
-      const projectIndex = localProjects.findIndex(p => p.id === id);
-      
-      if (projectIndex > -1) {
-        localProjects[projectIndex].title = document.getElementById('editProjectTitle').value;
-        localProjects[projectIndex].category = document.getElementById('editProjectCategory').value;
-        localProjects[projectIndex].budget = document.getElementById('editProjectBudget').value;
-        localProjects[projectIndex].location = document.getElementById('editProjectLocation').value;
-        localProjects[projectIndex].cover = document.getElementById('editProjectCover').value;
-        localProjects[projectIndex].description = document.getElementById('editProjectDesc').value;
-
-        localStorage.setItem('os_projects', JSON.stringify(localProjects));
-        closeProjectModal();
-        loadAdminProjects(); // Refresh table
-        
-        // Update the dashboard summary stats if needed (just visual feedback)
-        alert('Project updated successfully! The main website will now reflect these changes.');
-      }
     }
 
     // --- LEADS FETCHING LOGIC ---
@@ -876,8 +961,12 @@
     // Close modal on click outside
     window.onclick = function(event) {
       const modal = document.getElementById('editProjectModal');
+      const empModal = document.getElementById('employeeModal');
       if (event.target === modal) {
         modal.style.display = 'none';
+      }
+      if (event.target === empModal) {
+        empModal.style.display = 'none';
       }
     }
 

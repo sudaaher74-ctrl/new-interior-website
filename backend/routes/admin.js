@@ -7,20 +7,18 @@ const Attendance = require('../models/Attendance');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 
-// Admin middleware
-const authAdmin = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
-
+// Admin middleware (BYPASSED FOR LOGIN-FREE TESTING)
+const authAdmin = async (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    if (decoded.user.role !== 'Super Admin' && decoded.user.role !== 'Owner') {
-        return res.status(403).json({ msg: 'Not authorized for this action' });
+    const admin = await User.findOne({ email: 'admin@osinterior.com' });
+    if (admin) {
+      req.user = { id: admin._id, role: admin.role };
+      next();
+    } else {
+      res.status(400).json({ msg: 'Admin not found. Please run seed script.' });
     }
-    req.user = decoded.user;
-    next();
   } catch (e) {
-    res.status(400).json({ msg: 'Token is not valid' });
+    res.status(500).json({ msg: 'Auth bypass error' });
   }
 };
 

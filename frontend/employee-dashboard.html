@@ -241,10 +241,15 @@
         <div id="videoContainer">
           <video id="videoElement" autoplay playsinline></video>
           <canvas id="canvasElement"></canvas>
+          <img id="previewImage" style="display: none; width: 100%; border-radius: 8px; margin-top: 1rem;">
         </div>
         
-        <button id="startCamBtn" class="btn btn-secondary" style="margin-bottom: 1rem;" onclick="startCamera()">Open Camera</button>
-        <button id="checkInBtn" class="btn btn-primary" style="display: none;" onclick="performCheckIn()">Capture & Check In</button>
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;" id="actionButtonsRow">
+          <button id="startCamBtn" class="btn btn-secondary" style="flex: 1;" onclick="startCamera()">Open Camera</button>
+          <button id="uploadPhotoBtn" class="btn btn-secondary" style="flex: 1;" onclick="document.getElementById('photoInput').click()">Upload Photo</button>
+          <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoUpload(event)">
+        </div>
+        <button id="checkInBtn" class="btn btn-primary" style="display: none; width: 100%; margin-bottom: 1rem;" onclick="performCheckIn()">Confirm & Check In</button>
 
         <div id="checkOutSection" style="display: none;">
           <textarea id="workSummary" placeholder="Enter work summary for today..."></textarea>
@@ -278,6 +283,7 @@
 
     let stream = null;
     let locationData = null;
+    let uploadedPhotoBase64 = null;
 
     function logout() {
       localStorage.removeItem('erpToken');
@@ -295,23 +301,36 @@
 
     async function loadDashboard() {
       try {
-        // Fetch Projects (mocking list for now since we don't have project assignments API built yet)
-        // In real scenario, fetch from /api/v2/users/projects
         const projectSelect = document.getElementById('projectSelect');
         const projList = document.getElementById('assignedProjectsList');
         
-        // Mocking a project for testing
-        const mockProject = { _id: 'mock123', name: 'Downtown Renovation' };
-        projectSelect.innerHTML = `<option value="">Select Assigned Project</option><option value="${mockProject._id}">${mockProject.name}</option>`;
-        projList.innerHTML = `<p style="font-size:0.9rem;">1. ${mockProject.name}</p>`;
-
-        // Fetch Today's Attendance
-        const res = await fetch('/api/v2/attendance/today', {
+        // Fetch projects from the backend API
+        const projRes = await fetch(window.API_CONFIG.BASE_URL + '/v2/projects', {
           headers: { 'Authorization': 'Bearer ' + token }
         });
-        const data = await res.json();
+        const projects = projRes.ok ? await projRes.json() : [];
+
+        projectSelect.innerHTML = '<option value="">Select Assigned Project</option>';
+        projList.innerHTML = '';
+
+        if (projects.length === 0) {
+          projList.innerHTML = '<p style="font-size:0.9rem; color: var(--text-muted);">No active projects found.</p>';
+        } else {
+          projects.forEach((p, i) => {
+            projectSelect.innerHTML += `<option value="${p._id}">${p.name}</option>`;
+            projList.innerHTML += `<p style="font-size:0.9rem; margin-bottom: 0.25rem;">${i+1}. ${p.name}</p>`;
+          });
+        }
+
+        // Fetch Today's Attendance Status
+        const attRes = await fetch(window.API_CONFIG.BASE_URL + '/v2/attendance/today', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const todayAttendance = attRes.ok ? await attRes.json() : null;
         
-        updateUIBasedOnAttendance(data);
+        if (todayAttendance && todayAttendance.status === 'Present' && !todayAttendance.checkOut?.time) {
+          updateUIBasedOnAttendance(todayAttendance);
+        }
 
       } catch (err) {
         console.error(err);
@@ -323,7 +342,7 @@
       const statusBadge = document.getElementById('statusBadge');
       const actionTitle = document.getElementById('actionTitle');
       const projectSelect = document.getElementById('projectSelect');
-      const startCamBtn = document.getElementById('startCamBtn');
+      const actionButtonsRow = document.getElementById('actionButtonsRow');
       const videoContainer = document.getElementById('videoContainer');
       const checkInBtn = document.getElementById('checkInBtn');
       const checkOutSection = document.getElementById('checkOutSection');
@@ -338,7 +357,7 @@
           // Checked in, but not checked out
           actionTitle.textContent = 'Check Out';
           projectSelect.style.display = 'none';
-          startCamBtn.style.display = 'none';
+          if(actionButtonsRow) actionButtonsRow.style.display = 'none';
           videoContainer.style.display = 'none';
           checkInBtn.style.display = 'none';
           checkOutSection.style.display = 'block';
@@ -350,81 +369,110 @@
       }
     }
 
+    // Attempt to get location automatically when interacting
+    function fetchLocation() {
+      if(navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => { locationData = pos.coords; },
+          err => { console.warn('Location access denied'); }
+        );
+      }
+    }
+
     async function startCamera() {
+      fetchLocation();
       try {
         stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
         const video = document.getElementById('videoElement');
         video.srcObject = stream;
         document.getElementById('videoContainer').style.display = 'block';
-        document.getElementById('startCamBtn').style.display = 'none';
+        document.getElementById('actionButtonsRow').style.display = 'none';
         document.getElementById('checkInBtn').style.display = 'block';
-
-        // Get Location
-        navigator.geolocation.getCurrentPosition(
-          pos => { locationData = pos.coords; },
-          err => { showMsg('Please enable location services.', true); }
-        );
-
       } catch (err) {
-        showMsg('Camera access denied or unavailable.', true);
+        showMsg('Camera access denied. Please use Upload Photo.', true);
       }
+    }
+
+    function handlePhotoUpload(event) {
+      fetchLocation();
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        uploadedPhotoBase64 = e.target.result;
+        const preview = document.getElementById('previewImage');
+        preview.src = uploadedPhotoBase64;
+        preview.style.display = 'block';
+        
+        document.getElementById('videoContainer').style.display = 'block';
+        document.getElementById('videoElement').style.display = 'none';
+        document.getElementById('canvasElement').style.display = 'none';
+        
+        document.getElementById('actionButtonsRow').style.display = 'none';
+        document.getElementById('checkInBtn').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
     }
 
     async function performCheckIn() {
       const projectId = document.getElementById('projectSelect').value;
+      const selectElem = document.getElementById('projectSelect');
+      const projectName = selectElem.options[selectElem.selectedIndex]?.text;
+
       if (!projectId) return showMsg('Please select a project.', true);
-      if (!locationData) return showMsg('Waiting for location data. Please ensure GPS is enabled.', true);
 
-      const video = document.getElementById('videoElement');
-      const canvas = document.getElementById('canvasElement');
-      
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0);
-      const selfieUrl = canvas.toDataURL('image/jpeg'); // Base64 image
+      let selfieUrl = uploadedPhotoBase64;
 
-      // Stop camera
-      stream.getTracks().forEach(track => track.stop());
-      document.getElementById('videoContainer').style.display = 'none';
-      
+      if (!selfieUrl && stream) {
+        const video = document.getElementById('videoElement');
+        const canvas = document.getElementById('canvasElement');
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        selfieUrl = canvas.toDataURL('image/jpeg', 0.7);
+        stream.getTracks().forEach(track => track.stop());
+      }
+
+      if (!selfieUrl) return showMsg('Please capture or upload a photo.', true);
+
       document.getElementById('checkInBtn').disabled = true;
-      document.getElementById('checkInBtn').textContent = 'Processing...';
+      document.getElementById('checkInBtn').textContent = 'Saving...';
 
       try {
-        const res = await fetch('/api/v2/attendance/check-in', {
+        // Construct API payload
+        const payload = {
+          projectId: projectId,
+          lat: locationData ? locationData.latitude : 19.0760, // Default to Mumbai
+          lng: locationData ? locationData.longitude : 72.8777,
+          accuracy: locationData ? locationData.accuracy : 0,
+          selfieUrl: selfieUrl,
+          deviceInfo: navigator.userAgent
+        };
+
+        const res = await fetch(window.API_CONFIG.BASE_URL + '/v2/attendance/check-in', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token
           },
-          body: JSON.stringify({
-            projectId: projectId, // Sending mock project for now
-            lat: locationData.latitude,
-            lng: locationData.longitude,
-            accuracy: locationData.accuracy,
-            selfieUrl: selfieUrl,
-            deviceInfo: navigator.userAgent
-          })
+          body: JSON.stringify(payload)
         });
 
-        const data = await res.json();
-        
-        if (res.ok) {
-          showMsg('Checked in successfully!');
-          // Quick hack: mock population since we didn't populate in the post return
-          data.project = { name: 'Downtown Renovation' }; 
-          updateUIBasedOnAttendance(data);
-        } else {
-          showMsg(data.msg || 'Check-in failed', true);
-          document.getElementById('startCamBtn').style.display = 'block';
-          document.getElementById('checkInBtn').style.display = 'none';
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.msg || 'Check-in failed');
         }
+
+        const data = await res.json();
+        showMsg('Checked in successfully!');
+        updateUIBasedOnAttendance(data);
+
       } catch (err) {
         console.error(err);
-        showMsg('Network error.', true);
-      } finally {
+        showMsg(err.message, true);
         document.getElementById('checkInBtn').disabled = false;
-        document.getElementById('checkInBtn').textContent = 'Capture & Check In';
+        document.getElementById('checkInBtn').textContent = 'Confirm & Check In';
       }
     }
 

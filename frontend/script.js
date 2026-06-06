@@ -103,17 +103,54 @@ const DEFAULT_PROJECTS = [
 ];
 
 let PROJECTS = [];
+// Initial fallback
 try {
   const stored = localStorage.getItem('os_projects');
   if (stored) {
     PROJECTS = JSON.parse(stored);
   } else {
     PROJECTS = [...DEFAULT_PROJECTS];
-    localStorage.setItem('os_projects', JSON.stringify(PROJECTS));
   }
 } catch (err) {
   console.error("Local storage error:", err);
   PROJECTS = [...DEFAULT_PROJECTS];
+}
+
+async function loadProjectsFromAPI() {
+  try {
+    const res = await fetch(window.API_CONFIG.BASE_URL + '/v2/projects');
+    if (res.ok) {
+      const dbProjects = await res.json();
+      if (dbProjects.length > 0) {
+        // Map backend project fields to frontend expectations
+        PROJECTS = dbProjects.map(p => ({
+          id: p._id,
+          title: p.name || p.title,
+          category: p.category,
+          location: p.location || p.siteAddress || 'Unknown',
+          budget: p.budget,
+          area: p.area || '',
+          date: p.date || new Date(p.createdAt).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }),
+          description: p.description,
+          tags: p.tags || [p.category],
+          views: p.views || 0,
+          cover: p.cover || 'images/IMG_2695.JPG',
+          gallery: p.gallery || [p.cover || 'images/IMG_2695.JPG'],
+          beforeImg: p.beforeImg || p.cover || 'images/IMG_2695.JPG',
+          afterImg: p.afterImg || p.cover || 'images/IMG_2695.JPG',
+          testimonial: p.testimonial || { name: "Client", role: "Homeowner", text: "Exceptional work." }
+        }));
+        
+        // Re-render home page sections with API data
+        renderFeaturedProjects(projectFilter || 'All');
+        if (document.getElementById('page-projects').classList.contains('active')) {
+          renderProjectsPage();
+        }
+      }
+    }
+  } catch (err) {
+    console.error("Failed to load projects from API:", err);
+  }
 }
 
 const TESTIMONIALS = [
@@ -772,4 +809,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Scroll to trigger animations on initial load
   setTimeout(initRevealAnimations, 300);
+
+  // Fetch true data from API
+  loadProjectsFromAPI();
 });

@@ -1,11 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const Project = require('../models/Project');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
-
-const User = require('../models/User'); // Need User model for bypass
+const Lead = require('../models/Lead');
+const User = require('../models/User');
 
 // Admin middleware (BYPASSED FOR LOGIN-FREE TESTING)
 const authAdmin = async (req, res, next) => {
@@ -22,42 +18,46 @@ const authAdmin = async (req, res, next) => {
   }
 };
 
-// Create a project
-router.post('/', authAdmin, async (req, res) => {
+// Create a new lead (public endpoint, from contact form)
+router.post('/', async (req, res) => {
   try {
-    const project = new Project(req.body);
-    await project.save();
-    res.json(project);
+    const lead = new Lead(req.body);
+    await lead.save();
+    res.json(lead);
   } catch (err) {
     res.status(500).send('Server error');
   }
 });
 
-// Get all projects
+// Get all leads (admin only)
 router.get('/', authAdmin, async (req, res) => {
   try {
-    const projects = await Project.find().sort({ createdAt: -1 });
-    res.json(projects);
+    const leads = await Lead.find().sort({ createdAt: -1 });
+    res.json(leads);
   } catch (err) {
     res.status(500).send('Server error');
   }
 });
 
-// Update a project
-router.put('/:id', authAdmin, async (req, res) => {
+// Update lead status (admin only)
+router.put('/:id/status', authAdmin, async (req, res) => {
   try {
-    const project = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(project);
+    const lead = await Lead.findById(req.params.id);
+    if (!lead) return res.status(404).json({ msg: 'Lead not found' });
+    
+    lead.status = req.body.status || lead.status;
+    await lead.save();
+    res.json(lead);
   } catch (err) {
     res.status(500).send('Server error');
   }
 });
 
-// Delete a project
+// Delete a lead (admin only)
 router.delete('/:id', authAdmin, async (req, res) => {
   try {
-    await Project.findByIdAndDelete(req.params.id);
-    res.json({ msg: 'Project removed' });
+    await Lead.findByIdAndDelete(req.params.id);
+    res.json({ msg: 'Lead removed' });
   } catch (err) {
     res.status(500).send('Server error');
   }

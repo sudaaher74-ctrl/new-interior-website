@@ -8,15 +8,15 @@ const ProjectSchema = new mongoose.Schema({
     lat: { type: Number },
     lng: { type: Number }
   },
-  budget: { type: Number },
+  budget: { type: String },
   startDate: { type: Date },
   endDate: { type: Date },
   status: { 
     type: String, 
-    enum: ['Planning', 'Ongoing', 'On Hold', 'Completed'],
+    enum: ['Planning', 'Ongoing', 'On Hold', 'Completed', 'Upcoming'],
     default: 'Planning'
   },
   createdAt: { type: Date, default: Date.now }
-});
+}, { strict: false });
 
 module.exports = mongoose.models.ErpProject || mongoose.model('ErpProject', ProjectSchema);
