@@ -649,7 +649,7 @@
                       <td>${t.user.fullName}</td>
                       <td>${t.project ? t.project.name : 'Unknown'}</td>
                       <td>${new Date(t.checkIn.time).toLocaleTimeString()}</td>
-                      <td><span style="color: var(--success); font-weight: 500;">On Site</span></td>
+                      <td>${t.checkOut && t.checkOut.time ? `<span style="color: var(--warning); font-weight: 500;">Checked Out at ${new Date(t.checkOut.time).toLocaleTimeString()}</span>` : `<span style="color: var(--success); font-weight: 500;">On Site</span>`}</td>
                     </tr>
                   `;
               });
@@ -658,7 +658,8 @@
         
         // Update stats
         if (rawTrackingData.length > 0) {
-            document.getElementById('statOnSite').textContent = rawTrackingData.length;
+            const currentlyOnSite = rawTrackingData.filter(t => !t.checkOut || !t.checkOut.time).length;
+            document.getElementById('statOnSite').textContent = currentlyOnSite;
             document.getElementById('statAbsent').textContent = document.getElementById('statEmployees') ? parseInt(document.getElementById('statEmployees').textContent) - rawTrackingData.length : 1;
         }
 
@@ -941,7 +942,8 @@
             <div style="font-family: 'Inter', sans-serif; max-width: 220px; font-size: 13px;">
               <h4 style="margin: 0 0 4px 0; font-weight: 600;">${t.user.fullName}</h4>
               <p style="margin: 0 0 4px 0; color: var(--text-muted);">Site: ${t.project ? t.project.name : 'Unknown'}</p>
-              <p style="margin: 0 0 8px 0; color: var(--text-muted); font-size: 11px;">Time: ${new Date(t.checkIn.time).toLocaleTimeString()}</p>
+              <p style="margin: 0 0 2px 0; color: var(--text-muted); font-size: 11px;">Check-In: ${new Date(t.checkIn.time).toLocaleTimeString()}</p>
+              ${t.checkOut && t.checkOut.time ? `<p style="margin: 0 0 8px 0; color: var(--warning); font-size: 11px;">Checked Out: ${new Date(t.checkOut.time).toLocaleTimeString()}</p>` : `<p style="margin: 0 0 8px 0; color: var(--success); font-size: 11px;">Currently On Site</p>`}
               ${t.checkIn.selfieUrl ? `<img src="${t.checkIn.selfieUrl}" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 4px;" />` : '<p style="color: var(--danger); font-size: 11px;">No photo captured</p>'}
             </div>
           `;
