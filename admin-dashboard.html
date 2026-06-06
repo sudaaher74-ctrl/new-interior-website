@@ -178,6 +178,14 @@
       font-weight: 500;
     }
 
+    /* Tab Panels */
+    .tab-panel {
+      display: none;
+    }
+    .tab-panel.active {
+      display: block;
+    }
+
     /* Modal Styles */
     .modal {
       display: none;
@@ -227,11 +235,11 @@
   <aside class="sidebar">
     <div class="brand">OS Interior</div>
     <ul class="nav-links">
-      <li><a href="#" class="active">Dashboard</a></li>
-      <li><a href="#">Live Tracking</a></li>
-      <li><a href="#">Projects</a></li>
-      <li><a href="#">Employees</a></li>
-      <li><a href="#">AI Reports</a></li>
+      <li><a href="#" class="active" onclick="switchTab(event, 'panel-dashboard')">Dashboard</a></li>
+      <li><a href="#" onclick="switchTab(event, 'panel-tracking')">Live Tracking</a></li>
+      <li><a href="#" onclick="switchTab(event, 'panel-leads')">Leads</a></li>
+      <li><a href="#" onclick="switchTab(event, 'panel-projects')">Projects</a></li>
+      <li><a href="#" onclick="switchTab(event, 'panel-employees')">Employees</a></li>
     </ul>
   </aside>
 
@@ -242,7 +250,10 @@
     </header>
 
     <div class="dashboard-container">
-      <div class="stats-grid">
+      
+      <!-- DASHBOARD TAB -->
+      <div id="panel-dashboard" class="tab-panel active">
+        <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-title">Total Projects</div>
           <div class="stat-value" id="statProjects">-</div>
@@ -264,7 +275,7 @@
       <div class="table-container">
         <div class="table-header">
           <h2>Live Employee Tracking</h2>
-          <button class="btn" onclick="openMapModal()">View Map</button>
+          <button class="btn" onclick="switchTab(event, 'panel-tracking')">View Map Fullscreen</button>
         </div>
         <table>
           <thead>
@@ -298,20 +309,64 @@
             <tr><td colspan="3" style="text-align:center">Loading data...</td></tr>
           </tbody>
         </table>
+        </div>
+      </div> <!-- End Dashboard Tab -->
+
+      <!-- LIVE TRACKING TAB -->
+      <div id="panel-tracking" class="tab-panel">
+        <div class="table-container">
+          <div class="table-header">
+            <h2>Employee Photo Locations Map</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Click on any marker to view employee check-in selfie and details.</p>
+          </div>
+          <div id="map" style="height: 500px; border-radius: 8px; border: 1px solid var(--border-color); z-index: 1;"></div>
+        </div>
+      </div>
+
+      <!-- LEADS TAB -->
+      <div id="panel-leads" class="tab-panel">
+        <div class="table-container">
+          <div class="table-header">
+            <h2>Lead Generation (Contact Form)</h2>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Project Type</th>
+                <th>Message</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="leadsTableBody">
+              <tr><td colspan="6" style="text-align:center">Loading leads...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PROJECTS TAB (Placeholder) -->
+      <div id="panel-projects" class="tab-panel">
+        <div class="table-container">
+          <h2>Projects Management</h2>
+          <p style="color: var(--text-muted); margin-top: 1rem;">Coming soon...</p>
+        </div>
+      </div>
+
+      <!-- EMPLOYEES TAB (Placeholder) -->
+      <div id="panel-employees" class="tab-panel">
+        <div class="table-container">
+          <h2>Employees Management</h2>
+          <p style="color: var(--text-muted); margin-top: 1rem;">Coming soon...</p>
+        </div>
       </div>
 
     </div>
   </main>
 
-  <!-- Map Modal -->
-  <div id="mapModal" class="modal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeMapModal()">&times;</span>
-      <h3>Employee Photo Locations Map</h3>
-      <p style="color: var(--text-muted); font-size: 0.9rem;">Click on any marker to view employee check-in selfie and details.</p>
-      <div id="map"></div>
-    </div>
-  </div>
+  <!-- Map Modal Removed (Moved to Live Tracking Tab) -->
 
   <script>
     const token = 'dummy_admin_token';
@@ -387,18 +442,99 @@
               });
           }
         }
+        
+        // Fetch Leads
+        await loadLeads();
+
       } catch (err) {
         console.error(err);
       }
     }
 
-    function openMapModal() {
-      const modal = document.getElementById('mapModal');
-      modal.style.display = 'flex';
+    // --- TAB SWITCHING LOGIC ---
+    function switchTab(event, panelId) {
+      if (event) event.preventDefault();
       
-      // Initialize Map
+      // Update sidebar active state
+      document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+      if (event && event.currentTarget) {
+          event.currentTarget.classList.add('active');
+      } else {
+          const link = document.querySelector(`.nav-links a[onclick*="${panelId}"]`);
+          if (link) link.classList.add('active');
+      }
+
+      // Hide all panels, show target
+      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+      document.getElementById(panelId).classList.add('active');
+
+      // Specific panel logic
+      if (panelId === 'panel-tracking') {
+        initMap();
+      }
+    }
+
+    // --- LEADS FETCHING LOGIC ---
+    async function loadLeads() {
+      const tbody = document.getElementById('leadsTableBody');
+      try {
+        const url = window.API_CONFIG ? window.API_CONFIG.ENDPOINTS.LEADS : '/api/leads';
+        const res = await fetch(url, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (res.ok) {
+          const leads = await res.json();
+          tbody.innerHTML = '';
+          if (leads.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No leads found.</td></tr>';
+            return;
+          }
+          leads.forEach(l => {
+            tbody.innerHTML += `
+              <tr>
+                <td><strong>${l.name}</strong></td>
+                <td>
+                  <div>${l.phone || '-'}</div>
+                  <div style="font-size:0.8rem;color:var(--text-muted)">${l.email || '-'}</div>
+                </td>
+                <td>${l.projectType || 'N/A'}</td>
+                <td><div style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${l.message || ''}">${l.message || 'No message'}</div></td>
+                <td>${new Date(l.createdAt).toLocaleDateString()}</td>
+                <td><span style="background:#dbeafe; color:#1e40af; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight:600;">${l.status || 'new'}</span></td>
+              </tr>
+            `;
+          });
+        } else {
+            throw new Error("Failed to load leads from server");
+        }
+      } catch (err) {
+        console.error("API error, falling back to mock leads:", err);
+        const mockLeads = [
+          { name: "Rahul Sharma", phone: "+91 9876543210", email: "rahul@example.com", projectType: "Residential", message: "Looking for 3BHK interior design.", createdAt: new Date().toISOString(), status: "new" },
+          { name: "Anita Desai", phone: "+91 9123456789", email: "anita@example.com", projectType: "Corporate", message: "Need office renovation.", createdAt: new Date().toISOString(), status: "contacted" }
+        ];
+        tbody.innerHTML = '';
+        mockLeads.forEach(l => {
+          tbody.innerHTML += `
+            <tr>
+              <td><strong>${l.name}</strong> <span style="font-size:0.7rem; color:orange; font-weight:normal;">(Mock Data)</span></td>
+              <td>
+                <div>${l.phone || '-'}</div>
+                <div style="font-size:0.8rem;color:var(--text-muted)">${l.email || '-'}</div>
+              </td>
+              <td>${l.projectType || 'N/A'}</td>
+              <td><div style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${l.message || ''}">${l.message || 'No message'}</div></td>
+              <td>${new Date(l.createdAt).toLocaleDateString()}</td>
+              <td><span style="background:#dbeafe; color:#1e40af; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight:600;">${l.status || 'new'}</span></td>
+            </tr>
+          `;
+        });
+      }
+    }
+
+    // --- MAP LOGIC ---
+    function initMap() {
       if (!map) {
-        // Center at general default (e.g. 0, 0 or first user's location)
         map = L.map('map').setView([20.5937, 78.9629], 5); // India center default
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
@@ -431,30 +567,17 @@
         }
       });
 
-      // Recalculate view if there are markers
       if (bounds.length > 0) {
         map.fitBounds(bounds, { padding: [50, 50] });
       }
 
-      // Important: fix map sizing bug inside hidden div modal
       setTimeout(() => {
         map.invalidateSize();
       }, 200);
     }
 
-    function closeMapModal() {
-      document.getElementById('mapModal').style.display = 'none';
-    }
-
-    // Close on click outside
-    window.onclick = function(event) {
-      const modal = document.getElementById('mapModal');
-      if (event.target === modal) {
-        modal.style.display = 'none';
-      }
-    }
-
     loadDashboard();
   </script>
+  <script src="api-config.js"></script>
 </body>
 </html>
