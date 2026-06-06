@@ -27,8 +27,8 @@ async function seed() {
     // Create Admin
     const admin = new User({
       employeeId: 'EMP001',
-      fullName: 'AIVA Super Admin',
-      email: 'admin@aiva.com',
+      fullName: 'OS Interior Super Admin',
+      email: 'admin@osinterior.com',
       password: adminPassword,
       mobileNumber: '9999999999',
       role: 'Super Admin',
@@ -36,7 +36,7 @@ async function seed() {
       department: 'Management'
     });
     await admin.save();
-    console.log('Super Admin created: admin@aiva.com / admin123');
+    console.log('Super Admin created: admin@osinterior.com / admin123');
 
     // Create Project
     const project = new Project({
@@ -53,7 +53,7 @@ async function seed() {
     const employee = new User({
       employeeId: 'EMP002',
       fullName: 'Jane Smith',
-      email: 'employee@aiva.com',
+      email: 'employee@osinterior.com',
       password: employeePassword,
       mobileNumber: '8888888888',
       role: 'Employee',
@@ -62,7 +62,7 @@ async function seed() {
       assignedSites: [project._id]
     });
     await employee.save();
-    console.log('Employee created: employee@aiva.com / employee123 (Assigned to project)');
+    console.log('Employee created: employee@osinterior.com / employee123 (Assigned to project)');
 
     process.exit(0);
   } catch (err) {
