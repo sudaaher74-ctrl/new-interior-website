@@ -275,6 +275,7 @@
     </div>
   </div>
 
+  <script src="api-config.js"></script>
   <script>
     const token = 'dummy_token';
     const user = { fullName: "Demo Employee", role: "Employee" };
@@ -317,8 +318,9 @@
           projList.innerHTML = '<p style="font-size:0.9rem; color: var(--text-muted);">No active projects found.</p>';
         } else {
           projects.forEach((p, i) => {
-            projectSelect.innerHTML += `<option value="${p._id}">${p.name}</option>`;
-            projList.innerHTML += `<p style="font-size:0.9rem; margin-bottom: 0.25rem;">${i+1}. ${p.name}</p>`;
+            const displayName = p.name || p.title || 'Unnamed Project';
+            projectSelect.innerHTML += `<option value="${p._id}">${displayName}</option>`;
+            projList.innerHTML += `<p style="font-size:0.9rem; margin-bottom: 0.25rem;">${i+1}. ${displayName}</p>`;
           });
         }
 
