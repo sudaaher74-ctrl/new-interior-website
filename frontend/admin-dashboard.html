@@ -529,14 +529,15 @@
         <div class="table-container">
           <div class="table-header">
             <h2>Employees Management</h2>
+            <button class="btn btn-primary" onclick="document.getElementById('addEmployeeModal').style.display='block'">+ Add Employee</button>
           </div>
           <table>
             <thead>
               <tr>
+                <th>ID</th>
                 <th>Employee Name</th>
-                <th>Role</th>
-                <th>Status Today</th>
-                <th>Action</th>
+                <th>Email / Mobile</th>
+                <th>Designation</th>
               </tr>
             </thead>
             <tbody id="employeesTableBody">
@@ -548,6 +549,37 @@
 
     </div>
   </main>
+
+  <!-- Add Employee Modal -->
+  <div id="addEmployeeModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+      <span class="close-btn" onclick="document.getElementById('addEmployeeModal').style.display='none'">&times;</span>
+      <h3>Create New Employee</h3>
+      <form id="addEmployeeForm" onsubmit="createEmployee(event)" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+        <div>
+          <label style="font-weight: 500; font-size: 0.9rem;">Full Name</label>
+          <input type="text" id="empName" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; margin-top: 0.25rem;">
+        </div>
+        <div>
+          <label style="font-weight: 500; font-size: 0.9rem;">Email Address</label>
+          <input type="email" id="empEmail" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; margin-top: 0.25rem;">
+        </div>
+        <div>
+          <label style="font-weight: 500; font-size: 0.9rem;">Password</label>
+          <input type="password" id="empPassword" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; margin-top: 0.25rem;">
+        </div>
+        <div>
+          <label style="font-weight: 500; font-size: 0.9rem;">Mobile Number</label>
+          <input type="text" id="empMobile" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; margin-top: 0.25rem;">
+        </div>
+        <div>
+          <label style="font-weight: 500; font-size: 0.9rem;">Designation</label>
+          <input type="text" id="empDesignation" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; margin-top: 0.25rem;">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">Create Employee</button>
+      </form>
+    </div>
+  </div>
 
   <!-- Employee Details Modal -->
   <div id="employeeModal" class="modal">
@@ -628,12 +660,13 @@
           const stats = await statsRes.json();
           document.getElementById('statProjects').textContent = stats.totalProjects;
           document.getElementById('statActiveProjects').textContent = stats.activeProjects;
-          document.getElementById('statOnSite').textContent = stats.employeesOnSite;
-          document.getElementById('statAbsent').textContent = stats.employeesAbsent;
+          document.getElementById('statOnSite').textContent = stats.siteVisitsToday || 0; // Was employeesOnSite
+          const elAbsent = document.getElementById('statAbsent');
+          if (elAbsent) elAbsent.textContent = '-'; // Not applicable anymore
         }
 
         // Fetch Tracking Data from API
-        const trackRes = await fetch(window.API_CONFIG.BASE_URL + '/v2/admin/live-tracking', {
+        const trackRes = await fetch(window.API_CONFIG.BASE_URL + '/v2/admin/site-visits', {
           headers: { 'Authorization': 'Bearer ' + token }
         });
         if (trackRes.ok) {
@@ -641,26 +674,19 @@
           const trackBody = document.getElementById('trackingTableBody');
           trackBody.innerHTML = '';
           if (rawTrackingData.length === 0) {
-              trackBody.innerHTML = '<tr><td colspan="4" style="text-align:center">No employees on site today.</td></tr>';
+              trackBody.innerHTML = '<tr><td colspan="4" style="text-align:center">No site visits logged today.</td></tr>';
           } else {
               rawTrackingData.forEach(t => {
                   trackBody.innerHTML += `
                     <tr>
-                      <td>${t.user.fullName}</td>
+                      <td>${t.user ? t.user.fullName : 'Unknown'}</td>
                       <td>${t.project ? t.project.name : 'Unknown'}</td>
-                      <td>${new Date(t.checkIn.time).toLocaleTimeString()}</td>
-                      <td>${t.checkOut && t.checkOut.time ? `<span style="color: var(--warning); font-weight: 500;">Checked Out at ${new Date(t.checkOut.time).toLocaleTimeString()}</span>` : `<span style="color: var(--success); font-weight: 500;">On Site</span>`}</td>
+                      <td>${new Date(t.time).toLocaleTimeString()}</td>
+                      <td><span style="color: var(--success); font-weight: 500;">Logged</span></td>
                     </tr>
                   `;
               });
           }
-        }
-        
-        // Update stats
-        if (rawTrackingData.length > 0) {
-            const currentlyOnSite = rawTrackingData.filter(t => !t.checkOut || !t.checkOut.time).length;
-            document.getElementById('statOnSite').textContent = currentlyOnSite;
-            document.getElementById('statAbsent').textContent = document.getElementById('statEmployees') ? parseInt(document.getElementById('statEmployees').textContent) - rawTrackingData.length : 1;
         }
 
         // Fetch Projects
@@ -722,49 +748,82 @@
     }
 
     // --- EMPLOYEES LOGIC ---
-    const mockEmployees = [
-      { id: 1, name: "Demo Employee", role: "Employee" },
-      { id: 2, name: "Rahul Sharma", role: "Site Supervisor" },
-      { id: 3, name: "Anita Desai", role: "Interior Designer" }
-    ];
+    let realEmployees = [];
 
-    function loadEmployeesTab() {
+    async function loadEmployeesTab() {
       const tbody = document.getElementById('employeesTableBody');
-      tbody.innerHTML = '';
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Loading employees...</td></tr>';
       
-      mockEmployees.forEach(emp => {
-        const tracking = rawTrackingData.find(t => t.user.fullName === emp.name);
-        const statusHTML = tracking ? `<span style="color: var(--success); font-weight: 500;">Checked In</span>` : `<span style="color: var(--text-muted);">Not Checked In</span>`;
+      try {
+        const res = await fetch(window.API_CONFIG.BASE_URL + '/v2/admin/employees', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('Failed to fetch employees');
         
-        tbody.innerHTML += `
-          <tr>
-            <td><strong>${emp.name}</strong></td>
-            <td>${emp.role}</td>
-            <td>${statusHTML}</td>
-            <td><button class="btn" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="viewEmployeeDetails('${emp.name}')">View Status</button></td>
-          </tr>
-        `;
-      });
+        realEmployees = await res.json();
+        
+        // Also fetch site visits to calculate expenses
+        const trackRes = await fetch(window.API_CONFIG.BASE_URL + '/v2/admin/site-visits', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const visits = trackRes.ok ? await trackRes.json() : [];
+
+        tbody.innerHTML = '';
+        realEmployees.forEach(emp => {
+          // Calculate today's expense for this employee
+          const empVisits = visits.filter(v => v.user && v.user._id === emp._id);
+          const totalExpense = empVisits.reduce((sum, v) => sum + (v.expenseAmount || 0), 0);
+          const visitsCount = empVisits.length;
+
+          tbody.innerHTML += `
+            <tr>
+              <td><strong>${emp.employeeId || 'EMP-000'}</strong></td>
+              <td>${emp.fullName}</td>
+              <td>${emp.email}<br><small>${emp.mobileNumber}</small></td>
+              <td>
+                ${emp.designation || 'Employee'}<br>
+                <strong style="color:var(--warning)">Expense Today: ₹${totalExpense}</strong> (${visitsCount} visits)
+              </td>
+            </tr>
+          `;
+        });
+      } catch(e) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Failed to load employees.</td></tr>';
+      }
     }
 
-    function viewEmployeeDetails(name) {
-      const tracking = rawTrackingData.find(t => t.user.fullName === name);
-      document.getElementById('empModalName').textContent = name + " - Today's Status";
-      const content = document.getElementById('empModalContent');
-      
-      if (tracking) {
-        content.innerHTML = `
-          <div style="margin-bottom: 1rem; line-height: 1.5;">
-            <p><strong>Project:</strong> ${tracking.project ? tracking.project.name : 'Unknown'}</p>
-            <p><strong>Check-In Time:</strong> ${new Date(tracking.checkIn.time).toLocaleTimeString()}</p>
-          </div>
-          ${tracking.checkIn.selfieUrl ? `<img src="${tracking.checkIn.selfieUrl}" style="width: 100%; border-radius: 8px; border: 1px solid var(--border-color);">` : '<p style="color: var(--text-muted);">No photo uploaded.</p>'}
-        `;
-      } else {
-        content.innerHTML = `<p style="color: var(--text-muted);">No activity recorded for today.</p>`;
+    async function createEmployee(event) {
+      event.preventDefault();
+      const payload = {
+        fullName: document.getElementById('empName').value,
+        email: document.getElementById('empEmail').value,
+        password: document.getElementById('empPassword').value,
+        mobileNumber: document.getElementById('empMobile').value,
+        designation: document.getElementById('empDesignation').value
+      };
+
+      try {
+        const res = await fetch(window.API_CONFIG.BASE_URL + '/v2/admin/employees', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          alert('Employee created successfully! Their ID is ' + (data.user.employeeId || 'generated'));
+          document.getElementById('addEmployeeModal').style.display = 'none';
+          document.getElementById('addEmployeeForm').reset();
+          loadEmployeesTab();
+        } else {
+          alert(data.msg || 'Error creating employee');
+        }
+      } catch(e) {
+        alert('Network error');
       }
-      
-      document.getElementById('employeeModal').style.display = 'flex';
     }
 
     // --- PROJECTS MANAGEMENT LOGIC ---
@@ -932,19 +991,20 @@
       let bounds = [];
 
       rawTrackingData.forEach(t => {
-        if (t.checkIn && t.checkIn.location && t.checkIn.location.lat && t.checkIn.location.lng) {
-          const lat = t.checkIn.location.lat;
-          const lng = t.checkIn.location.lng;
+        if (t.location && t.location.lat && t.location.lng) {
+          const lat = t.location.lat;
+          const lng = t.location.lng;
           
           bounds.push([lat, lng]);
 
           const popupContent = `
             <div style="font-family: 'Inter', sans-serif; max-width: 220px; font-size: 13px;">
-              <h4 style="margin: 0 0 4px 0; font-weight: 600;">${t.user.fullName}</h4>
+              <h4 style="margin: 0 0 4px 0; font-weight: 600;">${t.user ? t.user.fullName : 'Unknown'}</h4>
               <p style="margin: 0 0 4px 0; color: var(--text-muted);">Site: ${t.project ? t.project.name : 'Unknown'}</p>
-              <p style="margin: 0 0 2px 0; color: var(--text-muted); font-size: 11px;">Check-In: ${new Date(t.checkIn.time).toLocaleTimeString()}</p>
-              ${t.checkOut && t.checkOut.time ? `<p style="margin: 0 0 8px 0; color: var(--warning); font-size: 11px;">Checked Out: ${new Date(t.checkOut.time).toLocaleTimeString()}</p>` : `<p style="margin: 0 0 8px 0; color: var(--success); font-size: 11px;">Currently On Site</p>`}
-              ${t.checkIn.selfieUrl ? `<img src="${t.checkIn.selfieUrl}" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 4px;" />` : '<p style="color: var(--danger); font-size: 11px;">No photo captured</p>'}
+              <p style="margin: 0 0 4px 0; color: var(--text-muted); font-size: 11px;">Time: ${new Date(t.time).toLocaleTimeString()}</p>
+              ${t.expenseAmount > 0 ? `<p style="margin: 0 0 4px 0; color: var(--warning); font-size: 12px; font-weight: bold;">Expense: ₹${t.expenseAmount}</p>` : ''}
+              ${t.expenseDescription ? `<p style="margin: 0 0 4px 0; color: var(--text-muted); font-size: 11px;">${t.expenseDescription}</p>` : ''}
+              ${t.photoUrl ? `<img src="${t.photoUrl}" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 4px;" />` : '<p style="color: var(--danger); font-size: 11px;">No photo captured</p>'}
             </div>
           `;
 

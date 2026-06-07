@@ -204,33 +204,10 @@
     <div class="main-content">
       <div class="card">
         <div class="card-title">
-          Today's Status
-          <span id="statusBadge" class="status-badge status-absent">Not Checked In</span>
+          Log Site Visit & Expenses
         </div>
-        <div class="info-grid">
-          <div class="info-item">
-            <p class="label">Date</p>
-            <p class="value" id="currentDate">-</p>
-          </div>
-          <div class="info-item">
-            <p class="label">Current Site</p>
-            <p class="value" id="currentSite">Select Project</p>
-          </div>
-          <div class="info-item">
-            <p class="label">Check-In Time</p>
-            <p class="value" id="checkInTime">--:--</p>
-          </div>
-          <div class="info-item">
-            <p class="label">Working Hours</p>
-            <p class="value" id="workHours">0h 0m</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" id="actionCard">
-        <h3 class="card-title" id="actionTitle">Check In</h3>
         <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
-          Please select your project, enable GPS, and capture a live selfie.
+          Select your site, capture a photo, and enter any travel expenses incurred.
         </p>
         
         <select id="projectSelect" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
@@ -249,14 +226,22 @@
           <button id="uploadPhotoBtn" class="btn btn-secondary" style="flex: 1;" onclick="document.getElementById('photoInput').click()">Upload Photo</button>
           <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoUpload(event)">
         </div>
-        <button id="checkInBtn" class="btn btn-primary" style="display: none; width: 100%; margin-bottom: 1rem;" onclick="performCheckIn()">Confirm & Check In</button>
-
-        <div id="checkOutSection" style="display: none;">
-          <textarea id="workSummary" placeholder="Enter work summary for today..."></textarea>
-          <button class="btn btn-danger" onclick="performCheckOut()">Submit & Check Out</button>
+        
+        <div id="expenseSection" style="margin-bottom: 1rem;">
+          <input type="number" id="expenseAmount" placeholder="Travel Expense Amount (₹)" style="width: 100%; padding: 0.75rem; margin-bottom: 0.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+          <input type="text" id="expenseDesc" placeholder="Expense Description (e.g., Train Panvel to CST)" style="width: 100%; padding: 0.75rem; margin-bottom: 0.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
         </div>
 
+        <button id="submitVisitBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" onclick="submitSiteVisit()">Submit Visit</button>
+
         <div id="actionMsg" class="msg-box"></div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Today's Visits</h3>
+        <div id="todaysVisitsList">
+          <p style="font-size: 0.9rem; color: var(--text-muted);">Loading visits...</p>
+        </div>
       </div>
     </div>
 
@@ -324,15 +309,7 @@
           });
         }
 
-        // Fetch Today's Attendance Status
-        const attRes = await fetch(window.API_CONFIG.BASE_URL + '/v2/attendance/today', {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-        const todayAttendance = attRes.ok ? await attRes.json() : null;
-        
-        if (todayAttendance && todayAttendance.status === 'Present' && !todayAttendance.checkOut?.time) {
-          updateUIBasedOnAttendance(todayAttendance);
-        }
+        loadTodaysVisits();
 
       } catch (err) {
         console.error(err);
@@ -340,34 +317,32 @@
       }
     }
 
-    function updateUIBasedOnAttendance(data) {
-      const statusBadge = document.getElementById('statusBadge');
-      const actionTitle = document.getElementById('actionTitle');
-      const projectSelect = document.getElementById('projectSelect');
-      const actionButtonsRow = document.getElementById('actionButtonsRow');
-      const videoContainer = document.getElementById('videoContainer');
-      const checkInBtn = document.getElementById('checkInBtn');
-      const checkOutSection = document.getElementById('checkOutSection');
+    async function loadTodaysVisits() {
+      const visitsList = document.getElementById('todaysVisitsList');
+      try {
+        const res = await fetch(window.API_CONFIG.BASE_URL + '/v2/site-visits/my-today', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const visits = res.ok ? await res.json() : [];
 
-      if (data.status === 'Present') {
-        statusBadge.textContent = 'Checked In';
-        statusBadge.className = 'status-badge status-present';
-        document.getElementById('checkInTime').textContent = new Date(data.checkIn.time).toLocaleTimeString();
-        document.getElementById('currentSite').textContent = data.project ? data.project.name : 'Unknown';
-
-        if (!data.checkOut || !data.checkOut.time) {
-          // Checked in, but not checked out
-          actionTitle.textContent = 'Check Out';
-          projectSelect.style.display = 'none';
-          if(actionButtonsRow) actionButtonsRow.style.display = 'none';
-          videoContainer.style.display = 'none';
-          checkInBtn.style.display = 'none';
-          checkOutSection.style.display = 'block';
-        } else {
-          // Checked out
-          statusBadge.textContent = 'Completed Day';
-          document.getElementById('actionCard').innerHTML = '<p style="text-align:center; color: var(--success); font-weight: 500;">You have completed your work for today.</p>';
+        if (visits.length === 0) {
+          visitsList.innerHTML = '<p style="font-size:0.9rem; color: var(--text-muted);">No visits logged today.</p>';
+          return;
         }
+
+        visitsList.innerHTML = visits.map(v => `
+          <div style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 0.5rem; background: rgba(255,255,255,0.02);">
+            <div style="display:flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <strong style="color: var(--primary);">${v.project ? v.project.name : 'Unknown Site'}</strong>
+              <span style="font-size: 0.85rem; color: var(--text-muted);">${new Date(v.time).toLocaleTimeString()}</span>
+            </div>
+            ${v.expenseAmount > 0 ? `<p style="font-size: 0.9rem; margin: 0 0 0.5rem 0; color: var(--warning);">Expense: ₹${v.expenseAmount} <span style="color:var(--text-muted); font-size:0.8rem;">(${v.expenseDescription})</span></p>` : ''}
+            <img src="${v.photoUrl}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 4px;">
+          </div>
+        `).join('');
+
+      } catch (err) {
+        visitsList.innerHTML = '<p style="font-size:0.9rem; color: var(--danger);">Error loading visits.</p>';
       }
     }
 
@@ -393,7 +368,6 @@
         video.srcObject = stream;
         document.getElementById('videoContainer').style.display = 'block';
         document.getElementById('actionButtonsRow').style.display = 'none';
-        document.getElementById('checkInBtn').style.display = 'block';
       } catch (err) {
         showMsg('Camera access denied. Please use Upload Photo.', true);
       }
@@ -402,61 +376,60 @@
     function handlePhotoUpload(event) {
       fetchLocation();
       const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        uploadedPhotoBase64 = e.target.result;
-        const preview = document.getElementById('previewImage');
-        preview.src = uploadedPhotoBase64;
-        preview.style.display = 'block';
-        
-        document.getElementById('videoContainer').style.display = 'block';
-        document.getElementById('videoElement').style.display = 'none';
-        document.getElementById('canvasElement').style.display = 'none';
-        
-        document.getElementById('actionButtonsRow').style.display = 'none';
-        document.getElementById('checkInBtn').style.display = 'block';
-      };
-      reader.readAsDataURL(file);
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          uploadedPhotoBase64 = e.target.result;
+          const preview = document.getElementById('previewImage');
+          preview.src = uploadedPhotoBase64;
+          preview.style.display = 'block';
+          
+          document.getElementById('videoContainer').style.display = 'block';
+          document.getElementById('videoElement').style.display = 'none';
+          document.getElementById('canvasElement').style.display = 'none';
+          document.getElementById('actionButtonsRow').style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+      }
     }
 
-    async function performCheckIn() {
+    async function submitSiteVisit() {
       const projectId = document.getElementById('projectSelect').value;
-      const selectElem = document.getElementById('projectSelect');
-      const projectName = selectElem.options[selectElem.selectedIndex]?.text;
+      const expenseAmount = document.getElementById('expenseAmount').value;
+      const expenseDesc = document.getElementById('expenseDesc').value;
 
-      if (!projectId) return showMsg('Please select a project.', true);
+      if (!projectId) return showMsg('Please select a project first.', true);
 
-      let selfieUrl = uploadedPhotoBase64;
-
-      if (!selfieUrl && stream) {
+      let photoUrl = uploadedPhotoBase64;
+      if (!photoUrl && stream) {
         const video = document.getElementById('videoElement');
         const canvas = document.getElementById('canvasElement');
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
-        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-        selfieUrl = canvas.toDataURL('image/jpeg', 0.7);
-        stream.getTracks().forEach(track => track.stop());
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        photoUrl = canvas.toDataURL('image/jpeg', 0.8);
       }
 
-      if (!selfieUrl) return showMsg('Please capture or upload a photo.', true);
+      if (!photoUrl) return showMsg('Please capture or upload a photo.', true);
 
-      document.getElementById('checkInBtn').disabled = true;
-      document.getElementById('checkInBtn').textContent = 'Saving...';
+      if (!locationData) {
+        showMsg('Acquiring location... Please wait a moment and try again.', true);
+        fetchLocation();
+        return;
+      }
 
       try {
-        // Construct API payload
         const payload = {
           projectId: projectId,
-          lat: locationData ? locationData.latitude : 19.0760, // Default to Mumbai
-          lng: locationData ? locationData.longitude : 72.8777,
-          accuracy: locationData ? locationData.accuracy : 0,
-          selfieUrl: selfieUrl,
-          deviceInfo: navigator.userAgent
+          lat: locationData.latitude,
+          lng: locationData.longitude,
+          accuracy: locationData.accuracy,
+          photoUrl: photoUrl,
+          expenseAmount: parseFloat(expenseAmount) || 0,
+          expenseDescription: expenseDesc
         };
 
-        const res = await fetch(window.API_CONFIG.BASE_URL + '/v2/attendance/check-in', {
+        const res = await fetch(window.API_CONFIG.BASE_URL + '/v2/site-visits/log', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -465,20 +438,29 @@
           body: JSON.stringify(payload)
         });
 
-        if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.msg || 'Check-in failed');
+        if (res.ok) {
+          showMsg('Site Visit logged successfully!');
+          // Reset form
+          document.getElementById('expenseAmount').value = '';
+          document.getElementById('expenseDesc').value = '';
+          document.getElementById('projectSelect').value = '';
+          uploadedPhotoBase64 = null;
+          document.getElementById('previewImage').style.display = 'none';
+          document.getElementById('actionButtonsRow').style.display = 'flex';
+          
+          if (stream) {
+            stream.getTracks().forEach(t => t.stop());
+            stream = null;
+            document.getElementById('videoContainer').style.display = 'none';
+          }
+          
+          loadTodaysVisits();
+        } else {
+          const data = await res.json();
+          showMsg(data.msg || 'Failed to log visit', true);
         }
-
-        const data = await res.json();
-        showMsg('Checked in successfully!');
-        updateUIBasedOnAttendance(data);
-
       } catch (err) {
-        console.error(err);
-        showMsg(err.message, true);
-        document.getElementById('checkInBtn').disabled = false;
-        document.getElementById('checkInBtn').textContent = 'Confirm & Check In';
+        showMsg('Network error. Please try again.', true);
       }
     }
 

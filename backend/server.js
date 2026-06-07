@@ -45,10 +45,14 @@ mongoose.connect(MONGODB_URI)
 
 // 1. New Moduler ERP APIs (v2)
 app.use('/api/v2/auth', require('./routes/auth'));
-app.use('/api/v2/attendance', require('./routes/attendance'));
 app.use('/api/v2/projects', require('./routes/projects'));
-app.use('/api/v2/admin', require('./routes/admin'));
+app.use('/api/v2/leads', require('./routes/leads'));
+app.use('/api/v2/attendance', require('./routes/attendance'));
 app.use('/api/v2/reports', require('./routes/reports'));
+app.use('/api/v2/admin', require('./routes/admin'));
+app.use('/api/v2/site-visits', require('./routes/siteVisits'));
+// Use v2 projects router for /api/projects as well so it uses the same bypass logic
+app.use('/api/projects', require('./routes/projects'));
 
 // 2. Main Site APIs
 app.use('/api/leads', require('./routes/leads'));

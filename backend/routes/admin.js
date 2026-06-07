@@ -4,21 +4,25 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Project = require('../models/Project');
 const Attendance = require('../models/Attendance');
+const SiteVisit = require('../models/SiteVisit');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 
-// Admin middleware (BYPASSED FOR LOGIN-FREE TESTING)
+// Admin middleware
 const authAdmin = async (req, res, next) => {
   try {
-    const admin = await User.findOne({ email: 'admin@osinterior.com' });
-    if (admin) {
-      req.user = { id: admin._id, role: admin.role };
-      next();
-    } else {
-      res.status(400).json({ msg: 'Admin not found. Please run seed script.' });
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.user.role !== 'Super Admin') {
+      return res.status(403).json({ msg: 'Access denied: Super Admin only' });
     }
+    
+    req.user = decoded.user;
+    next();
   } catch (e) {
-    res.status(500).json({ msg: 'Auth bypass error' });
+    res.status(401).json({ msg: 'Token is not valid' });
   }
 };
 
@@ -32,36 +36,76 @@ router.get('/stats', authAdmin, async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const employeesOnSite = await Attendance.countDocuments({
-      date: { $gte: today },
-      status: 'Present'
+    const siteVisitsToday = await SiteVisit.countDocuments({
+      time: { $gte: today }
     });
 
     res.json({
       totalProjects,
       activeProjects,
       totalEmployees,
-      employeesOnSite,
-      employeesAbsent: totalEmployees - employeesOnSite
+      siteVisitsToday
     });
   } catch (err) {
     res.status(500).send('Server error');
   }
 });
 
-// Get Live Tracking Data (Employees who checked in today)
-router.get('/live-tracking', authAdmin, async (req, res) => {
+// Get Site Visits Data (replaces live-tracking)
+router.get('/site-visits', authAdmin, async (req, res) => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const attendances = await Attendance.find({
-      date: { $gte: today },
-      status: 'Present'
+    const visits = await SiteVisit.find({
+      time: { $gte: today }
     }).populate('user', 'fullName profilePhoto').populate('project', 'name coordinates').lean();
 
-    res.json(attendances);
+    res.json(visits);
   } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
+
+// Get All Employees
+router.get('/employees', authAdmin, async (req, res) => {
+  try {
+    const employees = await User.find({ role: 'Employee' }).select('-password').lean();
+    res.json(employees);
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
+
+// Create Employee
+router.post('/employees', authAdmin, async (req, res) => {
+  const { fullName, email, password, mobileNumber, designation } = req.body;
+  try {
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ msg: 'User already exists' });
+    }
+
+    const salt = await require('bcryptjs').genSalt(10);
+    const hashedPassword = await require('bcryptjs').hash(password, salt);
+    
+    const count = await User.countDocuments();
+    const employeeId = 'EMP' + (count + 1).toString().padStart(3, '0');
+
+    user = new User({ 
+      employeeId, 
+      fullName, 
+      email, 
+      password: hashedPassword, 
+      mobileNumber,
+      designation: designation || 'Site Engineer',
+      role: 'Employee'
+    });
+
+    await user.save();
+    res.json({ msg: 'Employee created successfully', user: { id: user._id, fullName: user.fullName } });
+  } catch (err) {
+    console.error(err.message);
     res.status(500).send('Server error');
   }
 });

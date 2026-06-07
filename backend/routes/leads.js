@@ -1,20 +1,25 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 const Lead = require('../models/Lead');
 const User = require('../models/User');
 
-// Admin middleware (BYPASSED FOR LOGIN-FREE TESTING)
+// Admin middleware
 const authAdmin = async (req, res, next) => {
   try {
-    const admin = await User.findOne({ email: 'admin@osinterior.com' });
-    if (admin) {
-      req.user = { id: admin._id, role: admin.role };
-      next();
-    } else {
-      res.status(400).json({ msg: 'Admin not found. Please run seed script.' });
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.user.role !== 'Super Admin') {
+      return res.status(403).json({ msg: 'Access denied: Super Admin only' });
     }
+    
+    req.user = decoded.user;
+    next();
   } catch (e) {
-    res.status(500).json({ msg: 'Auth bypass error' });
+    res.status(401).json({ msg: 'Token is not valid' });
   }
 };
 

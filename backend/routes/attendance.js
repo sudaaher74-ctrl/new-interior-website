@@ -7,19 +7,17 @@ const User = require('../models/User');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 
-// Middleware to verify token (BYPASSED FOR LOGIN-FREE TESTING)
+// Middleware to verify token
 const auth = async (req, res, next) => {
   try {
-    // Automatically find the "Jane Smith" test employee and inject her ID
-    const user = await User.findOne({ email: 'employee@osinterior.com' });
-    if (user) {
-      req.user = { id: user._id, role: user.role };
-      next();
-    } else {
-      res.status(400).json({ msg: 'Test employee not found. Please run seed script.' });
-    }
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded.user;
+    next();
   } catch (e) {
-    res.status(500).json({ msg: 'Auth bypass error' });
+    res.status(401).json({ msg: 'Token is not valid' });
   }
 };
 
