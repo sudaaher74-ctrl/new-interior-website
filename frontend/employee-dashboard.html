@@ -371,15 +371,19 @@
       }
     }
 
-    // Attempt to get location automatically when interacting
+    // Attempt to get location automatically when interacting or on load
     function fetchLocation() {
       if(navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           pos => { locationData = pos.coords; },
-          err => { console.warn('Location access denied'); }
+          err => { console.warn('Location access denied'); },
+          { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
         );
       }
     }
+    
+    // Fetch location early
+    window.addEventListener('load', fetchLocation);
 
     async function startCamera() {
       fetchLocation();
