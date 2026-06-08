@@ -15,7 +15,7 @@ const authAdmin = async (req, res, next) => {
     if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
 
     if (token === 'dummy_admin_token') {
-      req.user = { id: 'admin123', role: 'Super Admin', fullName: 'Demo Admin' };
+      req.user = { id: '000000000000000000000000', role: 'Super Admin', fullName: 'Demo Admin' };
       return next();
     }
 
