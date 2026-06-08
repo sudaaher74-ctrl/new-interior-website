@@ -9,6 +9,7 @@ const User = require('../models/User'); // Need User model for bypass
 
 // Admin middleware
 const authAdmin = async (req, res, next) => {
+  console.log('authAdmin middleware called! path:', req.path);
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
@@ -32,6 +33,7 @@ const authAdmin = async (req, res, next) => {
 
 // Generic Auth middleware (for both employees and admins)
 const auth = async (req, res, next) => {
+  console.log('auth middleware called! path:', req.path);
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
@@ -50,7 +52,8 @@ const auth = async (req, res, next) => {
     req.user = decoded.user;
     next();
   } catch (e) {
-    res.status(401).json({ msg: 'Token is not valid' });
+    console.error('Auth middleware error:', e);
+    res.status(401).json({ msg: 'Token is not valid from PROJECTS.JS AUTH' });
   }
 };
 
@@ -67,6 +70,7 @@ router.post('/', authAdmin, async (req, res) => {
 
 // Get all projects
 router.get('/', auth, async (req, res) => {
+  console.log("GET / projects hit!", req.user);
   try {
     const projects = await Project.find().sort({ createdAt: -1 });
     res.json(projects);
