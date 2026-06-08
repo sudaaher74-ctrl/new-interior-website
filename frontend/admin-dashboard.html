@@ -435,12 +435,13 @@
             <tr>
               <th>Employee</th>
               <th>Site</th>
+              <th>Location</th>
               <th>Check-In Time</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody id="trackingTableBody">
-            <tr><td colspan="4" style="text-align:center">Loading data...</td></tr>
+            <tr><td colspan="5" style="text-align:center">Loading data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -674,13 +675,15 @@
           const trackBody = document.getElementById('trackingTableBody');
           trackBody.innerHTML = '';
           if (rawTrackingData.length === 0) {
-              trackBody.innerHTML = '<tr><td colspan="4" style="text-align:center">No site visits logged today.</td></tr>';
+              trackBody.innerHTML = '<tr><td colspan="5" style="text-align:center">No site visits logged today.</td></tr>';
           } else {
               rawTrackingData.forEach(t => {
+                  const locLink = (t.location && t.location.lat) ? `<a href="https://www.google.com/maps?q=${t.location.lat},${t.location.lng}" target="_blank" style="color:var(--primary);text-decoration:none;">View Map</a>` : 'N/A';
                   trackBody.innerHTML += `
                     <tr>
                       <td>${t.user ? t.user.fullName : 'Unknown'}</td>
                       <td>${t.project ? t.project.name : 'Unknown'}</td>
+                      <td>${locLink}</td>
                       <td>${new Date(t.time).toLocaleTimeString()}</td>
                       <td><span style="color: var(--success); font-weight: 500;">Logged</span></td>
                     </tr>
