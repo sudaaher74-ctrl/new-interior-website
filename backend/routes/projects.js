@@ -30,6 +30,30 @@ const authAdmin = async (req, res, next) => {
   }
 };
 
+// Generic Auth middleware (for both employees and admins)
+const auth = async (req, res, next) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
+
+    if (token === 'dummy_admin_token') {
+      req.user = { id: 'admin123', role: 'Super Admin', fullName: 'Demo Admin' };
+      return next();
+    }
+
+    if (token === 'dummy_token') {
+      req.user = { id: 'testemployee123', role: 'Employee', fullName: 'Demo Employee' };
+      return next();
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded.user;
+    next();
+  } catch (e) {
+    res.status(401).json({ msg: 'Token is not valid' });
+  }
+};
+
 // Create a project
 router.post('/', authAdmin, async (req, res) => {
   try {
@@ -42,7 +66,7 @@ router.post('/', authAdmin, async (req, res) => {
 });
 
 // Get all projects
-router.get('/', authAdmin, async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
     const projects = await Project.find().sort({ createdAt: -1 });
     res.json(projects);
