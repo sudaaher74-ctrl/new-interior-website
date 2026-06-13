@@ -61,22 +61,6 @@ const ProjectDetail = () => {
               {/* Tags */}
               <div id="detail-tags" style={{display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '48px'}}></div>
 
-              {/* Before/After */}
-              <div style={{marginBottom: '16px'}}>
-                <span className="label">Before & After</span>
-                <div className="gold-line"></div>
-              </div>
-              <div className="before-after">
-                <div className="before-after-item">
-                  <img id="detail-before" src="" alt="Before" loading="lazy" />
-                  <span className="ba-label">Before</span>
-                </div>
-                <div className="before-after-item">
-                  <img id="detail-after" src="" alt="After" loading="lazy" />
-                  <span className="ba-label">After</span>
-                </div>
-              </div>
-
               {/* Testimonial */}
               <div className="project-testimonial">
                 <blockquote id="detail-testimonial-text"></blockquote>

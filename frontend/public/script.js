@@ -444,8 +444,6 @@ function renderProjectDetail(project) {
   gallerySlideIndex = 0;
   renderGallerySlider();
 
-  document.getElementById('detail-before').src = project.beforeImg;
-  document.getElementById('detail-after').src = project.afterImg;
 
   document.getElementById('detail-testimonial-text').textContent = `"${project.testimonial.text}"`;
   document.getElementById('detail-testimonial-name').textContent = project.testimonial.name;
