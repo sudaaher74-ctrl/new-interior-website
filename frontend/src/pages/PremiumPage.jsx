@@ -13,9 +13,10 @@ const PremiumPage = () => {
         <header className={`${styles.header} ${styles.fadeInUp}`}>
           <div className={styles.logo}>Aura.</div>
           <nav className={styles.nav}>
-            <a href="#features" className={styles.navLink}>Features</a>
-            <a href="#showcase" className={styles.navLink}>Showcase</a>
-            <Link to="/" className={styles.navLink}>Back to Home</Link>
+            <Link to="/" className={styles.navLink}>Home</Link>
+            <Link to="/projects" className={styles.navLink}>Projects</Link>
+            <Link to="/contact" className={styles.navLink}>Quote</Link>
+            <Link to="/contact" className={styles.navLink}>Contacts</Link>
           </nav>
         </header>
 
