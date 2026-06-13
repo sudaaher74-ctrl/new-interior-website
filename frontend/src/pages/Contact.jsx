@@ -150,14 +150,7 @@ const Contact = () => {
       </div>
     </section>
 
-    <footer>
-      <div className="container">
-        <div className="footer-bottom" style={{paddingTop: '0', borderTop: 'none'}}>
-          <p>© 2024 OS Interiors Pvt. Ltd.</p>
-          <button className="btn-outline" >Back to Home</button>
-        </div>
-      </div>
-    </footer>
+    
 
   
     </main>

@@ -193,14 +193,7 @@ const About = () => {
       </div>
     </section>
 
-    <footer>
-      <div className="container">
-        <div className="footer-bottom" style={{paddingTop: '0', borderTop: 'none'}}>
-          <p>© 2024 OS Interiors Pvt. Ltd.</p>
-          <button className="btn-primary" >Book Consultation</button>
-        </div>
-      </div>
-    </footer>
+    
 
   
     </main>
