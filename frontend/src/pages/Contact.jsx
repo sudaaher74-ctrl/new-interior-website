@@ -9,7 +9,7 @@ const Contact = () => {
 
     <div className="page-hero" style={{paddingTop: '80px'}}>
       <div className="page-hero-bg"
-        style={{backgroundImage: `url('images/caravab1.jpeg')`}}></div>
+        style={{backgroundImage: `url('/images/caravab1.jpeg')`}}></div>
       <div className="page-hero-content">
         <span className="label">Get in Touch</span>
         <h1>Let's Create <em style={{color: 'var(--gold)', fontStyle: 'italic'}}>Something</em><br />Extraordinary</h1>

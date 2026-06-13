@@ -10,15 +10,15 @@ const DEFAULT_PROJECTS = [
     area: "4,200 sq ft", date: "March 2024",
     description: "A breathtaking sky-level corporate office  blending Mughal grandeur with contemporary minimalism. Gold-leaf ceiling panels, custom Italian marble floors, and bespoke handcrafted furniture define every corner of this masterpiece. The design philosophy centered on creating spaces that feel both intimate and grand — each room is a curated experience.",
     tags: ["Luxury", "Penthouse", "Contemporary"], views: 3842,
-    cover: "images/IMG_2695.JPG",
+    cover: "/images/IMG_2695.JPG",
     gallery: [
-      "images/IMG_2695.JPG",
-      "images/IMG_2697.JPG",
-      "images/IMG_2698.JPG",
-      "images/IMG_2706.JPG"
+      "/images/IMG_2695.JPG",
+      "/images/IMG_2697.JPG",
+      "/images/IMG_2698.JPG",
+      "/images/IMG_2706.JPG"
     ],
-    beforeImg: "images/IMG_2702.JPG",
-    afterImg: "images/IMG_2705.JPG",
+    beforeImg: "/images/IMG_2702.JPG",
+    afterImg: "/images/IMG_2705.JPG",
     testimonial: { name: "Rajiv Oberoi", role: "Homeowner", text: "OS Interiors transformed our vision into something beyond imagination. Every detail speaks of luxury and restraint — the perfect balance we had always dreamed of." }
   },
   {
@@ -27,15 +27,15 @@ const DEFAULT_PROJECTS = [
     area: "1200 sq ft", date: "January 2024",
     description: "A 180-person tech company headquarters designed for creativity and collaboration. Biophilic design elements, acoustic pods, focus zones, and an open atrium create a workplace that inspires innovation. The open floor plan encourages organic interaction while dedicated quiet zones maintain deep work capability.",
     tags: ["Corporate", "Tech", "Biophilic"], views: 2910,
-    cover: "images/juice1.jpeg",
+    cover: "/images/juice1.jpeg",
     gallery: [
-      "images/juice1.jpeg",
-      "images/juice2.jpeg",
-      "images/juice3.jpeg",
+      "/images/juice1.jpeg",
+      "/images/juice2.jpeg",
+      "/images/juice3.jpeg",
 
     ],
-    beforeImg: "images/juice1.jpeg",
-    afterImg: "images/juice2.jpeg",
+    beforeImg: "/images/juice1.jpeg",
+    afterImg: "/images/juice2.jpeg",
     testimonial: { name: "Shreya Kapoor", role: "COO, Nexus Technologies", text: "Our team productivity soared after the redesign. The space truly reflects our brand values and has become a powerful tool for talent acquisition." }
   },
   {
@@ -44,14 +44,14 @@ const DEFAULT_PROJECTS = [
     area: "6,800 sq ft", date: "November 2023",
     description: "Complete turnkey execution of a premium dining space in Mumbai from raw structure to grand opening in record time. Custom interiors, luxury finishes, ambient lighting design, smart kitchen integration, and signature themed décor inspired by the vibrant spirit of Mumbai. Every detail — from furniture and branding elements to guest experience and atmosphere — was managed by OS Interiors under one seamless contract, delivering a stress-free journey from concept to launch..",
     tags: ["Turnkey", "barbique", "Restoruent"], views: 4201,
-    cover: "images/bombayB1.jpeg",
+    cover: "/images/bombayB1.jpeg",
     gallery: [
-      "images/bombayB1.jpeg",
-      "images/bombayB2.jpeg",
+      "/images/bombayB1.jpeg",
+      "/images/bombayB2.jpeg",
 
     ],
-    beforeImg: "images/bombayB1.jpeg",
-    afterImg: "images/bombayB2.jpeg",
+    beforeImg: "/images/bombayB1.jpeg",
+    afterImg: "/images/bombayB2.jpeg",
     testimonial: { name: "Anand & Priya Shah", role: "Homeowners", text: "From empty plot to dream home in 90 days. OS Interiors' execution was flawless — we moved in and everything was perfect. Worth every rupee." }
   },
   {
@@ -60,14 +60,14 @@ const DEFAULT_PROJECTS = [
     area: "22,000 sq ft", date: "August 2023",
     description: "A 32-room boutique hotel redefined with tropical luxury. Each room tells a different story through custom art, handwoven textiles, and natural materials sourced from across India. The property achieved a 94% occupancy rate within six months of reopening.",
     tags: ["Hospitality", "Boutique", "Luxury"], views: 5130,
-    cover: "images/caravab1.jpeg",
+    cover: "/images/caravab1.jpeg",
     gallery: [
-      "images/caravab1.jpeg",
-      "images/carvan2.jpeg",
-      "images/carvan3.jpeg"
+      "/images/caravab1.jpeg",
+      "/images/carvan2.jpeg",
+      "/images/carvan3.jpeg"
     ],
-    beforeImg: "images/caravab1.jpeg",
-    afterImg: "images/carvan2.jpeg",
+    beforeImg: "/images/caravab1.jpeg",
+    afterImg: "/images/carvan2.jpeg",
     testimonial: { name: "Vikram Nair", role: "Owner, Meridian Hotels", text: "Our hotel went from 60% to 94% occupancy after the redesign. Guests specifically mention the design as a reason to return. Pure magic." }
   },
   {
@@ -76,13 +76,13 @@ const DEFAULT_PROJECTS = [
     area: "1500sq ft", date: "June 2023",
     description: "A multigenerational family home balancing traditional Indian aesthetics with modern comfort. Jali screens, terracotta accents, and courtyard-inspired spaces create warmth and identity. The home celebrates Indian craft without feeling nostalgic — it is deeply contemporary.",
     tags: ["corporate", "Traditional", "hotel"], views: 2340,
-    cover: "images/caffe.jpeg",
+    cover: "/images/caffe.jpeg",
     gallery: [
-      "images/caffe.jpeg",
-      "images/caffe.jpeg"
+      "/images/caffe.jpeg",
+      "/images/caffe.jpeg"
     ],
-    beforeImg: "images/caffe.jpeg",
-    afterImg: "images/caffe.jpeg",
+    beforeImg: "/images/caffe.jpeg",
+    afterImg: "/images/caffe.jpeg",
     testimonial: { name: "Sunita Arora", role: "Homeowner", text: "OS Interiors understood our culture, our family dynamics, and our aspirations. They created a home that truly feels like us — rooted yet modern." }
   },
   {
@@ -91,13 +91,13 @@ const DEFAULT_PROJECTS = [
     area: "35,000 sq ft", date: "February 2024",
     description: "A cutting-edge innovation center for 400+ employees featuring maker spaces, immersive collaboration rooms, a sky lounge, and sensory design zones that stimulate creative thinking. The project was completed in 14 weeks across three floors.",
     tags: ["Corporate", "Innovation", "Large Scale"], views: 3677,
-    cover: "images/BelapurC2.jpeg",
+    cover: "/images/BelapurC2.jpeg",
     gallery: [
-      "images/BelapurC2.jpeg",
-      "images/BelapurC3.jpeg"
+      "/images/BelapurC2.jpeg",
+      "/images/BelapurC3.jpeg"
     ],
-    beforeImg: "images/BelapurC2.jpeg",
-    afterImg: "images/BelapurC3.jpeg",
+    beforeImg: "/images/BelapurC2.jpeg",
+    afterImg: "/images/BelapurC3.jpeg",
     testimonial: { name: "Deepak Menon", role: "VP Real Estate, Cognizant", text: "The innovation lab has become a talent magnet. We've seen a measurable increase in patent filings since the redesign. World-class design, world-class results." }
   }
 ];
@@ -134,10 +134,10 @@ async function loadProjectsFromAPI() {
           description: p.description,
           tags: p.tags || [p.category],
           views: p.views || 0,
-          cover: p.cover || 'images/IMG_2695.JPG',
-          gallery: p.gallery || [p.cover || 'images/IMG_2695.JPG'],
-          beforeImg: p.beforeImg || p.cover || 'images/IMG_2695.JPG',
-          afterImg: p.afterImg || p.cover || 'images/IMG_2695.JPG',
+          cover: p.cover || '/images/IMG_2695.JPG',
+          gallery: p.gallery || [p.cover || '/images/IMG_2695.JPG'],
+          beforeImg: p.beforeImg || p.cover || '/images/IMG_2695.JPG',
+          afterImg: p.afterImg || p.cover || '/images/IMG_2695.JPG',
           testimonial: p.testimonial || { name: "Client", role: "Homeowner", text: "Exceptional work." }
         }));
         
@@ -234,10 +234,10 @@ function closeMobileMenu() {
 // ── HERO SLIDER ───────────────────────────────────────────────
 let heroSlideIndex = 0;
 const heroSlides = [
-  "images/IMG_2695.JPG",
-  "images/IMG_2696.JPG",
-  "images/IMG_2705.JPG",
-  "images/IMG_2706.JPG"
+  "/images/IMG_2695.JPG",
+  "/images/IMG_2696.JPG",
+  "/images/IMG_2705.JPG",
+  "/images/IMG_2706.JPG"
 ];
 
 function initHeroSlider() {
@@ -737,10 +737,10 @@ function handleAddProject(e) {
     area: document.getElementById('proj-area').value,
     description: document.getElementById('proj-description').value,
     tags: ['New'], views: 0, date: new Date().toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }),
-    cover: "images/IMG_2695.JPG",
-    gallery: ["images/IMG_2695.JPG"],
-    beforeImg: "images/IMG_2702.JPG",
-    afterImg: "images/IMG_2705.JPG",
+    cover: "/images/IMG_2695.JPG",
+    gallery: ["/images/IMG_2695.JPG"],
+    beforeImg: "/images/IMG_2702.JPG",
+    afterImg: "/images/IMG_2705.JPG",
     testimonial: { name: "Client", role: "Homeowner", text: "Exceptional work by the OS Interiors team." }
   };
   adminProjects.unshift(newProject);

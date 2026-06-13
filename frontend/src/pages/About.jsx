@@ -9,7 +9,7 @@ const About = () => {
 
     <div className="about-hero" style={{paddingTop: '80px'}}>
       <div className="about-hero-bg"
-        style={{backgroundImage: `url('images/IMG_2697.JPG')`}}></div>
+        style={{backgroundImage: `url('/images/IMG_2697.JPG')`}}></div>
       <div className="about-hero-content">
         <span className="label">About OS Interiors</span>
         <h1>A Decade of <em style={{color: 'var(--gold)', fontStyle: 'italic'}}>Excellence</em></h1>
@@ -20,7 +20,7 @@ const About = () => {
       <div className="container">
         <div className="about-story reveal">
           <div className="about-story-img">
-            <img src="images/IMG_2695.JPG" alt="OS Interiors Studio"
+            <img src="/images/IMG_2695.JPG" alt="OS Interiors Studio"
               loading="lazy" />
           </div>
           <div>

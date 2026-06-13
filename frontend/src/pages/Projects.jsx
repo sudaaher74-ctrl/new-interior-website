@@ -9,7 +9,7 @@ const Projects = () => {
 
     <div className="page-hero" style={{paddingTop: '80px'}} id="projects-page">
       <div className="page-hero-bg"
-        style={{backgroundImage: `url('images/bombayB1.jpeg')`}}></div>
+        style={{backgroundImage: `url('/images/bombayB1.jpeg')`}}></div>
       <div className="page-hero-content">
         <span className="label">Our Portfolio</span>
         <h1>200+ Projects of <em style={{color: 'var(--gold)', fontStyle: 'italic'}}>Pure Design</em></h1>

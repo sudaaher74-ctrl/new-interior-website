@@ -78,7 +78,7 @@ const Home = () => {
     <section style={{padding: '0'}}>
       <div className="services-grid">
         <div className="service-card" >
-          <img src="images/IMG_2696.JPG" alt="Residential Design" loading="lazy" />
+          <img src="/images/IMG_2696.JPG" alt="Residential Design" loading="lazy" />
           <div className="service-card-overlay">
             <span className="service-number">02</span>
             <h3>Residential</h3>
@@ -94,7 +94,7 @@ const Home = () => {
           </div>
         </div>
         <div className="service-card" >
-          <img src="images/IMG_2697.JPG" alt="Corporate Design" loading="lazy" />
+          <img src="/images/IMG_2697.JPG" alt="Corporate Design" loading="lazy" />
           <div className="service-card-overlay">
             <span className="service-number">02</span>
             <h3>Corporate</h3>
@@ -110,7 +110,7 @@ const Home = () => {
           </div>
         </div>
         <div className="service-card" >
-          <img src="images/IMG_2695.JPG" alt="Turnkey Projects" loading="lazy" />
+          <img src="/images/IMG_2695.JPG" alt="Turnkey Projects" loading="lazy" />
           <div className="service-card-overlay">
             <span className="service-number">03</span>
             <h3>Turnkey</h3>
@@ -250,7 +250,7 @@ const Home = () => {
 
     {/* CTA */}
     <section className="cta-section"
-      style={{backgroundImage: `url('images/IMG_2696.JPG')`}}>
+      style={{backgroundImage: `url('/images/IMG_2696.JPG')`}}>
       <div className="container reveal">
         <span className="label">Begin Your Journey</span>
         <h2>Ready to <em style={{fontStyle: 'italic', color: 'var(--gold)'}}>Transform</em> Your Space?</h2>
@@ -273,7 +273,7 @@ const Home = () => {
     {/* Gallery Preview */}
     <section style={{padding: '0'}}>
       <div className="gallery-grid">
-        <div className="gallery-item"><img src="images/IMG_2701.JPG" alt="Gallery" loading="lazy" />
+        <div className="gallery-item"><img src="/images/IMG_2701.JPG" alt="Gallery" loading="lazy" />
           <div className="gallery-item-overlay"><svg width="24" height="24" fill="none" stroke="white" strokeWidth="1.5"
               viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8" />
@@ -282,7 +282,7 @@ const Home = () => {
               <line x1="8" y1="11" x2="14" y2="11" />
             </svg></div>
         </div>
-        <div className="gallery-item"><img src="images/IMG_2698.JPG" alt="Gallery" loading="lazy" />
+        <div className="gallery-item"><img src="/images/IMG_2698.JPG" alt="Gallery" loading="lazy" />
           <div className="gallery-item-overlay"><svg width="24" height="24" fill="none" stroke="white" strokeWidth="1.5"
               viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8" />
@@ -291,7 +291,7 @@ const Home = () => {
               <line x1="8" y1="11" x2="14" y2="11" />
             </svg></div>
         </div>
-        <div className="gallery-item"><img src="images/IMG_2702.JPG" alt="Gallery" loading="lazy" />
+        <div className="gallery-item"><img src="/images/IMG_2702.JPG" alt="Gallery" loading="lazy" />
           <div className="gallery-item-overlay"><svg width="24" height="24" fill="none" stroke="white" strokeWidth="1.5"
               viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8" />
@@ -300,7 +300,7 @@ const Home = () => {
               <line x1="8" y1="11" x2="14" y2="11" />
             </svg></div>
         </div>
-        <div className="gallery-item"><img src="images/IMG_2705.JPG" alt="Gallery" loading="lazy" />
+        <div className="gallery-item"><img src="/images/IMG_2705.JPG" alt="Gallery" loading="lazy" />
           <div className="gallery-item-overlay"><svg width="24" height="24" fill="none" stroke="white" strokeWidth="1.5"
               viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8" />
@@ -309,7 +309,7 @@ const Home = () => {
               <line x1="8" y1="11" x2="14" y2="11" />
             </svg></div>
         </div>
-        <div className="gallery-item"><img src="images/IMG_2706.JPG" alt="Gallery" loading="lazy" />
+        <div className="gallery-item"><img src="/images/IMG_2706.JPG" alt="Gallery" loading="lazy" />
           <div className="gallery-item-overlay"><svg width="24" height="24" fill="none" stroke="white" strokeWidth="1.5"
               viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8" />
