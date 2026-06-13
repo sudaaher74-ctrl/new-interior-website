@@ -16,12 +16,20 @@
       "destination": "/backend/server.js"
     },
     {
-      "source": "/",
-      "destination": "/frontend/dist/index.html"
+      "source": "/assets/(.*)",
+      "destination": "/frontend/dist/assets/$1"
+    },
+    {
+      "source": "/images/(.*)",
+      "destination": "/frontend/dist/images/$1"
+    },
+    {
+      "source": "/(.*\.(?:js|css|svg|png|jpg|jpeg|gif|ico|txt|xml))",
+      "destination": "/frontend/dist/$1"
     },
     {
       "source": "/(.*)",
-      "destination": "/frontend/dist/$1"
+      "destination": "/frontend/dist/index.html"
     }
   ]
 }
