@@ -35,13 +35,13 @@ const ProjectDetail = () => {
                 <div className="project-gallery-controls">
                   <div className="project-gallery-dots" id="gallery-dots"></div>
                   <div style={{display: 'flex', gap: '8px'}}>
-                    <button className="btn-icon" style={{width: '40px', height: '40px'}}>
+                    <button className="btn-icon" onClick={() => window.slideGallery(-1)} style={{width: '40px', height: '40px'}}>
                       <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                         <line x1="19" y1="12" x2="5" y2="12" />
                         <polyline points="12 19 5 12 12 5" />
                       </svg>
                     </button>
-                    <button className="btn-icon" style={{width: '40px', height: '40px'}}>
+                    <button className="btn-icon" onClick={() => window.slideGallery(1)} style={{width: '40px', height: '40px'}}>
                       <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                         <line x1="5" y1="12" x2="19" y2="12" />
                         <polyline points="12 5 19 12 12 19" />

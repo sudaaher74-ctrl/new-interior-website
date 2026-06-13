@@ -17,14 +17,14 @@ const Home = () => {
           Navi mumbai
           penthouse to a corporate campus — every space, a masterpiece.</p>
         <div className="hero-actions">
-          <button className="btn-primary" >
+          <button className="btn-primary" onClick={() => navigate('/projects')}>
             View Our Work
             <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
               <line x1="5" y1="12" x2="19" y2="12" />
               <polyline points="12 5 19 12 12 19" />
             </svg>
           </button>
-          <button className="btn-outline" >Book Consultation</button>
+          <button className="btn-outline" onClick={() => navigate('/contact')}>Book Consultation</button>
         </div>
       </div>
       <div className="hero-counter container">
@@ -71,7 +71,7 @@ const Home = () => {
     {/* Services */}
     <section style={{padding: '0'}}>
       <div className="services-grid">
-        <div className="service-card" >
+        <div className="service-card" onClick={() => navigate('/projects')} style={{cursor: 'pointer'}}>
           <img src="/images/IMG_2696.JPG" alt="Residential Design" loading="lazy" />
           <div className="service-card-overlay">
             <span className="service-number">02</span>
@@ -87,7 +87,7 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <div className="service-card" >
+        <div className="service-card" onClick={() => navigate('/projects')} style={{cursor: 'pointer'}}>
           <img src="/images/IMG_2697.JPG" alt="Corporate Design" loading="lazy" />
           <div className="service-card-overlay">
             <span className="service-number">02</span>
@@ -103,7 +103,7 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <div className="service-card" >
+        <div className="service-card" onClick={() => navigate('/projects')} style={{cursor: 'pointer'}}>
           <img src="/images/IMG_2695.JPG" alt="Turnkey Projects" loading="lazy" />
           <div className="service-card-overlay">
             <span className="service-number">03</span>
@@ -141,7 +141,7 @@ const Home = () => {
         </div>
         <div className="projects-grid" id="featured-projects-grid"></div>
         <div style={{textAlign: 'center', marginTop: '56px'}}>
-          <button className="btn-outline" >
+          <button className="btn-outline" onClick={() => navigate('/projects')}>
             View All Projects
             <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
               <line x1="5" y1="12" x2="19" y2="12" />
@@ -200,13 +200,13 @@ const Home = () => {
         <div className="testimonials-wrapper reveal">
           <div className="testimonials-track" id="testimonials-track"></div>
           <div className="testimonial-controls">
-            <button className="btn-icon"  aria-label="Previous">
+            <button className="btn-icon" onClick={() => window.slideTestimonial(-1)} aria-label="Previous">
               <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                 <line x1="19" y1="12" x2="5" y2="12" />
                 <polyline points="12 19 5 12 12 5" />
               </svg>
             </button>
-            <button className="btn-icon"  aria-label="Next">
+            <button className="btn-icon" onClick={() => window.slideTestimonial(1)} aria-label="Next">
               <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                 <line x1="5" y1="12" x2="19" y2="12" />
                 <polyline points="12 5 19 12 12 19" />
@@ -252,7 +252,7 @@ const Home = () => {
         <p>Book a complimentary consultation with our senior design directors. We'll discuss your vision, timeline, and
           investment range — no obligation.</p>
         <div style={{display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap'}}>
-          <button className="btn-primary" >
+          <button className="btn-primary" onClick={() => navigate('/contact')}>
             Book Free Consultation
             <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
               <line x1="5" y1="12" x2="19" y2="12" />
