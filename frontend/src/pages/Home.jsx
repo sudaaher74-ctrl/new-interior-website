@@ -8,13 +8,7 @@ const Home = () => {
       
 
     {/* Hero */}
-    <section className="hero">
-      {/* Hero Video Background */}
-      <div className="hero-video-wrap">
-        <video autoPlay muted loop playsInline className="hero-video" id="hero-vid">
-          <source src="https://assets.mixkit.co/videos/preview/mixkit-luxury-home-interior-with-modern-lighting-42461-large.mp4" type="video/mp4" />
-        </video>
-      </div>
+    <section className="hero" id="hero">
       <div className="hero-slides" id="hero-slides"></div>
       <div className="hero-content container">
         <span className="label">Est. 2014 · Mumbai, India</span>

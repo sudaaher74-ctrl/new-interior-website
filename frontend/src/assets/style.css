@@ -335,7 +335,7 @@ section { padding: 120px 0; }
   transition: opacity 1.5s var(--transition-slow), transform 8s linear;
   transform: scale(1.05);
 }
-.hero-slide.active { opacity: 0.4; transform: scale(1); }
+.hero-slide.active { opacity: 1; transform: scale(1); }
 
 /* Hero Video Styles */
 .hero-video-wrap {
