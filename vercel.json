@@ -24,7 +24,7 @@
       "destination": "/frontend/dist/images/$1"
     },
     {
-      "source": "/(.*\.(?:js|css|svg|png|jpg|jpeg|gif|ico|txt|xml))",
+      "source": "/(.*\\.(?:js|css|svg|png|jpg|jpeg|gif|ico|txt|xml))",
       "destination": "/frontend/dist/$1"
     },
     {
