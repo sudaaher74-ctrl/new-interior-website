@@ -1,0 +1,277 @@
+.premiumWrapper {
+  /* Color Palette - Premium Dark Theme */
+  --bg-color: #0f172a; /* Slate 900 */
+  --surface-color: rgba(30, 41, 59, 0.6); /* Slate 800 with 60% opacity for glass */
+  --surface-border: rgba(255, 255, 255, 0.08);
+  
+  --text-primary: #f8fafc; /* Slate 50 */
+  --text-secondary: #94a3b8; /* Slate 400 */
+  
+  /* Vibrant Accents */
+  --accent-1: #6366f1; /* Indigo */
+  --accent-2: #a855f7; /* Purple */
+  --accent-3: #ec4899; /* Pink */
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%);
+  --gradient-hover: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-3) 100%);
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 4px 15px rgba(99, 102, 241, 0.3);
+  --shadow-glow-hover: 0 8px 25px rgba(99, 102, 241, 0.5);
+  
+  /* Animations */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Ambient Glow Effects */
+.bgGlow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  z-index: 0;
+  opacity: 0.4;
+  animation: pulseGlow 8s ease-in-out infinite alternate;
+}
+
+.bgGlow1 {
+  top: -10vw; left: -10vw;
+  width: 40vw; height: 40vw;
+  background: var(--accent-1);
+}
+
+.bgGlow2 {
+  bottom: -10vw; right: -10vw;
+  width: 50vw; height: 50vw;
+  background: var(--accent-2);
+  animation-delay: -4s;
+}
+
+@keyframes pulseGlow {
+  0% { transform: scale(1); opacity: 0.3; }
+  100% { transform: scale(1.2); opacity: 0.5; }
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Staggered Entry */
+.fadeInUp {
+  animation: fadeInUpAnim 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.delay1 { animation-delay: 0.1s; }
+.delay2 { animation-delay: 0.2s; }
+.delay3 { animation-delay: 0.3s; }
+
+@keyframes fadeInUpAnim {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5rem;
+}
+
+.logo {
+  font-size: 1.75rem;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -1px;
+}
+
+.nav {
+  display: flex;
+  gap: 2.5rem;
+}
+
+.navLink {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition-smooth);
+  position: relative;
+  padding: 10px 0;
+}
+
+.navLink:hover {
+  color: var(--text-primary);
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  bottom: 4px; left: 0;
+  width: 0%; height: 2px;
+  background: var(--gradient-primary);
+  transition: var(--transition-smooth);
+  border-radius: 2px;
+}
+
+.navLink:hover::after {
+  width: 100%;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: 6rem;
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -2px;
+}
+
+.heroSubtitle {
+  font-size: clamp(1.1rem, 2vw, 1.25rem);
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto 3rem auto;
+  line-height: 1.6;
+}
+
+/* Premium Button */
+.premiumButton {
+  padding: 16px 36px;
+  border-radius: 100px;
+  border: none;
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  background: var(--gradient-primary);
+  box-shadow: var(--shadow-glow);
+  transition: var(--transition-smooth);
+  position: relative;
+  z-index: 1;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.premiumButton::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  border-radius: 100px;
+  background: var(--gradient-hover);
+  opacity: 0;
+  transition: var(--transition-smooth);
+  z-index: -1;
+}
+
+@media (hover: hover) {
+  .premiumButton:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: var(--shadow-glow-hover);
+  }
+  .premiumButton:hover::before {
+    opacity: 1;
+  }
+}
+
+.premiumButton:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.2);
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+/* Glass Card */
+.glassCard {
+  background: var(--surface-color);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--surface-border);
+  border-radius: 24px;
+  padding: 2.5rem;
+  transition: var(--transition-smooth);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.glassCard::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -150%; width: 50%; height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.08), transparent);
+  transform: skewX(-20deg);
+  transition: 0.7s;
+}
+
+@media (hover: hover) {
+  .glassCard:hover {
+    transform: translateY(-8px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  }
+  .glassCard:hover::before {
+    left: 200%;
+  }
+}
+
+.cardIcon {
+  width: 56px; height: 56px;
+  border-radius: 16px;
+  background: rgba(99, 102, 241, 0.1);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1.5rem;
+  color: var(--accent-1);
+  font-size: 1.75rem;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  letter-spacing: -0.5px;
+}
+
+.cardText {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .container { padding: 1.5rem; }
+  .header { flex-direction: column; gap: 1.5rem; margin-bottom: 3rem; }
+  .nav { width: 100%; justify-content: center; gap: 1.5rem; }
+  .hero { margin-bottom: 4rem; }
+  .glassCard { padding: 2rem; }
+}

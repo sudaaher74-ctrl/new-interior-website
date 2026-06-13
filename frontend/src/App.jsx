@@ -10,6 +10,7 @@ import ProjectDetail from './pages/ProjectDetail';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import EmployeeDashboard from './pages/EmployeeDashboard';
+import PremiumPage from './pages/PremiumPage';
 
 import './assets/style.css';
 import './assets/admin.css';
@@ -71,6 +72,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/admin/*" element={<AdminDashboard />} />
           <Route path="/employee/*" element={<EmployeeDashboard />} />
+          <Route path="/premium" element={<PremiumPage />} />
           <Route path="*" element={
             <>
               <Navbar />
