@@ -20,7 +20,7 @@ const Layout = ({ children }) => {
 
   useEffect(() => {
     // Override vanilla navigateTo to use React Router
-    window.navigateTo = (pageId) => {
+    window.navigateTo = (pageId, data) => {
       const routes = {
         'page-home': '/',
         'page-about': '/about',
@@ -29,6 +29,13 @@ const Layout = ({ children }) => {
       };
       if (routes[pageId]) {
         navigate(routes[pageId]);
+      } else if (pageId === 'page-project-detail' && data) {
+        if (location.pathname !== `/projects/${data.id}`) {
+          navigate(`/projects/${data.id}`);
+        }
+        setTimeout(() => {
+          if (window.renderProjectDetail) window.renderProjectDetail(data);
+        }, 100);
       }
       if (window.closeMobileMenu) window.closeMobileMenu();
     };
@@ -44,7 +51,7 @@ const Layout = ({ children }) => {
       } else if (location.pathname === '/projects') {
         if (window.renderProjectsPage) window.renderProjectsPage();
       } else if (location.pathname.startsWith('/projects/')) {
-        if (window.openProject) window.openProject(location.pathname.split('/').pop());
+        if (window.openProject) window.openProject(Number(location.pathname.split('/').pop()));
       } else if (location.pathname === '/admin') {
         if (window.initAdminDashboard) window.initAdminDashboard();
       } else if (location.pathname === '/employee') {
