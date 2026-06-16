@@ -1,82 +1,142 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styles from './EmployeeDashboard.module.css';
 
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
+  const [currentDate, setCurrentDate] = useState('');
+
+  useEffect(() => {
+    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    setCurrentDate(new Date().toLocaleDateString(undefined, dateOptions));
+  }, []);
+
   return (
-    <>
-      
+    <div className={styles.portalWrapper}>
+      {/* Ambient Glow Effects */}
+      <div className={`${styles.bgGlow} ${styles.bgGlow1}`}></div>
+      <div className={`${styles.bgGlow} ${styles.bgGlow2}`}></div>
 
-  <nav className="navbar">
-    <div className="nav-brand">OS Interior</div>
-    <div className="nav-profile">
-      <span id="userName">Loading...</span>
-      <button className="logout-btn" >Logout</button>
+      <div className={styles.layout}>
+        {/* Sidebar */}
+        <aside className={styles.sidebar}>
+          <div className={styles.brand}>OS Portal.</div>
+          
+          <nav className={styles.navMenu}>
+            <button className={`${styles.navItem} ${styles.active}`}>
+              <span>📊</span> Dashboard
+            </button>
+            <button className={styles.navItem}>
+              <span>📸</span> Site Photos
+            </button>
+            <button className={styles.navItem}>
+              <span>📝</span> Daily Reports
+            </button>
+            <button className={styles.navItem}>
+              <span>💰</span> Expenses
+            </button>
+          </nav>
+
+          <div className={styles.userProfile}>
+            <div className={styles.avatar}>JD</div>
+            <div className={styles.userInfo}>
+              <span className={styles.userName} id="userName">Loading...</span>
+              <span className={styles.userRole}>Site Engineer</span>
+            </div>
+            <button className={styles.logoutBtn} title="Logout" onClick={() => navigate('/login')}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </button>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className={styles.mainContent}>
+          <header className={styles.header}>
+            <h1 className={styles.pageTitle}>Overview</h1>
+            <div className={styles.dateDisplay}>{currentDate}</div>
+          </header>
+
+          <div className={styles.dashboardGrid}>
+            {/* Left Column */}
+            <div className={styles.leftCol}>
+              <div className={`${styles.glassCard} ${styles.delay1}`}>
+                <h2 className={styles.cardTitle}><span>📍</span> Log Site Visit & Expenses</h2>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
+                  Select your assigned project, capture site progress photos, and record any travel expenses incurred today.
+                </p>
+
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>Assigned Project</label>
+                  <select id="projectSelect" className={styles.select}>
+                    <option value="">Select a project...</option>
+                    {/* Will be populated dynamically */}
+                  </select>
+                </div>
+
+                <div className={styles.cameraArea} id="videoContainer">
+                  <div className={styles.cameraIcon}>📷</div>
+                  <span>Click "Open Camera" to capture</span>
+                  <video id="videoElement" autoPlay playsInline style={{display: 'none', position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', borderRadius: '14px'}}></video>
+                  <canvas id="canvasElement" style={{display: 'none'}}></canvas>
+                  <img id="previewImage" style={{display: 'none', position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', borderRadius: '14px'}} alt="Site Preview" />
+                </div>
+
+                <div className={styles.actionRow} id="actionButtonsRow">
+                  <button id="startCamBtn" className={`${styles.btn} ${styles.btnSecondary}`}>📸 Open Camera</button>
+                  <button id="uploadPhotoBtn" className={`${styles.btn} ${styles.btnSecondary}`}>📁 Upload Photo</button>
+                  <input type="file" id="photoInput" accept="image/*" capture="environment" style={{display: 'none'}} />
+                </div>
+
+                <div className={styles.inputGroup} id="expenseSection">
+                  <label className={styles.label}>Travel Expense</label>
+                  <input type="number" id="expenseAmount" className={styles.input} placeholder="Amount (₹)" style={{marginBottom: '0.75rem'}} />
+                  <input type="text" id="expenseDesc" className={styles.input} placeholder="Description (e.g., Train Panvel to CST)" />
+                </div>
+
+                <button id="submitVisitBtn" className={`${styles.btn} ${styles.btnPrimary}`}>Submit Visit Report</button>
+                <div id="actionMsg" style={{marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--accent-1)'}}></div>
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className={styles.rightCol}>
+              <div className={`${styles.actionGrid} ${styles.delay2}`}>
+                <div className={styles.actionCard}>
+                  <div className={styles.actionIcon}>📁</div>
+                  <div className={styles.actionLabel}>Upload Docs</div>
+                </div>
+                <div className={styles.actionCard}>
+                  <div className={styles.actionIcon}>✍️</div>
+                  <div className={styles.actionLabel}>Draft Report</div>
+                </div>
+              </div>
+
+              <div className={`${styles.glassCard} ${styles.delay3}`} style={{marginBottom: '2rem'}}>
+                <h3 className={styles.cardTitle}><span>🕒</span> Today's Visits</h3>
+                <div id="todaysVisitsList" className={styles.list}>
+                  <div className={styles.listItem}>
+                    <div className={styles.itemInfo}>
+                      <span className={styles.itemTitle}>Loading visits...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className={`${styles.glassCard} ${styles.delay3}`}>
+                <h3 className={styles.cardTitle}><span>📋</span> Active Assignments</h3>
+                <div id="assignedProjectsList" className={styles.list}>
+                  <div className={styles.listItem}>
+                    <div className={styles.itemInfo}>
+                      <span className={styles.itemTitle}>Loading projects...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
-  </nav>
-
-  <div className="container">
-    <div className="main-content">
-      <div className="card">
-        <div className="card-title">
-          Log Site Visit & Expenses
-        </div>
-        <p style={{color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem'}}>
-          Select your site, capture a photo, and enter any travel expenses incurred.
-        </p>
-        
-        <select id="projectSelect" style={{width: '100%', padding: '0.75rem', marginBottom: '1rem', borderRadius: '8px', border: '1px solid var(--border-color)'}}>
-          <option value="">Select Assigned Project</option>
-          {/* Will be populated dynamically */}
-        </select>
-
-        <div id="videoContainer">
-          <video id="videoElement" autoPlay playsInline></video>
-          <canvas id="canvasElement"></canvas>
-          <img id="previewImage" style={{display: 'none', width: '100%', borderRadius: '8px', marginTop: '1rem'}} />
-        </div>
-        
-        <div style={{display: 'flex', gap: '0.5rem', marginBottom: '1rem'}} id="actionButtonsRow">
-          <button id="startCamBtn" className="btn btn-secondary" style={{flex: '1'}} >Open Camera</button>
-          <button id="uploadPhotoBtn" className="btn btn-secondary" style={{flex: '1'}} >Upload Photo</button>
-          <input type="file" id="photoInput" accept="image/*" capture="environment" style={{display: 'none'}}  />
-        </div>
-        
-        <div id="expenseSection" style={{marginBottom: '1rem'}}>
-          <input type="number" id="expenseAmount" placeholder="Travel Expense Amount (₹)" style={{width: '100%', padding: '0.75rem', marginBottom: '0.5rem', borderRadius: '8px', border: '1px solid var(--border-color)'}} />
-          <input type="text" id="expenseDesc" placeholder="Expense Description (e.g., Train Panvel to CST)" style={{width: '100%', padding: '0.75rem', marginBottom: '0.5rem', borderRadius: '8px', border: '1px solid var(--border-color)'}} />
-        </div>
-
-        <button id="submitVisitBtn" className="btn btn-primary" style={{width: '100%', marginBottom: '1rem'}} >Submit Visit</button>
-
-        <div id="actionMsg" className="msg-box"></div>
-      </div>
-
-      <div className="card">
-        <h3 className="card-title">Today's Visits</h3>
-        <div id="todaysVisitsList">
-          <p style={{fontSize: '0.9rem', color: 'var(--text-muted)'}}>Loading visits...</p>
-        </div>
-      </div>
-    </div>
-
-    <div className="sidebar">
-      <div className="card">
-        <h3 className="card-title">Quick Actions</h3>
-        <button className="btn btn-secondary" style={{marginBottom: '0.5rem'}}>Upload Site Photos</button>
-        <button className="btn btn-secondary">Submit Daily Report</button>
-      </div>
-      <div className="card">
-        <h3 className="card-title">Assigned Projects</h3>
-        <div id="assignedProjectsList">
-          <p style={{fontSize: '0.9rem', color: 'var(--text-muted)'}}>Loading projects...</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  
-    </>
   );
 };
 
