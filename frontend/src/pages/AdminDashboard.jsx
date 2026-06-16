@@ -1,12 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const [siteVisits, setSiteVisits] = useState([]);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+
+  const API_URL = window.API_CONFIG?.BASE_URL || '/api';
+
+  useEffect(() => {
+    const fetchVisits = async () => {
+      try {
+        const token = localStorage.getItem('token') || 'dummy_token';
+        const res = await axios.get(`${API_URL}/v2/site-visits/all`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSiteVisits(res.data);
+      } catch (err) {
+        console.error("Failed to fetch site visits", err);
+      }
+    };
+    fetchVisits();
+    const interval = setInterval(fetchVisits, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
-      
-
   <aside className="sidebar">
     <div className="brand">OS Interior</div>
     <ul className="nav-links">
@@ -50,7 +71,6 @@ const AdminDashboard = () => {
       <div className="table-container">
         <div className="table-header">
           <h2>Live Employee Tracking</h2>
-          <button className="btn" >View Map Fullscreen</button>
         </div>
         <table>
           <thead>
@@ -59,11 +79,44 @@ const AdminDashboard = () => {
               <th>Site</th>
               <th>Location</th>
               <th>Check-In Time</th>
-              <th>Status</th>
+              <th>Photo</th>
             </tr>
           </thead>
           <tbody id="trackingTableBody">
-            <tr><td colspan="5" style={{textAlign: 'center'}}>Loading data...</td></tr>
+            {siteVisits.length === 0 ? (
+              <tr><td colSpan="5" style={{textAlign: 'center'}}>Loading data or no visits logged yet...</td></tr>
+            ) : (
+              siteVisits.map((visit) => (
+                <tr key={visit._id}>
+                  <td style={{fontWeight: '500'}}>{visit.user?.fullName || 'Unknown User'}</td>
+                  <td>{visit.project?.name || visit.project?.title || 'Unknown Project'}</td>
+                  <td>
+                    {visit.location?.lat ? (
+                      <a 
+                        href={`https://www.google.com/maps?q=${visit.location.lat},${visit.location.lng}`} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        style={{color: 'var(--primary)', textDecoration: 'underline'}}
+                      >
+                        📍 View Map
+                      </a>
+                    ) : 'No GPS Data'}
+                  </td>
+                  <td>{new Date(visit.time).toLocaleString()}</td>
+                  <td>
+                    {visit.photoUrl ? (
+                      <button 
+                        onClick={() => setSelectedPhoto(visit.photoUrl)} 
+                        className="btn btn-secondary"
+                        style={{padding: '0.25rem 0.5rem', fontSize: '0.8rem'}}
+                      >
+                        📸 View Selfie
+                      </button>
+                    ) : 'No Photo'}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -82,7 +135,7 @@ const AdminDashboard = () => {
             </tr>
           </thead>
           <tbody id="projectsTableBody">
-            <tr><td colspan="3" style={{textAlign: 'center'}}>Loading data...</td></tr>
+            <tr><td colSpan="3" style={{textAlign: 'center'}}>Loading data...</td></tr>
           </tbody>
         </table>
         </div>
@@ -93,9 +146,11 @@ const AdminDashboard = () => {
         <div className="table-container">
           <div className="table-header">
             <h2>Employee Photo Locations Map</h2>
-            <p style={{color: 'var(--text-muted)', fontSize: '0.9rem'}}>Click on any marker to view employee check-in selfie and details.</p>
+            <p style={{color: 'var(--text-muted)', fontSize: '0.9rem'}}>All map views are linked directly on the dashboard table.</p>
           </div>
-          <div id="map" style={{height: '500px', borderRadius: '8px', border: '1px solid var(--border-color)', zIndex: '1'}}></div>
+          <div id="map" style={{height: '500px', borderRadius: '8px', border: '1px solid var(--border-color)', zIndex: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fa'}}>
+            <p style={{color: 'var(--text-muted)'}}>Map plugin placeholder. Click "View Map" in the Live Tracking table to open coordinates in Google Maps.</p>
+          </div>
         </div>
       </div>
 
@@ -117,7 +172,7 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody id="leadsTableBody">
-              <tr><td colspan="6" style={{textAlign: 'center'}}>Loading leads...</td></tr>
+              <tr><td colSpan="6" style={{textAlign: 'center'}}>Loading leads...</td></tr>
             </tbody>
           </table>
         </div>
@@ -141,7 +196,7 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody id="adminProjectsTableBody">
-              <tr><td colspan="6" style={{textAlign: 'center'}}>Loading projects...</td></tr>
+              <tr><td colSpan="6" style={{textAlign: 'center'}}>Loading projects...</td></tr>
             </tbody>
           </table>
         </div>
@@ -164,7 +219,7 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody id="employeesTableBody">
-              <tr><td colspan="4" style={{textAlign: 'center'}}>Loading employees...</td></tr>
+              <tr><td colSpan="4" style={{textAlign: 'center'}}>Loading employees...</td></tr>
             </tbody>
           </table>
         </div>
@@ -172,6 +227,17 @@ const AdminDashboard = () => {
 
     </div>
   </main>
+
+  {/* Photo Preview Modal */}
+  {selectedPhoto && (
+    <div className="modal" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.8)'}}>
+      <div className="modal-content" style={{maxWidth: '600px', padding: '1rem', background: '#fff', borderRadius: '8px', position: 'relative'}}>
+        <span className="close-btn" style={{position: 'absolute', top: '10px', right: '15px', fontSize: '1.5rem', cursor: 'pointer'}} onClick={() => setSelectedPhoto(null)}>&times;</span>
+        <h3 style={{marginBottom: '1rem'}}>Employee Check-in Selfie</h3>
+        <img src={selectedPhoto} alt="Employee Verification" style={{width: '100%', borderRadius: '8px', objectFit: 'contain', maxHeight: '70vh'}} />
+      </div>
+    </div>
+  )}
 
   {/* Add Employee Modal */}
   <div id="addEmployeeModal" className="modal">
@@ -212,8 +278,6 @@ const AdminDashboard = () => {
       <div id="empModalContent" style={{marginTop: '1rem', fontSize: '0.95rem'}}></div>
     </div>
   </div>
-
-  {/* Map Modal Removed (Moved to Live Tracking Tab) */}
 
   {/* Edit Project Modal */}
   <div id="editProjectModal" className="modal">

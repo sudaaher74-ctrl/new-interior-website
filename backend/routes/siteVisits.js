@@ -64,4 +64,20 @@ router.get('/my-today', auth, async (req, res) => {
   }
 });
 
+// Get all site visits for Admin Live Tracking
+router.get('/all', auth, async (req, res) => {
+  try {
+    const visits = await SiteVisit.find()
+      .populate('user', 'fullName role')
+      .populate('project', 'name title')
+      .sort({ time: -1 })
+      .lean();
+
+    res.json(visits);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
 module.exports = router;
