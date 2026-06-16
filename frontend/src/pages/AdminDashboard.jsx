@@ -1,330 +1,347 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import styles from './AdminDashboard.module.css';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('dashboard');
+  
+  // Data States
+  const [stats, setStats] = useState({ totalProjects: '-', activeProjects: '-', totalEmployees: '-', siteVisitsToday: '-' });
   const [siteVisits, setSiteVisits] = useState([]);
+  const [leads, setLeads] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  
+  // UI States
+  const [currentDate, setCurrentDate] = useState('');
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
   const API_URL = window.API_CONFIG?.BASE_URL || '/api';
 
   useEffect(() => {
-    const fetchVisits = async () => {
-      try {
-        const token = localStorage.getItem('token') || 'dummy_token';
-        const res = await axios.get(`${API_URL}/v2/site-visits/all`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setSiteVisits(res.data);
-      } catch (err) {
-        console.error("Failed to fetch site visits", err);
-      }
-    };
-    fetchVisits();
-    const interval = setInterval(fetchVisits, 30000);
+    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    setCurrentDate(new Date().toLocaleDateString(undefined, dateOptions));
+    
+    const token = localStorage.getItem('token');
+    if (!token) {
+      localStorage.setItem('token', 'dummy_admin_token'); 
+    }
+
+    fetchAllData();
+    const interval = setInterval(fetchAllData, 30000);
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <>
-  <aside className="sidebar">
-    <div className="brand">OS Interior</div>
-    <ul className="nav-links">
-      <li><a href="#" className="active" >Dashboard</a></li>
-      <li><a href="#" >Live Tracking</a></li>
-      <li><a href="#" >Leads</a></li>
-      <li><a href="#" >Projects</a></li>
-      <li><a href="#" >Employees</a></li>
-    </ul>
-  </aside>
-
-  <main className="main-content">
-    <header className="topbar">
-      <h2>Welcome, Admin</h2>
-      <button className="logout-btn" >Logout</button>
-    </header>
-
-    <div className="dashboard-container">
+  const fetchAllData = async () => {
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
       
-      {/* DASHBOARD TAB */}
-      <div id="panel-dashboard" className="tab-panel active">
-        <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-title">Total Projects</div>
-          <div className="stat-value" id="statProjects">-</div>
+      // 1. Stats
+      try {
+        const resStats = await axios.get(`${API_URL}/v2/admin/stats`, { headers });
+        setStats(resStats.data);
+      } catch(e) {}
+
+      // 2. Live Tracking (Site Visits)
+      try {
+        const resVisits = await axios.get(`${API_URL}/v2/site-visits/all`, { headers });
+        setSiteVisits(resVisits.data);
+      } catch(e) {}
+
+      // 3. Leads
+      try {
+        const resLeads = await axios.get(`${API_URL}/v2/leads`, { headers });
+        setLeads(resLeads.data);
+      } catch(e) {
+        // Fallback for leads if v2 doesn't exist
+        try {
+          const resLeadsOld = await axios.get(`${API_URL}/leads`, { headers });
+          setLeads(resLeadsOld.data);
+        } catch(e2) {}
+      }
+
+      // 4. Projects
+      try {
+        const resProjects = await axios.get(`${API_URL}/v2/projects`, { headers });
+        setProjects(resProjects.data);
+      } catch(e) {}
+
+      // 5. Employees
+      try {
+        const resEmployees = await axios.get(`${API_URL}/v2/admin/employees`, { headers });
+        setEmployees(resEmployees.data);
+      } catch(e) {}
+      
+    } catch (error) {
+      console.error("Fetch data error:", error);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
+
+  const renderDashboardTab = () => (
+    <div className={`${styles.fadeInUp} ${styles.delay1}`}>
+      <div className={styles.statsGrid}>
+        <div className={styles.glassCard}>
+          <div className={styles.cardTitle}>Total Projects</div>
+          <div className={styles.statValue}>{stats.totalProjects}</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-title">Active Projects</div>
-          <div className="stat-value" id="statActiveProjects">-</div>
+        <div className={styles.glassCard}>
+          <div className={styles.cardTitle}>Active Projects</div>
+          <div className={styles.statValue}>{stats.activeProjects}</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-title">On Site Today</div>
-          <div className="stat-value" id="statOnSite">-</div>
+        <div className={styles.glassCard}>
+          <div className={styles.cardTitle}>Site Visits Today</div>
+          <div className={styles.statValue}>{stats.siteVisitsToday}</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-title">Absent Today</div>
-          <div className="stat-value" style={{color: 'var(--danger)'}} id="statAbsent">-</div>
+        <div className={styles.glassCard}>
+          <div className={styles.cardTitle}>Total Employees</div>
+          <div className={styles.statValue}>{stats.totalEmployees}</div>
         </div>
       </div>
 
-      <div className="table-container">
-        <div className="table-header">
-          <h2>Live Employee Tracking</h2>
+      <div className={styles.tableContainer}>
+        <div className={styles.tableHeader}>
+          <h2 className={styles.pageTitle} style={{fontSize: '1.5rem'}}>Recent Site Activity</h2>
         </div>
-        <table>
+        <table className={styles.table}>
           <thead>
             <tr>
               <th>Employee</th>
               <th>Site</th>
-              <th>Location</th>
               <th>Check-In Time</th>
               <th>Photo</th>
             </tr>
           </thead>
-          <tbody id="trackingTableBody">
-            {siteVisits.length === 0 ? (
-              <tr><td colSpan="5" style={{textAlign: 'center'}}>Loading data or no visits logged yet...</td></tr>
-            ) : (
-              siteVisits.map((visit) => (
-                <tr key={visit._id}>
-                  <td style={{fontWeight: '500'}}>{visit.user?.fullName || 'Unknown User'}</td>
-                  <td>{visit.project?.name || visit.project?.title || 'Unknown Project'}</td>
-                  <td>
-                    {visit.location?.lat ? (
-                      <a 
-                        href={`https://www.google.com/maps?q=${visit.location.lat},${visit.location.lng}`} 
-                        target="_blank" 
-                        rel="noreferrer"
-                        style={{color: 'var(--primary)', textDecoration: 'underline'}}
-                      >
-                        📍 View Map
-                      </a>
-                    ) : 'No GPS Data'}
-                  </td>
-                  <td>{new Date(visit.time).toLocaleString()}</td>
-                  <td>
-                    {visit.photoUrl ? (
-                      <button 
-                        onClick={() => setSelectedPhoto(visit.photoUrl)} 
-                        className="btn btn-secondary"
-                        style={{padding: '0.25rem 0.5rem', fontSize: '0.8rem'}}
-                      >
-                        📸 View Selfie
-                      </button>
-                    ) : 'No Photo'}
-                  </td>
-                </tr>
-              ))
+          <tbody>
+            {siteVisits.slice(0, 5).map((visit) => (
+              <tr key={visit._id}>
+                <td style={{fontWeight: '500'}}>{visit.user?.fullName || 'Unknown User'}</td>
+                <td>{visit.project?.name || visit.project?.title || 'Unknown'}</td>
+                <td>{new Date(visit.time).toLocaleString()}</td>
+                <td>
+                  {visit.photoUrl ? (
+                    <button onClick={() => setSelectedPhoto(visit.photoUrl)} className={`${styles.btn} ${styles.btnSecondary}`} style={{padding: '0.25rem 0.5rem', fontSize: '0.8rem'}}>📸 View</button>
+                  ) : '-'}
+                </td>
+              </tr>
+            ))}
+            {siteVisits.length === 0 && (
+              <tr><td colSpan="4" style={{textAlign: 'center', padding: '2rem'}}>No recent activity.</td></tr>
             )}
           </tbody>
         </table>
       </div>
-      
-      <div className="table-container">
-        <div className="table-header">
-          <h2>Active Projects</h2>
-          <button className="btn">Add Project</button>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Client</th>
-              <th>Status</th>
+    </div>
+  );
+
+  const renderTrackingTab = () => (
+    <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
+      <div className={styles.tableHeader}>
+        <h2 className={styles.pageTitle} style={{fontSize: '1.5rem'}}>Live Tracking Map Data</h2>
+      </div>
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Site</th>
+            <th>Location</th>
+            <th>Check-In Time</th>
+            <th>Snapshot</th>
+          </tr>
+        </thead>
+        <tbody>
+          {siteVisits.map((visit) => (
+            <tr key={visit._id}>
+              <td style={{fontWeight: '500'}}>{visit.user?.fullName || 'Unknown User'}</td>
+              <td>{visit.project?.name || visit.project?.title || 'Unknown Project'}</td>
+              <td>
+                {visit.location?.lat ? (
+                  <a href={`https://www.google.com/maps?q=${visit.location.lat},${visit.location.lng}`} target="_blank" rel="noreferrer" style={{color: 'var(--accent-1)', textDecoration: 'underline'}}>
+                    📍 Open Maps
+                  </a>
+                ) : 'No GPS'}
+              </td>
+              <td>{new Date(visit.time).toLocaleString()}</td>
+              <td>
+                {visit.photoUrl ? (
+                  <button onClick={() => setSelectedPhoto(visit.photoUrl)} className={`${styles.btn} ${styles.btnSecondary}`} style={{padding: '0.25rem 0.5rem', fontSize: '0.8rem'}}>📸 View Selfie</button>
+                ) : 'No Photo'}
+              </td>
             </tr>
-          </thead>
-          <tbody id="projectsTableBody">
-            <tr><td colSpan="3" style={{textAlign: 'center'}}>Loading data...</td></tr>
-          </tbody>
-        </table>
-        </div>
-      </div> {/* End Dashboard Tab */}
+          ))}
+          {siteVisits.length === 0 && (
+            <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>No tracking data available.</td></tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
 
-      {/* LIVE TRACKING TAB */}
-      <div id="panel-tracking" className="tab-panel">
-        <div className="table-container">
-          <div className="table-header">
-            <h2>Employee Photo Locations Map</h2>
-            <p style={{color: 'var(--text-muted)', fontSize: '0.9rem'}}>All map views are linked directly on the dashboard table.</p>
+  const renderLeadsTab = () => (
+    <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
+      <div className={styles.tableHeader}>
+        <h2 className={styles.pageTitle} style={{fontSize: '1.5rem'}}>Lead Generation</h2>
+      </div>
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Project Type</th>
+            <th>Message</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {leads.map((lead) => (
+            <tr key={lead._id}>
+              <td style={{fontWeight: '500'}}>{lead.name}</td>
+              <td>{lead.contact || lead.email || lead.phone}</td>
+              <td>{lead.projectType || lead.serviceRequested || '-'}</td>
+              <td style={{maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{lead.message}</td>
+              <td>{new Date(lead.createdAt).toLocaleDateString()}</td>
+              <td><span className={styles.badge} style={{background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6'}}>{lead.status || 'New'}</span></td>
+            </tr>
+          ))}
+          {leads.length === 0 && (
+            <tr><td colSpan="6" style={{textAlign: 'center', padding: '2rem'}}>No leads found.</td></tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const renderProjectsTab = () => (
+    <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
+      <div className={styles.tableHeader}>
+        <h2 className={styles.pageTitle} style={{fontSize: '1.5rem'}}>Projects Management</h2>
+        <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.5rem 1rem'}}>+ Add Project</button>
+      </div>
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Location</th>
+            <th>Budget</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {projects.map((proj) => (
+            <tr key={proj._id}>
+              <td style={{fontWeight: '500'}}>{proj.title || proj.name}</td>
+              <td>{proj.category || proj.type || '-'}</td>
+              <td>{proj.location || '-'}</td>
+              <td>{proj.budget ? `₹${proj.budget}` : '-'}</td>
+              <td><span className={styles.badge}>{proj.status || 'Active'}</span></td>
+            </tr>
+          ))}
+          {projects.length === 0 && (
+            <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>No projects found.</td></tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const renderEmployeesTab = () => (
+    <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
+      <div className={styles.tableHeader}>
+        <h2 className={styles.pageTitle} style={{fontSize: '1.5rem'}}>Employees Management</h2>
+        <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.5rem 1rem'}}>+ Add Employee</button>
+      </div>
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Employee Name</th>
+            <th>Contact</th>
+            <th>Designation</th>
+          </tr>
+        </thead>
+        <tbody>
+          {employees.map((emp) => (
+            <tr key={emp._id}>
+              <td>{emp.employeeId || emp._id.substring(0, 6)}</td>
+              <td style={{fontWeight: '500'}}>{emp.fullName || emp.name}</td>
+              <td>{emp.email || emp.mobileNumber || '-'}</td>
+              <td>{emp.designation || emp.role}</td>
+            </tr>
+          ))}
+          {employees.length === 0 && (
+            <tr><td colSpan="4" style={{textAlign: 'center', padding: '2rem'}}>No employees found.</td></tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  return (
+    <div className={styles.portalWrapper}>
+      {/* Ambient Glow Effects */}
+      <div className={`${styles.bgGlow} ${styles.bgGlow1}`}></div>
+      <div className={`${styles.bgGlow} ${styles.bgGlow2}`}></div>
+
+      <div className={styles.layout}>
+        {/* Sidebar */}
+        <aside className={styles.sidebar}>
+          <div className={styles.brand}>OS Admin.</div>
+          
+          <nav className={styles.navMenu}>
+            <button className={`${styles.navItem} ${activeTab === 'dashboard' ? styles.active : ''}`} onClick={() => setActiveTab('dashboard')}><span>📊</span> Dashboard</button>
+            <button className={`${styles.navItem} ${activeTab === 'tracking' ? styles.active : ''}`} onClick={() => setActiveTab('tracking')}><span>📍</span> Live Tracking</button>
+            <button className={`${styles.navItem} ${activeTab === 'leads' ? styles.active : ''}`} onClick={() => setActiveTab('leads')}><span>🎯</span> Leads</button>
+            <button className={`${styles.navItem} ${activeTab === 'projects' ? styles.active : ''}`} onClick={() => setActiveTab('projects')}><span>🏗️</span> Projects</button>
+            <button className={`${styles.navItem} ${activeTab === 'employees' ? styles.active : ''}`} onClick={() => setActiveTab('employees')}><span>👥</span> Employees</button>
+          </nav>
+
+          <div className={styles.userProfile}>
+            <div className={styles.avatar}>A</div>
+            <div className={styles.userInfo}>
+              <span className={styles.userName}>Super Admin</span>
+              <span className={styles.userRole}>Management</span>
+            </div>
+            <button className={styles.logoutBtn} title="Logout" onClick={handleLogout}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </button>
           </div>
-          <div id="map" style={{height: '500px', borderRadius: '8px', border: '1px solid var(--border-color)', zIndex: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fa'}}>
-            <p style={{color: 'var(--text-muted)'}}>Map plugin placeholder. Click "View Map" in the Live Tracking table to open coordinates in Google Maps.</p>
-          </div>
-        </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className={styles.mainContent}>
+          <header className={styles.header}>
+            <h1 className={styles.pageTitle} style={{textTransform: 'capitalize'}}>{activeTab.replace('-', ' ')}</h1>
+            <div className={styles.dateDisplay}>{currentDate}</div>
+          </header>
+
+          {activeTab === 'dashboard' && renderDashboardTab()}
+          {activeTab === 'tracking' && renderTrackingTab()}
+          {activeTab === 'leads' && renderLeadsTab()}
+          {activeTab === 'projects' && renderProjectsTab()}
+          {activeTab === 'employees' && renderEmployeesTab()}
+          
+        </main>
       </div>
 
-      {/* LEADS TAB */}
-      <div id="panel-leads" className="tab-panel">
-        <div className="table-container">
-          <div className="table-header">
-            <h2>Lead Generation (Contact Form)</h2>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Contact</th>
-                <th>Project Type</th>
-                <th>Message</th>
-                <th>Date</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="leadsTableBody">
-              <tr><td colSpan="6" style={{textAlign: 'center'}}>Loading leads...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* PROJECTS TAB */}
-      <div id="panel-projects" className="tab-panel">
-        <div className="table-container">
-          <div className="table-header">
-            <h2>Projects Management</h2>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Cover</th>
-                <th>Title</th>
-                <th>Category</th>
-                <th>Location</th>
-                <th>Budget</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="adminProjectsTableBody">
-              <tr><td colSpan="6" style={{textAlign: 'center'}}>Loading projects...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* EMPLOYEES TAB */}
-      <div id="panel-employees" className="tab-panel">
-        <div className="table-container">
-          <div className="table-header">
-            <h2>Employees Management</h2>
-            <button className="btn btn-primary" >+ Add Employee</button>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Employee Name</th>
-                <th>Email / Mobile</th>
-                <th>Designation</th>
-              </tr>
-            </thead>
-            <tbody id="employeesTableBody">
-              <tr><td colSpan="4" style={{textAlign: 'center'}}>Loading employees...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-    </div>
-  </main>
-
-  {/* Photo Preview Modal */}
-  {selectedPhoto && (
-    <div className="modal" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.8)'}}>
-      <div className="modal-content" style={{maxWidth: '600px', padding: '1rem', background: '#fff', borderRadius: '8px', position: 'relative'}}>
-        <span className="close-btn" style={{position: 'absolute', top: '10px', right: '15px', fontSize: '1.5rem', cursor: 'pointer'}} onClick={() => setSelectedPhoto(null)}>&times;</span>
-        <h3 style={{marginBottom: '1rem'}}>Employee Check-in Selfie</h3>
-        <img src={selectedPhoto} alt="Employee Verification" style={{width: '100%', borderRadius: '8px', objectFit: 'contain', maxHeight: '70vh'}} />
-      </div>
-    </div>
-  )}
-
-  {/* Add Employee Modal */}
-  <div id="addEmployeeModal" className="modal">
-    <div className="modal-content" style={{maxWidth: '500px'}}>
-      <span className="close-btn" >&times;</span>
-      <h3>Create New Employee</h3>
-      <form id="addEmployeeForm"  style={{display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem'}}>
-        <div>
-          <label style={{fontWeight: '500', fontSize: '0.9rem'}}>Full Name</label>
-          <input type="text" id="empName" required style={{width: '100%', padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', marginTop: '0.25rem'}} />
-        </div>
-        <div>
-          <label style={{fontWeight: '500', fontSize: '0.9rem'}}>Email Address</label>
-          <input type="email" id="empEmail" required style={{width: '100%', padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', marginTop: '0.25rem'}} />
-        </div>
-        <div>
-          <label style={{fontWeight: '500', fontSize: '0.9rem'}}>Password</label>
-          <input type="password" id="empPassword" required style={{width: '100%', padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', marginTop: '0.25rem'}} />
-        </div>
-        <div>
-          <label style={{fontWeight: '500', fontSize: '0.9rem'}}>Mobile Number</label>
-          <input type="text" id="empMobile" required style={{width: '100%', padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', marginTop: '0.25rem'}} />
-        </div>
-        <div>
-          <label style={{fontWeight: '500', fontSize: '0.9rem'}}>Designation</label>
-          <input type="text" id="empDesignation" required style={{width: '100%', padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', marginTop: '0.25rem'}} />
-        </div>
-        <button type="submit" className="btn btn-primary" style={{marginTop: '0.5rem'}}>Create Employee</button>
-      </form>
-    </div>
-  </div>
-
-  {/* Employee Details Modal */}
-  <div id="employeeModal" className="modal">
-    <div className="modal-content" style={{maxWidth: '500px'}}>
-      <span className="close-btn" >&times;</span>
-      <h3 id="empModalName">Employee Details</h3>
-      <div id="empModalContent" style={{marginTop: '1rem', fontSize: '0.95rem'}}></div>
-    </div>
-  </div>
-
-  {/* Edit Project Modal */}
-  <div id="editProjectModal" className="modal">
-    <div className="modal-content" style={{maxWidth: '600px'}}>
-      <span className="close-btn" >&times;</span>
-      <h3>Edit Project</h3>
-      <form id="editProjectForm"  style={{display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem'}}>
-        <input type="hidden" id="editProjectId" />
-        
-        <div>
-          <label style={{fontWeight: '500', fontSize: '0.9rem'}}>Title</label>
-          <input type="text" id="editProjectTitle" required style={{width: '100%', padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', marginTop: '0.25rem'}} />
-        </div>
-        
-        <div style={{display: 'flex', gap: '1rem'}}>
-          <div style={{flex: '1'}}>
-            <label style={{fontWeight: '500', fontSize: '0.9rem'}}>Category</label>
-            <input type="text" id="editProjectCategory" style={{width: '100%', padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', marginTop: '0.25rem'}} />
-          </div>
-          <div style={{flex: '1'}}>
-            <label style={{fontWeight: '500', fontSize: '0.9rem'}}>Budget</label>
-            <input type="text" id="editProjectBudget" style={{width: '100%', padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', marginTop: '0.25rem'}} />
+      {/* Photo Preview Modal */}
+      {selectedPhoto && (
+        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.85)', zIndex: 9999, backdropFilter: 'blur(10px)'}}>
+          <div className={styles.glassCard} style={{maxWidth: '600px', width: '90%', padding: '1rem', position: 'relative'}}>
+            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: 'var(--text-primary)'}} onClick={() => setSelectedPhoto(null)}>&times;</span>
+            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem'}}>Live Site Verification</h3>
+            <img src={selectedPhoto} alt="Employee Verification" style={{width: '100%', borderRadius: '12px', objectFit: 'contain', maxHeight: '70vh'}} />
           </div>
         </div>
-
-        <div>
-          <label style={{fontWeight: '500', fontSize: '0.9rem'}}>Location</label>
-          <input type="text" id="editProjectLocation" style={{width: '100%', padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', marginTop: '0.25rem'}} />
-        </div>
-
-        <div>
-          <label style={{fontWeight: '500', fontSize: '0.9rem'}}>Cover Image Path</label>
-          <input type="text" id="editProjectCover" style={{width: '100%', padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', marginTop: '0.25rem'}} />
-        </div>
-
-        <div>
-          <label style={{fontWeight: '500', fontSize: '0.9rem'}}>Description</label>
-          <textarea id="editProjectDesc" rows="4" style={{width: '100%', padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: '4px', marginTop: '0.25rem'}}></textarea>
-        </div>
-
-        <button type="submit" className="btn" style={{marginTop: '0.5rem'}}>Save Changes</button>
-      </form>
+      )}
     </div>
-  </div>
-
-  
-    </>
   );
 };
 
