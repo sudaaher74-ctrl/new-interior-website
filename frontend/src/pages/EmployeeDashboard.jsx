@@ -32,8 +32,9 @@ const EmployeeDashboard = () => {
     setCurrentDate(new Date().toLocaleDateString(undefined, dateOptions));
     
     const token = localStorage.getItem('token');
-    if (!token) {
-      localStorage.setItem('token', 'dummy_token'); 
+    if (!token || token === 'dummy_token' || token === 'dummy_admin_token') {
+      navigate('/login');
+      return;
     }
 
     fetchData();
@@ -44,11 +45,12 @@ const EmployeeDashboard = () => {
         stream.getTracks().forEach(track => track.stop());
       }
     };
-  }, []);
+  }, [navigate]);
 
   const fetchData = async () => {
     try {
-      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
       
       try {
         const projRes = await axios.get(`${API_URL}/projects`, { headers });
@@ -65,7 +67,12 @@ const EmployeeDashboard = () => {
         setVisits([]);
       }
       
-      setUser({ fullName: 'Demo Employee', role: 'Site Engineer' });
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      } else {
+        setUser({ fullName: 'Unknown', role: 'Employee' });
+      }
     } catch (error) {
       console.error(error);
     }

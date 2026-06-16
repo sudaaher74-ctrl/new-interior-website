@@ -17,6 +17,8 @@ const AdminDashboard = () => {
   // UI States
   const [currentDate, setCurrentDate] = useState('');
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
+  const [newEmployee, setNewEmployee] = useState({ fullName: '', email: '', password: '', mobileNumber: '', designation: '' });
 
   const API_URL = window.API_CONFIG?.BASE_URL || '/api';
 
@@ -86,6 +88,20 @@ const AdminDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
+  };
+
+  const handleAddEmployee = async (e) => {
+    e.preventDefault();
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      await axios.post(`${API_URL}/v2/admin/employees`, newEmployee, { headers });
+      setShowAddEmployeeModal(false);
+      setNewEmployee({ fullName: '', email: '', password: '', mobileNumber: '', designation: '' });
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to add employee: ' + (err.response?.data?.msg || err.message));
+    }
   };
 
   const renderDashboardTab = () => (
@@ -260,7 +276,7 @@ const AdminDashboard = () => {
     <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
       <div className={styles.tableHeader}>
         <h2 className={styles.pageTitle} style={{fontSize: '1.5rem'}}>Employees Management</h2>
-        <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.5rem 1rem'}}>+ Add Employee</button>
+        <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.5rem 1rem'}} onClick={() => setShowAddEmployeeModal(true)}>+ Add Employee</button>
       </div>
       <table className={styles.table}>
         <thead>
@@ -342,6 +358,39 @@ const AdminDashboard = () => {
             <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: 'var(--text-primary)'}} onClick={() => setSelectedPhoto(null)}>&times;</span>
             <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem'}}>Live Site Verification</h3>
             <img src={selectedPhoto} alt="Employee Verification" style={{width: '100%', borderRadius: '12px', objectFit: 'contain', maxHeight: '70vh'}} />
+          </div>
+        </div>
+      )}
+
+      {/* Add Employee Modal */}
+      {showAddEmployeeModal && (
+        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', zIndex: 9999, backdropFilter: 'blur(10px)'}}>
+          <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative'}}>
+            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: 'var(--text-primary)'}} onClick={() => setShowAddEmployeeModal(false)}>&times;</span>
+            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem'}}>Add New Employee</h3>
+            <form onSubmit={handleAddEmployee} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Full Name</label>
+                <input type="text" required value={newEmployee.fullName} onChange={e => setNewEmployee({...newEmployee, fullName: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Email</label>
+                <input type="email" required value={newEmployee.email} onChange={e => setNewEmployee({...newEmployee, email: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Password</label>
+                <input type="password" required value={newEmployee.password} onChange={e => setNewEmployee({...newEmployee, password: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Mobile Number</label>
+                <input type="tel" required value={newEmployee.mobileNumber} onChange={e => setNewEmployee({...newEmployee, mobileNumber: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Designation</label>
+                <input type="text" value={newEmployee.designation} onChange={e => setNewEmployee({...newEmployee, designation: e.target.value})} placeholder="e.g. Site Engineer" style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '1rem'}}>Save Employee</button>
+            </form>
           </div>
         </div>
       )}
