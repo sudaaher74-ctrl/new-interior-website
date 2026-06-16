@@ -27,15 +27,15 @@ const AdminDashboard = () => {
     setCurrentDate(new Date().toLocaleDateString(undefined, dateOptions));
     
     let token = localStorage.getItem('token');
-    if (!token || token === 'dummy_token') {
-      token = 'dummy_admin_token';
-      localStorage.setItem('token', token); 
+    if (!token || token === 'dummy_token' || token === 'dummy_admin_token') {
+      navigate('/login');
+      return;
     }
 
     fetchAllData();
     const interval = setInterval(fetchAllData, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [navigate]);
 
   const fetchAllData = async () => {
     try {
@@ -141,7 +141,7 @@ const AdminDashboard = () => {
           <tbody>
             {siteVisits.slice(0, 5).map((visit) => (
               <tr key={visit._id}>
-                <td style={{fontWeight: '500'}}>{visit.user?.fullName || 'Demo Employee'}</td>
+                <td style={{fontWeight: '500'}}>{visit.user?.fullName || 'Unknown User'}</td>
                 <td>{visit.project?.name || visit.project?.title || 'Unknown'}</td>
                 <td>{new Date(visit.time).toLocaleString()}</td>
                 <td>

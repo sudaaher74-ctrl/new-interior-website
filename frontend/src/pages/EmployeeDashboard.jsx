@@ -56,8 +56,8 @@ const EmployeeDashboard = () => {
         const projRes = await axios.get(`${API_URL}/projects`, { headers });
         setProjects(projRes.data);
       } catch (err) {
-        console.error("Failed to fetch projects, using dummy data");
-        setProjects([{ _id: '1', title: 'Dummy Project A' }]);
+        console.error("Failed to fetch projects, setting empty");
+        setProjects([]);
       }
 
       try {

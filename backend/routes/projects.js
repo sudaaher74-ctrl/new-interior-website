@@ -14,10 +14,7 @@ const authAdmin = async (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
 
-    if (token === 'dummy_admin_token') {
-      req.user = { id: '000000000000000000000000', role: 'Super Admin', fullName: 'Demo Admin' };
-      return next();
-    }
+
 
     const decoded = jwt.verify(token, JWT_SECRET);
     if (decoded.user.role !== 'Super Admin') {
@@ -38,15 +35,7 @@ const auth = async (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
 
-    if (token === 'dummy_admin_token') {
-      req.user = { id: '000000000000000000000000', role: 'Super Admin', fullName: 'Demo Admin' };
-      return next();
-    }
 
-    if (token === 'dummy_token') {
-      req.user = { id: '000000000000000000000123', role: 'Employee', fullName: 'Demo Employee' };
-      return next();
-    }
 
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded.user;
