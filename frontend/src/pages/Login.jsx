@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import styles from './Login.module.css';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -45,51 +46,58 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <div className="logo-container">
-        <h1>OS Interior</h1>
-        <p>Employee Portal Login</p>
+    <div className={styles.pageWrapper}>
+      <div className={`${styles.ambientGlow} ${styles.ambientGlow1}`}></div>
+      <div className={`${styles.ambientGlow} ${styles.ambientGlow2}`}></div>
+
+      <div className={styles.glassContainer}>
+        <div className={styles.logoContainer}>
+          <h1>OS Interior</h1>
+          <p>Employee Portal</p>
+        </div>
+
+        <form onSubmit={handleSubmit} id="loginForm">
+          <div className={styles.formGroup}>
+            <label htmlFor="email">Email Address</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              placeholder="name@osinterior.com" 
+              required 
+              autoComplete="email" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={styles.inputField}
+            />
+          </div>
+          
+          <div className={styles.formGroup}>
+            <label htmlFor="password">Password</label>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              placeholder="••••••••" 
+              required 
+              autoComplete="current-password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={styles.inputField}
+            />
+          </div>
+
+          {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
+
+          <button type="submit" className={styles.btnSubmit} disabled={loading}>
+            {loading ? (
+              <div className={styles.loadingSpinner}></div>
+            ) : (
+              <span>Secure Sign In</span>
+            )}
+          </button>
+        </form>
       </div>
-
-      <form onSubmit={handleSubmit} id="loginForm">
-        <div className="form-group">
-          <label htmlFor="email">Email Address</label>
-          <input 
-            type="email" 
-            id="email" 
-            name="email" 
-            placeholder="name@osinterior.com" 
-            required 
-            autoComplete="email" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input 
-            type="password" 
-            id="password" 
-            name="password" 
-            placeholder="••••••••" 
-            required 
-            autoComplete="current-password" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-
-        {errorMsg && <div className="error-msg" style={{display: 'block'}}>{errorMsg}</div>}
-
-        <button type="submit" className="btn-submit" disabled={loading}>
-          {loading ? (
-            <div className="loading-spinner" style={{display: 'inline-block'}}></div>
-          ) : (
-            <span>Sign In</span>
-          )}
-        </button>
-      </form>
     </div>
   );
 };
