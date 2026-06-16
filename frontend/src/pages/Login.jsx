@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { API_URL } from '../api/config';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -9,6 +8,8 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const API_URL = window.API_CONFIG?.BASE_URL || '/api';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
