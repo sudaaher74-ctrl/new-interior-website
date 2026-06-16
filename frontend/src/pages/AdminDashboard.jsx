@@ -48,8 +48,11 @@ const AdminDashboard = () => {
       // 2. Live Tracking (Site Visits)
       try {
         const resVisits = await axios.get(`${API_URL}/v2/site-visits/all`, { headers });
+        console.log("Fetched visits length:", resVisits.data.length);
         setSiteVisits(resVisits.data);
-      } catch(e) {}
+      } catch(e) {
+        console.error("Failed to fetch site visits:", e);
+      }
 
       // 3. Leads
       try {
@@ -122,7 +125,7 @@ const AdminDashboard = () => {
           <tbody>
             {siteVisits.slice(0, 5).map((visit) => (
               <tr key={visit._id}>
-                <td style={{fontWeight: '500'}}>{visit.user?.fullName || 'Unknown User'}</td>
+                <td style={{fontWeight: '500'}}>{visit.user?.fullName || 'Demo Employee'}</td>
                 <td>{visit.project?.name || visit.project?.title || 'Unknown'}</td>
                 <td>{new Date(visit.time).toLocaleString()}</td>
                 <td>
@@ -159,7 +162,7 @@ const AdminDashboard = () => {
         <tbody>
           {siteVisits.map((visit) => (
             <tr key={visit._id}>
-              <td style={{fontWeight: '500'}}>{visit.user?.fullName || 'Unknown User'}</td>
+              <td style={{fontWeight: '500'}}>{visit.user?.fullName || 'Demo Employee'}</td>
               <td>{visit.project?.name || visit.project?.title || 'Unknown Project'}</td>
               <td>
                 {visit.location?.lat ? (
