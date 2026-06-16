@@ -14,11 +14,11 @@ const AdminDashboard = () => {
   const [projects, setProjects] = useState([]);
   const [employees, setEmployees] = useState([]);
   
-  // UI States
   const [currentDate, setCurrentDate] = useState('');
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
   const [newEmployee, setNewEmployee] = useState({ fullName: '', email: '', password: '', mobileNumber: '', designation: '' });
+  const [selectedTrackingEmployee, setSelectedTrackingEmployee] = useState(null);
 
   const API_URL = window.API_CONFIG?.BASE_URL || '/api';
 
@@ -160,48 +160,110 @@ const AdminDashboard = () => {
     </div>
   );
 
-  const renderTrackingTab = () => (
-    <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
-      <div className={styles.tableHeader}>
-        <h2 className={styles.pageTitle} style={{fontSize: '1.5rem'}}>Live Tracking Map Data</h2>
-      </div>
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Employee</th>
-            <th>Site</th>
-            <th>Location</th>
-            <th>Check-In Time</th>
-            <th>Snapshot</th>
-          </tr>
-        </thead>
-        <tbody>
-          {siteVisits.map((visit) => (
-            <tr key={visit._id}>
-              <td style={{fontWeight: '500'}}>{visit.user?.fullName || 'Demo Employee'}</td>
-              <td>{visit.project?.name || visit.project?.title || 'Unknown Project'}</td>
-              <td>
-                {visit.location?.lat ? (
-                  <a href={`https://www.google.com/maps?q=${visit.location.lat},${visit.location.lng}`} target="_blank" rel="noreferrer" style={{color: 'var(--accent-1)', textDecoration: 'underline'}}>
-                    📍 Open Maps
-                  </a>
-                ) : 'No GPS'}
-              </td>
-              <td>{new Date(visit.time).toLocaleString()}</td>
-              <td>
-                {visit.photoUrl ? (
-                  <button onClick={() => setSelectedPhoto(visit.photoUrl)} className={`${styles.btn} ${styles.btnSecondary}`} style={{padding: '0.25rem 0.5rem', fontSize: '0.8rem'}}>📸 View Selfie</button>
-                ) : 'No Photo'}
-              </td>
+  const renderTrackingTab = () => {
+    if (!selectedTrackingEmployee) {
+      return (
+        <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
+          <div className={styles.tableHeader}>
+            <h2 className={styles.pageTitle} style={{fontSize: '1.5rem'}}>Select Employee to View Tracking</h2>
+          </div>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Employee Name</th>
+                <th>Designation</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {employees.map((emp) => (
+                <tr key={emp._id}>
+                  <td style={{fontWeight: '500'}}>{emp.fullName || emp.name}</td>
+                  <td>{emp.designation || emp.role}</td>
+                  <td>
+                    <button 
+                      onClick={() => setSelectedTrackingEmployee(emp)} 
+                      className={`${styles.btn} ${styles.btnPrimary}`} 
+                      style={{padding: '0.25rem 0.5rem', fontSize: '0.8rem', width: 'auto'}}
+                    >
+                      View Live Data
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {employees.length === 0 && (
+                <tr><td colSpan="3" style={{textAlign: 'center', padding: '2rem'}}>No employees found.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    const employeeVisits = siteVisits.filter(visit => {
+      const visitUserId = visit.user?._id || visit.user;
+      return visitUserId === selectedTrackingEmployee._id;
+    });
+
+    return (
+      <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
+        <div className={styles.tableHeader}>
+          <h2 className={styles.pageTitle} style={{fontSize: '1.5rem'}}>
+            Tracking: {selectedTrackingEmployee.fullName || selectedTrackingEmployee.name}
+          </h2>
+          <button 
+            className={`${styles.btn} ${styles.btnSecondary}`} 
+            style={{width: 'auto', padding: '0.5rem 1rem'}} 
+            onClick={() => setSelectedTrackingEmployee(null)}
+          >
+            ← Back to Employees
+          </button>
+        </div>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Site</th>
+              <th>Location</th>
+              <th>Check-In Time</th>
+              <th>Expenses</th>
+              <th>Snapshot</th>
             </tr>
-          ))}
-          {siteVisits.length === 0 && (
-            <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>No tracking data available.</td></tr>
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
+          </thead>
+          <tbody>
+            {employeeVisits.map((visit) => (
+              <tr key={visit._id}>
+                <td>{visit.project?.name || visit.project?.title || 'Unknown Project'}</td>
+                <td>
+                  {visit.location?.lat ? (
+                    <a href={`https://www.google.com/maps?q=${visit.location.lat},${visit.location.lng}`} target="_blank" rel="noreferrer" style={{color: 'var(--accent-1)', textDecoration: 'underline'}}>
+                      📍 Open Maps
+                    </a>
+                  ) : 'No GPS'}
+                </td>
+                <td>{new Date(visit.time).toLocaleString()}</td>
+                <td>
+                  {visit.expenseAmount ? (
+                    <div style={{fontSize: '0.9rem'}}>
+                      <strong style={{color: 'var(--accent-2)'}}>₹{visit.expenseAmount}</strong>
+                      <div style={{color: 'var(--text-secondary)', fontSize: '0.8rem'}}>{visit.expenseDescription}</div>
+                    </div>
+                  ) : '-'}
+                </td>
+                <td>
+                  {visit.photoUrl ? (
+                    <button onClick={() => setSelectedPhoto(visit.photoUrl)} className={`${styles.btn} ${styles.btnSecondary}`} style={{padding: '0.25rem 0.5rem', fontSize: '0.8rem'}}>📸 View</button>
+                  ) : 'No Photo'}
+                </td>
+              </tr>
+            ))}
+            {employeeVisits.length === 0 && (
+              <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>No tracking data available for this employee.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
 
   const renderLeadsTab = () => (
     <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
