@@ -155,11 +155,25 @@ const EmployeeDashboard = () => {
 
   const capturePhoto = () => {
     if (videoRef.current && canvasRef.current) {
-      const context = canvasRef.current.getContext('2d');
-      canvasRef.current.width = videoRef.current.videoWidth;
-      canvasRef.current.height = videoRef.current.videoHeight;
-      context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
-      const base64Img = canvasRef.current.toDataURL('image/jpeg', 0.8);
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+      
+      const MAX_WIDTH = 800;
+      let width = video.videoWidth;
+      let height = video.videoHeight;
+      
+      if (width > MAX_WIDTH) {
+        height = Math.round((height * MAX_WIDTH) / width);
+        width = MAX_WIDTH;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      context.drawImage(video, 0, 0, width, height);
+      
+      // Compress heavily for offline queue safety
+      const base64Img = canvas.toDataURL('image/jpeg', 0.6);
       setImageSrc(base64Img);
       
       if (stream) {
@@ -214,6 +228,7 @@ const EmployeeDashboard = () => {
       lat: loc.lat,
       lng: loc.lng,
       accuracy: loc.accuracy,
+      photoBase64: imageSrc, // Include compressed image!
       expenseAmount: Number(expenseAmount) || 0,
       expenseDescription: expenseDesc,
       offlineTimestamp: new Date().toISOString()

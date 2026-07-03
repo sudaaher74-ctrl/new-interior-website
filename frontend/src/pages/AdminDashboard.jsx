@@ -455,6 +455,7 @@ const AdminDashboard = () => {
               <th>Location</th>
               <th>Check-In Time</th>
               <th>Expenses</th>
+              <th>Photo</th>
             </tr>
           </thead>
           <tbody>
@@ -475,6 +476,16 @@ const AdminDashboard = () => {
                       <strong style={{color: 'var(--accent-2)'}}>₹{visit.expenseAmount}</strong>
                       <div style={{color: 'var(--text-secondary)', fontSize: '0.8rem'}}>{visit.expenseDescription}</div>
                     </div>
+                  ) : '-'}
+                </td>
+                <td>
+                  {visit.photoUrl ? (
+                    <button 
+                      onClick={() => setSelectedPhoto(visit.photoUrl)} 
+                      style={{background: 'rgba(37,99,235,0.1)', color: '#2563eb', padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid #2563eb', cursor: 'pointer', fontSize: '0.8rem'}}
+                    >
+                      📸 View
+                    </button>
                   ) : '-'}
                 </td>
               </tr>
@@ -881,6 +892,17 @@ const AdminDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Photo Viewer Modal */}
+      {selectedPhoto && (
+        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.8)', zIndex: 9999, backdropFilter: 'blur(10px)'}}>
+          <div style={{position: 'relative', maxWidth: '90%', maxHeight: '90%'}}>
+            <span style={{position: 'absolute', top: '-40px', right: '0px', fontSize: '2rem', cursor: 'pointer', color: 'white'}} onClick={() => setSelectedPhoto(null)}>&times;</span>
+            <img src={selectedPhoto} alt="Site Visit" style={{maxWidth: '100%', maxHeight: '80vh', borderRadius: '8px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)'}} />
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

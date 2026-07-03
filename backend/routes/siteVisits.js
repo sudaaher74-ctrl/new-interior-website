@@ -2,6 +2,13 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const SiteVisit = require('../models/SiteVisit');
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 
@@ -23,14 +30,22 @@ const auth = async (req, res, next) => {
 
 // Log a new Site Visit
 router.post('/log', auth, async (req, res) => {
-  const { projectId, lat, lng, accuracy, photoUrl, expenseAmount, expenseDescription } = req.body;
+  const { projectId, lat, lng, accuracy, photoUrl, photoBase64, expenseAmount, expenseDescription } = req.body;
 
   try {
+    let finalPhotoUrl = photoUrl;
+
+    // Upload to Cloudinary if base64 is provided
+    if (photoBase64 && process.env.CLOUDINARY_CLOUD_NAME) {
+      const uploadRes = await cloudinary.uploader.upload(photoBase64, { folder: 'os_interior_visits' });
+      finalPhotoUrl = uploadRes.secure_url;
+    }
+
     const visit = new SiteVisit({
       user: req.user.id,
       project: projectId,
       location: { lat, lng, accuracy },
-      photoUrl,
+      photoUrl: finalPhotoUrl,
       expenseAmount: expenseAmount || 0,
       expenseDescription: expenseDescription || ''
     });
