@@ -2,8 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 import styles from './AdminDashboard.module.css';
 
+// Fix Leaflet default icon issue
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -60,10 +74,11 @@ const AdminDashboard = () => {
     const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     setCurrentDate(new Date().toLocaleDateString(undefined, dateOptions));
     
-    let token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
     if (!token || token === 'dummy_token' || token === 'dummy_admin_token') {
-      token = 'dummy_admin_token';
-      localStorage.setItem('token', token);
+      localStorage.removeItem('token');
+      navigate('/login');
+      return;
     }
 
     fetchAllData();
@@ -136,6 +151,18 @@ const AdminDashboard = () => {
     } catch (err) {
       console.error(err);
       toast.error('Failed to add employee: ' + (err.response?.data?.msg || err.message));
+    }
+  };
+
+  const handleResetPassword = async (employeeId) => {
+    if (!window.confirm("Are you sure you want to reset this employee's password to 'osinterior123'?")) return;
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      await axios.put(`${API_URL}/v2/admin/employees/${employeeId}`, { password: 'osinterior123' }, { headers });
+      toast.success("Password reset to 'osinterior123'");
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to reset password: ' + (err.response?.data?.msg || err.message));
     }
   };
 
@@ -238,6 +265,37 @@ const AdminDashboard = () => {
         <div className={styles.glassCard}>
           <div className={styles.cardTitle}>Total Employees</div>
           <div className={styles.statValue}>{stats.totalEmployees}</div>
+        </div>
+      </div>
+
+      {/* Analytics Chart */}
+      <div className={`${styles.glassCard} ${styles.delay2}`} style={{ marginBottom: '2rem' }}>
+        <div className={styles.cardTitle}>Site Visits (Last 7 Days)</div>
+        <div style={{ width: '100%', height: 300 }}>
+          <ResponsiveContainer>
+            <BarChart data={Array.from({length: 7}).map((_, i) => {
+              const d = new Date();
+              d.setDate(d.getDate() - (6 - i));
+              const dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+              const visits = siteVisits.filter(v => new Date(v.time).toDateString() === d.toDateString()).length;
+              return { name: dateStr, visits };
+            })}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+              <XAxis dataKey="name" stroke="var(--text-secondary)" tick={{fill: 'var(--text-secondary)'}} />
+              <YAxis allowDecimals={false} stroke="var(--text-secondary)" tick={{fill: 'var(--text-secondary)'}} />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', color: '#0f172a' }}
+                itemStyle={{ color: 'var(--accent-1)' }}
+              />
+              <Bar dataKey="visits" fill="url(#colorVisits)" radius={[4, 4, 0, 0]} />
+              <defs>
+                <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--accent-1)" stopOpacity={1}/>
+                  <stop offset="100%" stopColor="var(--accent-1)" stopOpacity={0.6}/>
+                </linearGradient>
+              </defs>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
@@ -351,7 +409,7 @@ const AdminDashboard = () => {
                 <td>
                   {visit.location?.lat ? (
                     <a href={`https://www.google.com/maps?q=${visit.location.lat},${visit.location.lng}`} target="_blank" rel="noreferrer" style={{color: 'var(--accent-1)', textDecoration: 'underline'}}>
-                      📍 Open Maps
+                      📍 {visit.location.lat.toFixed(4)}, {visit.location.lng.toFixed(4)}
                     </a>
                   ) : 'No GPS'}
                 </td>
@@ -371,6 +429,31 @@ const AdminDashboard = () => {
             )}
           </tbody>
         </table>
+        
+        {/* Live Tracking Map */}
+        {employeeVisits.length > 0 && (
+          <div style={{ marginTop: '2rem', borderRadius: '12px', overflow: 'hidden', height: '400px', border: '1px solid var(--surface-border)' }}>
+            <MapContainer 
+              center={[employeeVisits[0].location.lat, employeeVisits[0].location.lng]} 
+              zoom={13} 
+              style={{ height: '100%', width: '100%' }}
+            >
+              <TileLayer
+                url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+              />
+              {employeeVisits.map(visit => (
+                <Marker key={visit._id} position={[visit.location.lat, visit.location.lng]}>
+                  <Popup>
+                    <strong>{visit.project?.name || visit.project?.title || 'Unknown Project'}</strong><br/>
+                    {new Date(visit.time).toLocaleTimeString()}<br/>
+                    {visit.expenseAmount > 0 ? `Expense: ₹${visit.expenseAmount}` : 'No Expense'}
+                  </Popup>
+                </Marker>
+              ))}
+            </MapContainer>
+          </div>
+        )}
       </div>
     );
   };
@@ -538,8 +621,9 @@ const AdminDashboard = () => {
               <td>{emp.email || emp.mobileNumber || '-'}</td>
               <td>{emp.designation || emp.role}</td>
               <td>
-                <button onClick={() => setEditingEmployee(emp)} style={{marginRight: '0.5rem', padding: '0.25rem 0.5rem', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '4px', color: 'white', cursor: 'pointer'}}>Edit</button>
-                <button onClick={() => handleDeleteEmployee(emp._id)} style={{padding: '0.25rem 0.5rem', background: 'rgba(239, 68, 68, 0.2)', border: 'none', borderRadius: '4px', color: '#ef4444', cursor: 'pointer'}}>Delete</button>
+                <button onClick={() => setEditingEmployee(emp)} style={{marginRight: '0.5rem', padding: '0.25rem 0.5rem', background: 'rgba(37, 99, 235, 0.1)', border: '1px solid rgba(37, 99, 235, 0.3)', borderRadius: '4px', color: '#2563eb', cursor: 'pointer'}}>Edit</button>
+                <button onClick={() => handleResetPassword(emp._id)} style={{marginRight: '0.5rem', padding: '0.25rem 0.5rem', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '4px', color: '#f59e0b', cursor: 'pointer'}}>Reset Pass</button>
+                <button onClick={() => handleDeleteEmployee(emp._id)} style={{padding: '0.25rem 0.5rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#ef4444', cursor: 'pointer'}}>Delete</button>
               </td>
             </tr>
           ))}
@@ -554,10 +638,6 @@ const AdminDashboard = () => {
 
   return (
     <div className={styles.portalWrapper}>
-      {/* Ambient Glow Effects */}
-      <div className={`${styles.bgGlow} ${styles.bgGlow1}`}></div>
-      <div className={`${styles.bgGlow} ${styles.bgGlow2}`}></div>
-
       <div className={styles.layout}>
         {/* Sidebar */}
         <aside className={styles.sidebar}>

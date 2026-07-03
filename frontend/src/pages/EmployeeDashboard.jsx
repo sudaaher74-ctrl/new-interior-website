@@ -33,10 +33,11 @@ const EmployeeDashboard = () => {
     const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     setCurrentDate(new Date().toLocaleDateString(undefined, dateOptions));
     
-    let token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
     if (!token || token === 'dummy_token' || token === 'dummy_admin_token') {
-      token = 'dummy_token';
-      localStorage.setItem('token', token);
+      localStorage.removeItem('token');
+      navigate('/login');
+      return;
     }
 
     fetchData();
@@ -196,10 +197,6 @@ const EmployeeDashboard = () => {
 
   return (
     <div className={styles.portalWrapper}>
-      {/* Ambient Glow Effects */}
-      <div className={`${styles.bgGlow} ${styles.bgGlow1}`}></div>
-      <div className={`${styles.bgGlow} ${styles.bgGlow2}`}></div>
-
       <div className={styles.layout}>
         {/* Sidebar */}
         <aside className={styles.sidebar}>
