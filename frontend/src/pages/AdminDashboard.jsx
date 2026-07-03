@@ -6,6 +6,8 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGri
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import styles from './AdminDashboard.module.css';
 
 // Fix Leaflet default icon issue
@@ -244,6 +246,59 @@ const AdminDashboard = () => {
     } catch (err) {
       console.error(err);
       toast.error('Failed to delete employee: ' + (err.response?.data?.msg || err.message));
+    }
+  };
+
+  const generatePDFReport = (project) => {
+    try {
+      const doc = new jsPDF();
+      
+      // Branding / Header
+      doc.setFontSize(20);
+      doc.setTextColor(37, 99, 235); // OS Brand Blue
+      doc.text('OS Interiors', 14, 22);
+      
+      doc.setFontSize(14);
+      doc.setTextColor(15, 23, 42);
+      doc.text(`Project Report: ${project.title || project.name}`, 14, 32);
+      
+      doc.setFontSize(10);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 40);
+
+      // Aggregate Data
+      const projVisits = siteVisits.filter(v => (v.project?._id || v.project) === project._id);
+      const totalExpenses = projVisits.reduce((sum, v) => sum + (Number(v.expenseAmount) || 0), 0);
+
+      doc.text(`Total Visits Logged: ${projVisits.length}`, 14, 50);
+      doc.text(`Total Expenses Claimed: INR ${totalExpenses}`, 14, 56);
+
+      // Table Data
+      const tableColumn = ["Date", "Employee", "Location (GPS)", "Expense (INR)"];
+      const tableRows = [];
+
+      projVisits.forEach(visit => {
+        const visitDate = new Date(visit.time).toLocaleString();
+        const empName = visit.user?.fullName || visit.user?.name || 'Unknown Engineer';
+        const gps = visit.location?.lat ? `${visit.location.lat.toFixed(4)}, ${visit.location.lng.toFixed(4)}` : 'N/A';
+        const exp = visit.expenseAmount ? `${visit.expenseAmount} - ${visit.expenseDescription || ''}` : '0';
+        tableRows.push([visitDate, empName, gps, exp]);
+      });
+
+      autoTable(doc, {
+        startY: 65,
+        head: [tableColumn],
+        body: tableRows,
+        headStyles: { fillColor: [37, 99, 235] },
+        styles: { fontSize: 9 },
+      });
+
+      // Save
+      doc.save(`OS_Project_Report_${project.title || 'Project'}.pdf`);
+      toast.success('Report downloaded successfully!');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to generate PDF');
     }
   };
 
@@ -565,6 +620,7 @@ const AdminDashboard = () => {
               <td>{proj.budget ? `₹${proj.budget}` : '-'}</td>
               <td><span className={styles.badge}>{proj.status || 'Active'}</span></td>
               <td>
+                <button onClick={() => generatePDFReport(proj)} style={{marginRight: '0.5rem', padding: '0.25rem 0.5rem', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '4px', color: '#10b981', cursor: 'pointer'}}>📄 Report</button>
                 <button onClick={() => setEditingProject(proj)} style={{marginRight: '0.5rem', padding: '0.25rem 0.5rem', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '4px', color: 'white', cursor: 'pointer'}}>Edit</button>
                 <button onClick={() => handleDeleteProject(proj._id)} style={{padding: '0.25rem 0.5rem', background: 'rgba(239, 68, 68, 0.2)', border: 'none', borderRadius: '4px', color: '#ef4444', cursor: 'pointer'}}>Delete</button>
               </td>
