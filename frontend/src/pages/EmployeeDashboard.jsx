@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 import styles from './EmployeeDashboard.module.css';
 
 const EmployeeDashboard = () => {
@@ -124,11 +125,11 @@ const EmployeeDashboard = () => {
 
   const submitVisit = () => {
     if (!selectedProject) {
-      alert('Please select a project');
+      toast.error('Please select a project');
       return setActionMsg('Please select a project');
     }
     if (!imageSrc) {
-      alert('Please capture a photo from your camera');
+      toast.error('Please capture a photo from your camera');
       return setActionMsg('Please capture a photo from your camera');
     }
     
@@ -145,7 +146,8 @@ const EmployeeDashboard = () => {
         },
         (error) => {
           console.error(error);
-          setActionMsg('Failed to get location. Please allow GPS access in your browser settings.');
+          toast.error('Failed to get location. Please allow GPS access in your browser settings.');
+          setActionMsg('Failed to get location.');
         },
         { enableHighAccuracy: true, timeout: 10000 }
       );
@@ -169,6 +171,7 @@ const EmployeeDashboard = () => {
 
       const res = await axios.post(`${API_URL}/v2/site-visits/log`, payload, { headers });
       
+      toast.success('Visit logged successfully!');
       setActionMsg('Visit logged successfully!');
       
       // Ensure visit has populated project for UI
@@ -186,6 +189,7 @@ const EmployeeDashboard = () => {
       setExpenseDesc('');
     } catch (err) {
       console.error(err);
+      toast.error('Failed to submit visit. Server error.');
       setActionMsg('Failed to submit visit. Server error.');
     }
   };

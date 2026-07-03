@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -67,6 +68,7 @@ const Layout = ({ children }) => {
 function App() {
   return (
     <Router>
+      <Toaster position="top-right" />
       <Layout>
         <Routes>
           <Route path="/login" element={<Login />} />

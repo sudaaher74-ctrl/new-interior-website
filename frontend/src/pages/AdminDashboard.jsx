@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 import styles from './AdminDashboard.module.css';
 
 const AdminDashboard = () => {
@@ -23,6 +24,35 @@ const AdminDashboard = () => {
   const [editingProject, setEditingProject] = useState(null);
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [selectedTrackingEmployee, setSelectedTrackingEmployee] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleExportCSV = (data, filename) => {
+    if (!data || data.length === 0) {
+      toast.error('No data to export.');
+      return;
+    }
+    const headers = Object.keys(data[0]).filter(k => typeof data[0][k] !== 'object' && k !== '__v');
+    const csvRows = [];
+    csvRows.push(headers.join(','));
+    
+    for (const row of data) {
+      const values = headers.map(header => {
+        const val = row[header] ? row[header].toString().replace(/"/g, '""') : '';
+        return `"${val}"`;
+      });
+      csvRows.push(values.join(','));
+    }
+    
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', `${filename}.csv`);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    toast.success(`${filename}.csv exported successfully!`);
+  };
 
   const API_URL = window.API_CONFIG?.BASE_URL || '/api';
 
@@ -101,10 +131,11 @@ const AdminDashboard = () => {
       await axios.post(`${API_URL}/v2/admin/employees`, newEmployee, { headers });
       setShowAddEmployeeModal(false);
       setNewEmployee({ fullName: '', email: '', password: '', mobileNumber: '', designation: '' });
+      toast.success('Employee added successfully!');
       fetchAllData();
     } catch (err) {
       console.error(err);
-      alert('Failed to add employee: ' + (err.response?.data?.msg || err.message));
+      toast.error('Failed to add employee: ' + (err.response?.data?.msg || err.message));
     }
   };
 
@@ -112,10 +143,11 @@ const AdminDashboard = () => {
     try {
       const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
       await axios.put(`${API_URL}/v2/leads/${leadId}/status`, { status }, { headers });
+      toast.success('Lead status updated!');
       fetchAllData();
     } catch (err) {
       console.error(err);
-      alert('Failed to update lead status: ' + (err.response?.data?.msg || err.message));
+      toast.error('Failed to update lead status: ' + (err.response?.data?.msg || err.message));
     }
   };
 
@@ -126,10 +158,11 @@ const AdminDashboard = () => {
       await axios.post(`${API_URL}/v2/projects`, newProject, { headers });
       setShowAddProjectModal(false);
       setNewProject({ name: '', clientName: '', siteAddress: '', status: 'Planning', budget: '' });
+      toast.success('Project added successfully!');
       fetchAllData();
     } catch (err) {
       console.error(err);
-      alert('Failed to add project: ' + (err.response?.data?.msg || err.message));
+      toast.error('Failed to add project: ' + (err.response?.data?.msg || err.message));
     }
   };
 
@@ -139,10 +172,11 @@ const AdminDashboard = () => {
       const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
       await axios.put(`${API_URL}/v2/projects/${editingProject._id}`, editingProject, { headers });
       setEditingProject(null);
+      toast.success('Project updated successfully!');
       fetchAllData();
     } catch (err) {
       console.error(err);
-      alert('Failed to edit project: ' + (err.response?.data?.msg || err.message));
+      toast.error('Failed to edit project: ' + (err.response?.data?.msg || err.message));
     }
   };
 
@@ -151,10 +185,11 @@ const AdminDashboard = () => {
     try {
       const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
       await axios.delete(`${API_URL}/v2/projects/${id}`, { headers });
+      toast.success('Project deleted successfully!');
       fetchAllData();
     } catch (err) {
       console.error(err);
-      alert('Failed to delete project: ' + (err.response?.data?.msg || err.message));
+      toast.error('Failed to delete project: ' + (err.response?.data?.msg || err.message));
     }
   };
 
@@ -164,10 +199,11 @@ const AdminDashboard = () => {
       const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
       await axios.put(`${API_URL}/v2/admin/employees/${editingEmployee._id}`, editingEmployee, { headers });
       setEditingEmployee(null);
+      toast.success('Employee updated successfully!');
       fetchAllData();
     } catch (err) {
       console.error(err);
-      alert('Failed to edit employee: ' + (err.response?.data?.msg || err.message));
+      toast.error('Failed to edit employee: ' + (err.response?.data?.msg || err.message));
     }
   };
 
@@ -176,10 +212,11 @@ const AdminDashboard = () => {
     try {
       const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
       await axios.delete(`${API_URL}/v2/admin/employees/${id}`, { headers });
+      toast.success('Employee deleted successfully!');
       fetchAllData();
     } catch (err) {
       console.error(err);
-      alert('Failed to delete employee: ' + (err.response?.data?.msg || err.message));
+      toast.error('Failed to delete employee: ' + (err.response?.data?.msg || err.message));
     }
   };
 
@@ -338,10 +375,27 @@ const AdminDashboard = () => {
     );
   };
 
-  const renderLeadsTab = () => (
+  const renderLeadsTab = () => {
+    const filteredLeads = leads.filter(l => 
+      (l.name && l.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (l.email && l.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (l.projectType && l.projectType.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+    
+    return (
     <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
-      <div className={styles.tableHeader}>
-        <h2 className={styles.pageTitle} style={{fontSize: '1.5rem'}}>Lead Generation</h2>
+      <div className={styles.tableHeader} style={{ flexWrap: 'wrap', gap: '1rem' }}>
+        <h2 className={styles.pageTitle} style={{fontSize: '1.5rem', margin: 0}}>Lead Generation</h2>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <input 
+            type="text" 
+            placeholder="Search leads..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ padding: '0.4rem 0.8rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.2)', color: 'white' }}
+          />
+          <button className={`${styles.btn} ${styles.btnSecondary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => handleExportCSV(filteredLeads, 'leads')}>Export CSV</button>
+        </div>
       </div>
       <table className={styles.table}>
         <thead>
@@ -355,7 +409,7 @@ const AdminDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {leads.map((lead) => (
+          {filteredLeads.map((lead) => (
             <tr key={lead._id}>
               <td style={{fontWeight: '500'}}>{lead.name}</td>
               <td>{lead.contact || lead.email || lead.phone}</td>
@@ -376,19 +430,37 @@ const AdminDashboard = () => {
               </td>
             </tr>
           ))}
-          {leads.length === 0 && (
-            <tr><td colSpan="6" style={{textAlign: 'center', padding: '2rem'}}>No leads found.</td></tr>
+          {filteredLeads.length === 0 && (
+            <tr><td colSpan="6" style={{textAlign: 'center', padding: '2rem'}}>No leads found matching "{searchQuery}".</td></tr>
           )}
         </tbody>
       </table>
     </div>
   );
+  };
 
-  const renderProjectsTab = () => (
+  const renderProjectsTab = () => {
+    const filteredProjects = projects.filter(p => 
+      (p.title && p.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (p.name && p.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (p.location && p.location.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+
+    return (
     <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
-      <div className={styles.tableHeader}>
-        <h2 className={styles.pageTitle} style={{fontSize: '1.5rem'}}>Projects Management</h2>
-        <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.5rem 1rem'}} onClick={() => setShowAddProjectModal(true)}>+ Add Project</button>
+      <div className={styles.tableHeader} style={{ flexWrap: 'wrap', gap: '1rem' }}>
+        <h2 className={styles.pageTitle} style={{fontSize: '1.5rem', margin: 0}}>Projects Management</h2>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <input 
+            type="text" 
+            placeholder="Search projects..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ padding: '0.4rem 0.8rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.2)', color: 'white' }}
+          />
+          <button className={`${styles.btn} ${styles.btnSecondary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => handleExportCSV(filteredProjects, 'projects')}>Export CSV</button>
+          <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => setShowAddProjectModal(true)}>+ Add Project</button>
+        </div>
       </div>
       <table className={styles.table}>
         <thead>
@@ -402,7 +474,7 @@ const AdminDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {projects.map((proj) => (
+          {filteredProjects.map((proj) => (
             <tr key={proj._id}>
               <td style={{fontWeight: '500'}}>{proj.title || proj.name}</td>
               <td>{proj.category || proj.type || '-'}</td>
@@ -415,19 +487,38 @@ const AdminDashboard = () => {
               </td>
             </tr>
           ))}
-          {projects.length === 0 && (
-            <tr><td colSpan="6" style={{textAlign: 'center', padding: '2rem'}}>No projects found.</td></tr>
+          {filteredProjects.length === 0 && (
+            <tr><td colSpan="6" style={{textAlign: 'center', padding: '2rem'}}>No projects found matching "{searchQuery}".</td></tr>
           )}
         </tbody>
       </table>
     </div>
   );
+  };
 
-  const renderEmployeesTab = () => (
+  const renderEmployeesTab = () => {
+    const filteredEmployees = employees.filter(e => 
+      (e.fullName && e.fullName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (e.name && e.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (e.designation && e.designation.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (e.employeeId && e.employeeId.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+
+    return (
     <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
-      <div className={styles.tableHeader}>
-        <h2 className={styles.pageTitle} style={{fontSize: '1.5rem'}}>Employees Management</h2>
-        <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.5rem 1rem'}} onClick={() => setShowAddEmployeeModal(true)}>+ Add Employee</button>
+      <div className={styles.tableHeader} style={{ flexWrap: 'wrap', gap: '1rem' }}>
+        <h2 className={styles.pageTitle} style={{fontSize: '1.5rem', margin: 0}}>Employees Management</h2>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <input 
+            type="text" 
+            placeholder="Search employees..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ padding: '0.4rem 0.8rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.2)', color: 'white' }}
+          />
+          <button className={`${styles.btn} ${styles.btnSecondary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => handleExportCSV(filteredEmployees, 'employees')}>Export CSV</button>
+          <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => setShowAddEmployeeModal(true)}>+ Add Employee</button>
+        </div>
       </div>
       <table className={styles.table}>
         <thead>
@@ -440,7 +531,7 @@ const AdminDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {employees.map((emp) => (
+          {filteredEmployees.map((emp) => (
             <tr key={emp._id}>
               <td>{emp.employeeId || emp._id.substring(0, 6)}</td>
               <td style={{fontWeight: '500'}}>{emp.fullName || emp.name}</td>
@@ -452,13 +543,14 @@ const AdminDashboard = () => {
               </td>
             </tr>
           ))}
-          {employees.length === 0 && (
-            <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>No employees found.</td></tr>
+          {filteredEmployees.length === 0 && (
+            <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>No employees found matching "{searchQuery}".</td></tr>
           )}
         </tbody>
       </table>
     </div>
   );
+  };
 
   return (
     <div className={styles.portalWrapper}>
