@@ -259,7 +259,7 @@ const Home = () => {
               <polyline points="12 5 19 12 12 19" />
             </svg>
           </button>
-          <a className="btn-outline" href="tel:+912266424242">+91 22 6642 4242</a>
+          <a className="btn-outline" href="tel:+919773597150">+91 97735 97150</a>
         </div>
       </div>
     </section>

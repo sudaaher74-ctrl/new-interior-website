@@ -79,7 +79,7 @@ const Contact = () => {
                         type="tel" 
                         id="cf-phone" 
                         className="form-control" 
-                        placeholder="+91 8767067884" 
+                        placeholder="+91 97735 97150" 
                         required 
                         value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
@@ -177,7 +177,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <div className="contact-info-label">Phone</div>
-                  <div className="contact-info-value">+91 22 6642 4242<br />+91 8767067884</div>
+                  <div className="contact-info-value">+91 97735 97150</div>
                 </div>
               </div>
               <div className="contact-info-item">
