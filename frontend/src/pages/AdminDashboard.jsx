@@ -18,6 +18,8 @@ const AdminDashboard = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
   const [newEmployee, setNewEmployee] = useState({ fullName: '', email: '', password: '', mobileNumber: '', designation: '' });
+  const [showAddProjectModal, setShowAddProjectModal] = useState(false);
+  const [newProject, setNewProject] = useState({ name: '', clientName: '', siteAddress: '', status: 'Planning', budget: '' });
   const [selectedTrackingEmployee, setSelectedTrackingEmployee] = useState(null);
 
   const API_URL = window.API_CONFIG?.BASE_URL || '/api';
@@ -101,6 +103,20 @@ const AdminDashboard = () => {
     } catch (err) {
       console.error(err);
       alert('Failed to add employee: ' + (err.response?.data?.msg || err.message));
+    }
+  };
+
+  const handleAddProject = async (e) => {
+    e.preventDefault();
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      await axios.post(`${API_URL}/v2/projects`, newProject, { headers });
+      setShowAddProjectModal(false);
+      setNewProject({ name: '', clientName: '', siteAddress: '', status: 'Planning', budget: '' });
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to add project: ' + (err.response?.data?.msg || err.message));
     }
   };
 
@@ -304,7 +320,7 @@ const AdminDashboard = () => {
     <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
       <div className={styles.tableHeader}>
         <h2 className={styles.pageTitle} style={{fontSize: '1.5rem'}}>Projects Management</h2>
-        <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.5rem 1rem'}}>+ Add Project</button>
+        <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.5rem 1rem'}} onClick={() => setShowAddProjectModal(true)}>+ Add Project</button>
       </div>
       <table className={styles.table}>
         <thead>
@@ -452,6 +468,41 @@ const AdminDashboard = () => {
                 <input type="text" value={newEmployee.designation} onChange={e => setNewEmployee({...newEmployee, designation: e.target.value})} placeholder="e.g. Site Engineer" style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
               </div>
               <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '1rem'}}>Save Employee</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Project Modal */}
+      {showAddProjectModal && (
+        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', zIndex: 9999, backdropFilter: 'blur(10px)'}}>
+          <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative'}}>
+            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: 'var(--text-primary)'}} onClick={() => setShowAddProjectModal(false)}>&times;</span>
+            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem'}}>Add New Project</h3>
+            <form onSubmit={handleAddProject} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Project Name</label>
+                <input type="text" required value={newProject.name} onChange={e => setNewProject({...newProject, name: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Client Name</label>
+                <input type="text" value={newProject.clientName} onChange={e => setNewProject({...newProject, clientName: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Site Address</label>
+                <input type="text" value={newProject.siteAddress} onChange={e => setNewProject({...newProject, siteAddress: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Status</label>
+                <select value={newProject.status} onChange={e => setNewProject({...newProject, status: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}}>
+                  <option value="Planning">Planning</option>
+                  <option value="Ongoing">Ongoing</option>
+                  <option value="On Hold">On Hold</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Upcoming">Upcoming</option>
+                </select>
+              </div>
+              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '1rem'}}>Save Project</button>
             </form>
           </div>
         </div>
