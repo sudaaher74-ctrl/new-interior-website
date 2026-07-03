@@ -9,7 +9,7 @@ const SiteVisitSchema = new mongoose.Schema({
     lng: Number,
     accuracy: Number
   },
-  photoUrl: { type: String, required: true }, // Base64 or URL
+  photoUrl: { type: String }, // Optional, historically Base64 or URL
   expenseAmount: { type: Number, default: 0 },
   expenseDescription: { type: String },
   createdAt: { type: Date, default: Date.now }

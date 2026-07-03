@@ -24,6 +24,7 @@ const EmployeeDashboard = () => {
   const [imageSrc, setImageSrc] = useState(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [actionMsg, setActionMsg] = useState('');
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   const API_URL = window.API_CONFIG?.BASE_URL || '/api'; // fallback to /api for local dev proxy
   
@@ -122,8 +123,14 @@ const EmployeeDashboard = () => {
   };
 
   const submitVisit = () => {
-    if (!selectedProject) return setActionMsg('Please select a project');
-    if (!imageSrc) return setActionMsg('Please capture a photo from your camera');
+    if (!selectedProject) {
+      alert('Please select a project');
+      return setActionMsg('Please select a project');
+    }
+    if (!imageSrc) {
+      alert('Please capture a photo from your camera');
+      return setActionMsg('Please capture a photo from your camera');
+    }
     
     setActionMsg('Acquiring secure GPS location...');
     if (navigator.geolocation) {
@@ -156,7 +163,6 @@ const EmployeeDashboard = () => {
         lat: loc.lat,
         lng: loc.lng,
         accuracy: loc.accuracy,
-        photoUrl: imageSrc,
         expenseAmount: Number(expenseAmount) || 0,
         expenseDescription: expenseDesc
       };
@@ -196,10 +202,10 @@ const EmployeeDashboard = () => {
           <div className={styles.brand}>OS Portal.</div>
           
           <nav className={styles.navMenu}>
-            <button className={`${styles.navItem} ${styles.active}`}><span>📊</span> Dashboard</button>
-            <button className={styles.navItem}><span>📸</span> Site Photos</button>
-            <button className={styles.navItem}><span>📝</span> Daily Reports</button>
-            <button className={styles.navItem}><span>💰</span> Expenses</button>
+            <button className={`${styles.navItem} ${activeTab === 'dashboard' ? styles.active : ''}`} onClick={() => setActiveTab('dashboard')}><span>📊</span> Dashboard</button>
+            <button className={`${styles.navItem} ${activeTab === 'photos' ? styles.active : ''}`} onClick={() => setActiveTab('photos')}><span>📸</span> Site Photos</button>
+            <button className={`${styles.navItem} ${activeTab === 'reports' ? styles.active : ''}`} onClick={() => setActiveTab('reports')}><span>📝</span> Daily Reports</button>
+            <button className={`${styles.navItem} ${activeTab === 'expenses' ? styles.active : ''}`} onClick={() => setActiveTab('expenses')}><span>💰</span> Expenses</button>
           </nav>
 
           <div className={styles.userProfile}>
@@ -219,150 +225,161 @@ const EmployeeDashboard = () => {
         {/* Main Content */}
         <main className={styles.mainContent}>
           <header className={styles.header}>
-            <h1 className={styles.pageTitle}>Overview</h1>
+            <h1 className={styles.pageTitle}>
+              {activeTab === 'dashboard' && 'Overview'}
+              {activeTab === 'photos' && 'Site Photos Gallery'}
+              {activeTab === 'reports' && 'Daily Reports'}
+              {activeTab === 'expenses' && 'My Expenses'}
+            </h1>
             <div className={styles.dateDisplay}>{currentDate}</div>
           </header>
 
-          <div className={styles.dashboardGrid}>
-            {/* Left Column */}
-            <div className={styles.leftCol}>
-              <div className={`${styles.glassCard} ${styles.delay1}`}>
-                <h2 className={styles.cardTitle}><span>📍</span> Log Site Visit & Expenses</h2>
-                <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
-                  Select your assigned project, capture a live site photo, and record any travel expenses. Upload from gallery is strictly disabled.
-                </p>
+                   {activeTab === 'dashboard' && (
+            <div className={styles.dashboardGrid}>
+              {/* Left Column */}
+              <div className={styles.leftCol}>
+                <div className={`${styles.glassCard} ${styles.delay1}`}>
+                  <h2 className={styles.cardTitle}><span>📍</span> Log Site Visit & Expenses</h2>
+                  <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
+                    Select your assigned project, capture a live site photo, and record any travel expenses. Upload from gallery is strictly disabled.
+                  </p>
 
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>Assigned Project</label>
-                  <select 
-                    className={styles.select} 
-                    value={selectedProject} 
-                    onChange={e => setSelectedProject(e.target.value)}
-                  >
-                    <option value="">Select a project...</option>
-                    {projects.map(p => (
-                      <option key={p._id} value={p._id}>{p.title || p.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className={styles.cameraArea}>
-                  {!isCameraOpen && !imageSrc && (
-                    <div style={{ textAlign: 'center' }}>
-                      <div className={styles.cameraIcon}>📷</div>
-                      <span>Click "Open Camera" to start live capture</span>
-                    </div>
-                  )}
-                  
-                  {isCameraOpen && (
-                    <video 
-                      ref={videoRef} 
-                      autoPlay 
-                      playsInline 
-                      style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', borderRadius: '14px' }}
-                    ></video>
-                  )}
-                  
-                  {imageSrc && (
-                    <img 
-                      src={imageSrc} 
-                      style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', borderRadius: '14px' }} 
-                      alt="Site Capture" 
-                    />
-                  )}
-                  
-                  <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
-                </div>
-
-                <div className={styles.actionRow}>
-                  {!isCameraOpen && !imageSrc && (
-                    <button onClick={startCamera} className={`${styles.btn} ${styles.btnPrimary}`}>📸 Open Camera</button>
-                  )}
-                  
-                  {isCameraOpen && (
-                    <button onClick={capturePhoto} className={`${styles.btn} ${styles.btnPrimary}`} style={{ background: 'var(--gradient-success)' }}>
-                      📸 Capture Now
-                    </button>
-                  )}
-                  
-                  {imageSrc && (
-                    <button onClick={retakePhoto} className={`${styles.btn} ${styles.btnSecondary}`}>🔄 Retake Photo</button>
-                  )}
-                </div>
-
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>Travel Expense (Optional)</label>
-                  <input 
-                    type="number" 
-                    className={styles.input} 
-                    placeholder="Amount (₹)" 
-                    style={{marginBottom: '0.75rem'}} 
-                    value={expenseAmount}
-                    onChange={e => setExpenseAmount(e.target.value)}
-                  />
-                  <input 
-                    type="text" 
-                    className={styles.input} 
-                    placeholder="Description (e.g., Train Panvel to CST)" 
-                    value={expenseDesc}
-                    onChange={e => setExpenseDesc(e.target.value)}
-                  />
-                </div>
-
-                <button onClick={submitVisit} className={`${styles.btn} ${styles.btnPrimary}`}>🚀 Submit Secure Visit Report</button>
-                
-                {actionMsg && (
-                  <div style={{marginTop: '1rem', textAlign: 'center', fontSize: '0.95rem', color: 'var(--accent-1)', fontWeight: '500'}}>
-                    {actionMsg}
+                  <div className={styles.inputGroup}>
+                    <label className={styles.label}>Assigned Project</label>
+                    <select 
+                      className={styles.select} 
+                      value={selectedProject} 
+                      onChange={e => setSelectedProject(e.target.value)}
+                    >
+                      <option value="">Select a project...</option>
+                      {projects.map(p => (
+                        <option key={p._id} value={p._id}>{p.title || p.name}</option>
+                      ))}
+                    </select>
                   </div>
-                )}
-              </div>
-            </div>
 
-            {/* Right Column */}
-            <div className={styles.rightCol}>
-              <div className={`${styles.glassCard} ${styles.delay3}`} style={{marginBottom: '2rem'}}>
-                <h3 className={styles.cardTitle}><span>🕒</span> Today's Visits</h3>
-                <div className={styles.list}>
-                  {visits.length === 0 ? (
-                    <div className={styles.listItem}>
-                      <span className={styles.itemTitle} style={{ color: 'var(--text-secondary)' }}>No visits logged today.</span>
-                    </div>
-                  ) : (
-                    visits.map((visit, idx) => (
-                      <div className={styles.listItem} key={idx}>
-                        <div className={styles.itemInfo}>
-                          <span className={styles.itemTitle}>{visit.project?.name || visit.project?.title || 'Unknown Project'}</span>
-                          <span className={styles.itemDesc}>{new Date(visit.time).toLocaleTimeString()}</span>
-                        </div>
-                        <div className={styles.badge}>Completed</div>
+                  <div className={styles.cameraArea}>
+                    {!isCameraOpen && !imageSrc && (
+                      <div style={{textAlign: 'center', padding: '3rem 1rem'}}>
+                        <div style={{fontSize: '3rem', marginBottom: '1rem'}}>📷</div>
+                        <p style={{color: 'var(--text-secondary)', marginBottom: '1.5rem'}}>Camera access required for live site photos.</p>
+                        <button onClick={startCamera} className={`${styles.btn} ${styles.btnPrimary}`}>📸 Open Camera</button>
                       </div>
-                    ))
+                    )}
+                    {isCameraOpen && (
+                      <div className={styles.videoContainer}>
+                        <video ref={videoRef} className={styles.videoStream} autoPlay playsInline muted></video>
+                        <button onClick={capturePhoto} className={`${styles.btn} ${styles.btnPrimary}`} style={{ background: 'var(--gradient-success)' }}>
+                          ✅ Capture Photo
+                        </button>
+                      </div>
+                    )}
+                    {imageSrc && (
+                      <div className={styles.imagePreview}>
+                        <img src={imageSrc} alt="Site" />
+                        <button onClick={retakePhoto} className={`${styles.btn} ${styles.btnSecondary}`}>🔄 Retake Photo</button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className={styles.inputGroup}>
+                    <label className={styles.label}>Travel Expense (Optional)</label>
+                    <input 
+                      type="number" 
+                      className={styles.input} 
+                      placeholder="Amount (₹)" 
+                      style={{marginBottom: '0.75rem'}} 
+                      value={expenseAmount}
+                      onChange={e => setExpenseAmount(e.target.value)}
+                    />
+                    <input 
+                      type="text" 
+                      className={styles.input} 
+                      placeholder="Description (e.g., Train Panvel to CST)" 
+                      value={expenseDesc}
+                      onChange={e => setExpenseDesc(e.target.value)}
+                    />
+                  </div>
+
+                  <button onClick={submitVisit} className={`${styles.btn} ${styles.btnPrimary}`}>🚀 Submit Secure Visit Report</button>
+                  
+                  {actionMsg && (
+                    <div style={{marginTop: '1rem', textAlign: 'center', fontSize: '0.95rem', color: 'var(--accent-1)', fontWeight: '500'}}>
+                      {actionMsg}
+                    </div>
                   )}
                 </div>
               </div>
 
-              <div className={`${styles.glassCard} ${styles.delay3}`}>
-                <h3 className={styles.cardTitle}><span>📋</span> Active Assignments</h3>
-                <div className={styles.list}>
-                  {projects.length === 0 ? (
-                    <div className={styles.listItem}>
-                      <span className={styles.itemTitle} style={{ color: 'var(--text-secondary)' }}>No active projects.</span>
-                    </div>
-                  ) : (
-                    projects.map((proj, idx) => (
-                      <div className={styles.listItem} key={idx}>
-                        <div className={styles.itemInfo}>
-                          <span className={styles.itemTitle}>{proj.title || proj.name}</span>
+              {/* Right Column */}
+              <div className={styles.rightCol}>
+                <div className={`${styles.glassCard} ${styles.delay3}`} style={{marginBottom: '2rem'}}>
+                  <h3 className={styles.cardTitle}><span>🕒</span> Today's Visits</h3>
+                  <div className={styles.visitsList}>
+                    {visits.map((v, idx) => (
+                      <div key={idx} className={styles.visitItem}>
+                        <div className={styles.visitHeader}>
+                          <span className={styles.visitProject}>{v.project?.name || 'Unknown Project'}</span>
+                          <span className={styles.visitTime}>{new Date(v.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                         </div>
-                        <div className={styles.badge} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', borderColor: 'rgba(59, 130, 246, 0.2)' }}>Active</div>
+                        <div className={styles.visitDetails}>
+                          <div>📍 Location: {v.location.lat.toFixed(4)}, {v.location.lng.toFixed(4)}</div>
+                          <div>📏 Accuracy: {Math.round(v.location.accuracy)} meters</div>
+                          {v.expenseAmount > 0 && (
+                            <div style={{color: 'var(--accent-1)', marginTop: '0.25rem'}}>💰 Exp: ₹{v.expenseAmount} ({v.expenseDescription})</div>
+                          )}
+                        </div>
                       </div>
-                    ))
-                  )}
+                    ))}
+                    {visits.length === 0 && (
+                      <div style={{textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)'}}>
+                        No visits logged today.
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className={`${styles.glassCard} ${styles.delay3}`}>
+                  <h3 className={styles.cardTitle}><span>📋</span> Active Assignments</h3>
+                  <div className={styles.list}>
+                    {projects.length === 0 ? (
+                      <div className={styles.listItem}>
+                        <span className={styles.itemTitle} style={{ color: 'var(--text-secondary)' }}>No active projects.</span>
+                      </div>
+                    ) : (
+                      projects.map((proj, idx) => (
+                        <div className={styles.listItem} key={idx}>
+                          <div className={styles.itemInfo}>
+                            <span className={styles.itemTitle}>{proj.title || proj.name}</span>
+                          </div>
+                          <div className={styles.badge} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', borderColor: 'rgba(59, 130, 246, 0.2)' }}>Active</div>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {activeTab === 'photos' && (
+            <div className={`${styles.glassCard} ${styles.fadeInUp}`}>
+              <h2 className={styles.cardTitle}>Site Photos Gallery</h2>
+              <p style={{color: 'var(--text-secondary)'}}>Your uploaded site photos will appear here.</p>
+            </div>
+          )}
+          {activeTab === 'reports' && (
+            <div className={`${styles.glassCard} ${styles.fadeInUp}`}>
+              <h2 className={styles.cardTitle}>Daily Reports</h2>
+              <p style={{color: 'var(--text-secondary)'}}>A history of your submitted daily reports will appear here.</p>
+            </div>
+          )}
+          {activeTab === 'expenses' && (
+            <div className={`${styles.glassCard} ${styles.fadeInUp}`}>
+              <h2 className={styles.cardTitle}>My Expenses</h2>
+              <p style={{color: 'var(--text-secondary)'}}>A history of your logged expenses will appear here.</p>
+            </div>
+          )}
         </main>
       </div>
     </div>

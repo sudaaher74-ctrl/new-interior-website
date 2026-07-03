@@ -20,6 +20,8 @@ const AdminDashboard = () => {
   const [newEmployee, setNewEmployee] = useState({ fullName: '', email: '', password: '', mobileNumber: '', designation: '' });
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
   const [newProject, setNewProject] = useState({ name: '', clientName: '', siteAddress: '', status: 'Planning', budget: '' });
+  const [editingProject, setEditingProject] = useState(null);
+  const [editingEmployee, setEditingEmployee] = useState(null);
   const [selectedTrackingEmployee, setSelectedTrackingEmployee] = useState(null);
 
   const API_URL = window.API_CONFIG?.BASE_URL || '/api';
@@ -106,6 +108,17 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleUpdateLeadStatus = async (leadId, status) => {
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      await axios.put(`${API_URL}/v2/leads/${leadId}/status`, { status }, { headers });
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update lead status: ' + (err.response?.data?.msg || err.message));
+    }
+  };
+
   const handleAddProject = async (e) => {
     e.preventDefault();
     try {
@@ -117,6 +130,56 @@ const AdminDashboard = () => {
     } catch (err) {
       console.error(err);
       alert('Failed to add project: ' + (err.response?.data?.msg || err.message));
+    }
+  };
+
+  const handleEditProject = async (e) => {
+    e.preventDefault();
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      await axios.put(`${API_URL}/v2/projects/${editingProject._id}`, editingProject, { headers });
+      setEditingProject(null);
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to edit project: ' + (err.response?.data?.msg || err.message));
+    }
+  };
+
+  const handleDeleteProject = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this project?")) return;
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      await axios.delete(`${API_URL}/v2/projects/${id}`, { headers });
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete project: ' + (err.response?.data?.msg || err.message));
+    }
+  };
+
+  const handleEditEmployee = async (e) => {
+    e.preventDefault();
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      await axios.put(`${API_URL}/v2/admin/employees/${editingEmployee._id}`, editingEmployee, { headers });
+      setEditingEmployee(null);
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to edit employee: ' + (err.response?.data?.msg || err.message));
+    }
+  };
+
+  const handleDeleteEmployee = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this employee?")) return;
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      await axios.delete(`${API_URL}/v2/admin/employees/${id}`, { headers });
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete employee: ' + (err.response?.data?.msg || err.message));
     }
   };
 
@@ -242,7 +305,6 @@ const AdminDashboard = () => {
               <th>Location</th>
               <th>Check-In Time</th>
               <th>Expenses</th>
-              <th>Snapshot</th>
             </tr>
           </thead>
           <tbody>
@@ -265,15 +327,10 @@ const AdminDashboard = () => {
                     </div>
                   ) : '-'}
                 </td>
-                <td>
-                  {visit.photoUrl ? (
-                    <button onClick={() => setSelectedPhoto(visit.photoUrl)} className={`${styles.btn} ${styles.btnSecondary}`} style={{padding: '0.25rem 0.5rem', fontSize: '0.8rem'}}>📸 View</button>
-                  ) : 'No Photo'}
-                </td>
               </tr>
             ))}
             {employeeVisits.length === 0 && (
-              <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>No tracking data available for this employee.</td></tr>
+              <tr><td colSpan="4" style={{textAlign: 'center', padding: '2rem'}}>No tracking data available for this employee.</td></tr>
             )}
           </tbody>
         </table>
@@ -305,7 +362,18 @@ const AdminDashboard = () => {
               <td>{lead.projectType || lead.serviceRequested || '-'}</td>
               <td style={{maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{lead.message}</td>
               <td>{new Date(lead.createdAt).toLocaleDateString()}</td>
-              <td><span className={styles.badge} style={{background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6'}}>{lead.status || 'New'}</span></td>
+              <td>
+                <select 
+                  value={lead.status || 'New'}
+                  onChange={(e) => handleUpdateLeadStatus(lead._id, e.target.value)}
+                  style={{padding: '0.25rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', cursor: 'pointer'}}
+                >
+                  <option value="New" style={{color: 'black'}}>New</option>
+                  <option value="Contacted" style={{color: 'black'}}>Contacted</option>
+                  <option value="Converted" style={{color: 'black'}}>Converted</option>
+                  <option value="Closed" style={{color: 'black'}}>Closed</option>
+                </select>
+              </td>
             </tr>
           ))}
           {leads.length === 0 && (
@@ -330,6 +398,7 @@ const AdminDashboard = () => {
             <th>Location</th>
             <th>Budget</th>
             <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -340,10 +409,14 @@ const AdminDashboard = () => {
               <td>{proj.location || '-'}</td>
               <td>{proj.budget ? `₹${proj.budget}` : '-'}</td>
               <td><span className={styles.badge}>{proj.status || 'Active'}</span></td>
+              <td>
+                <button onClick={() => setEditingProject(proj)} style={{marginRight: '0.5rem', padding: '0.25rem 0.5rem', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '4px', color: 'white', cursor: 'pointer'}}>Edit</button>
+                <button onClick={() => handleDeleteProject(proj._id)} style={{padding: '0.25rem 0.5rem', background: 'rgba(239, 68, 68, 0.2)', border: 'none', borderRadius: '4px', color: '#ef4444', cursor: 'pointer'}}>Delete</button>
+              </td>
             </tr>
           ))}
           {projects.length === 0 && (
-            <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>No projects found.</td></tr>
+            <tr><td colSpan="6" style={{textAlign: 'center', padding: '2rem'}}>No projects found.</td></tr>
           )}
         </tbody>
       </table>
@@ -363,6 +436,7 @@ const AdminDashboard = () => {
             <th>Employee Name</th>
             <th>Contact</th>
             <th>Designation</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -372,10 +446,14 @@ const AdminDashboard = () => {
               <td style={{fontWeight: '500'}}>{emp.fullName || emp.name}</td>
               <td>{emp.email || emp.mobileNumber || '-'}</td>
               <td>{emp.designation || emp.role}</td>
+              <td>
+                <button onClick={() => setEditingEmployee(emp)} style={{marginRight: '0.5rem', padding: '0.25rem 0.5rem', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '4px', color: 'white', cursor: 'pointer'}}>Edit</button>
+                <button onClick={() => handleDeleteEmployee(emp._id)} style={{padding: '0.25rem 0.5rem', background: 'rgba(239, 68, 68, 0.2)', border: 'none', borderRadius: '4px', color: '#ef4444', cursor: 'pointer'}}>Delete</button>
+              </td>
             </tr>
           ))}
           {employees.length === 0 && (
-            <tr><td colSpan="4" style={{textAlign: 'center', padding: '2rem'}}>No employees found.</td></tr>
+            <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>No employees found.</td></tr>
           )}
         </tbody>
       </table>
@@ -503,6 +581,74 @@ const AdminDashboard = () => {
                 </select>
               </div>
               <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '1rem'}}>Save Project</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Project Modal */}
+      {editingProject && (
+        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', zIndex: 9999, backdropFilter: 'blur(10px)'}}>
+          <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative'}}>
+            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: 'var(--text-primary)'}} onClick={() => setEditingProject(null)}>&times;</span>
+            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem'}}>Edit Project</h3>
+            <form onSubmit={handleEditProject} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Project Name</label>
+                <input type="text" required value={editingProject.title || editingProject.name} onChange={e => setEditingProject({...editingProject, name: e.target.value, title: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Client Name</label>
+                <input type="text" value={editingProject.clientName || ''} onChange={e => setEditingProject({...editingProject, clientName: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Site Address</label>
+                <input type="text" value={editingProject.siteAddress || editingProject.location || ''} onChange={e => setEditingProject({...editingProject, siteAddress: e.target.value, location: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Status</label>
+                <select value={editingProject.status || 'Planning'} onChange={e => setEditingProject({...editingProject, status: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}}>
+                  <option value="Planning">Planning</option>
+                  <option value="Ongoing">Ongoing</option>
+                  <option value="On Hold">On Hold</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Upcoming">Upcoming</option>
+                </select>
+              </div>
+              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '1rem'}}>Update Project</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Employee Modal */}
+      {editingEmployee && (
+        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', zIndex: 9999, backdropFilter: 'blur(10px)'}}>
+          <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative'}}>
+            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: 'var(--text-primary)'}} onClick={() => setEditingEmployee(null)}>&times;</span>
+            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem'}}>Edit Employee</h3>
+            <form onSubmit={handleEditEmployee} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Full Name</label>
+                <input type="text" required value={editingEmployee.fullName || editingEmployee.name || ''} onChange={e => setEditingEmployee({...editingEmployee, fullName: e.target.value, name: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Email</label>
+                <input type="email" required value={editingEmployee.email || ''} onChange={e => setEditingEmployee({...editingEmployee, email: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>New Password (leave blank to keep current)</label>
+                <input type="password" value={editingEmployee.password || ''} onChange={e => setEditingEmployee({...editingEmployee, password: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Mobile Number</label>
+                <input type="tel" required value={editingEmployee.mobileNumber || ''} onChange={e => setEditingEmployee({...editingEmployee, mobileNumber: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Designation</label>
+                <input type="text" value={editingEmployee.designation || ''} onChange={e => setEditingEmployee({...editingEmployee, designation: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '1rem'}}>Update Employee</button>
             </form>
           </div>
         </div>

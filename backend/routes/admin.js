@@ -117,4 +117,40 @@ router.post('/employees', authAdmin, async (req, res) => {
   }
 });
 
+// Update Employee
+router.put('/employees/:id', authAdmin, async (req, res) => {
+  const { fullName, email, mobileNumber, designation, password } = req.body;
+  try {
+    let employee = await User.findById(req.params.id);
+    if (!employee) return res.status(404).json({ msg: 'Employee not found' });
+
+    employee.fullName = fullName || employee.fullName;
+    employee.email = email || employee.email;
+    employee.mobileNumber = mobileNumber || employee.mobileNumber;
+    employee.designation = designation || employee.designation;
+    
+    if (password) {
+      const salt = await require('bcryptjs').genSalt(10);
+      employee.password = await require('bcryptjs').hash(password, salt);
+    }
+
+    await employee.save();
+    res.json({ msg: 'Employee updated', employee });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
+
+// Delete Employee
+router.delete('/employees/:id', authAdmin, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ msg: 'Employee removed' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
+
 module.exports = router;
