@@ -26,6 +26,13 @@ const EmployeeDashboard = () => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [actionMsg, setActionMsg] = useState('');
   const [activeTab, setActiveTab] = useState('dashboard');
+  
+  // Offline Sync State
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [offlineQueue, setOfflineQueue] = useState(() => {
+    const saved = localStorage.getItem('offlineVisits_queue');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const API_URL = window.API_CONFIG?.BASE_URL || '/api'; // fallback to /api for local dev proxy
   
@@ -42,13 +49,56 @@ const EmployeeDashboard = () => {
 
     fetchData();
 
+    const handleOnline = () => {
+      setIsOnline(true);
+      syncOfflineQueue();
+    };
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
     return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
       // Cleanup camera on unmount
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
     };
   }, [navigate]);
+
+  const syncOfflineQueue = async () => {
+    const queueStr = localStorage.getItem('offlineVisits_queue');
+    if (!queueStr) return;
+    const queue = JSON.parse(queueStr);
+    if (queue.length === 0) return;
+
+    toast.loading(`Syncing ${queue.length} offline visits...`, { id: 'sync' });
+    const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+    
+    let successCount = 0;
+    const remainingQueue = [];
+
+    for (const payload of queue) {
+      try {
+        await axios.post(`${API_URL}/v2/site-visits/log`, payload, { headers });
+        successCount++;
+      } catch (err) {
+        remainingQueue.push(payload);
+      }
+    }
+
+    if (successCount > 0) {
+      toast.success(`Successfully synced ${successCount} visits!`, { id: 'sync' });
+      fetchData(); // Refresh list
+    } else {
+      toast.error('Sync failed. Will retry later.', { id: 'sync' });
+    }
+
+    localStorage.setItem('offlineVisits_queue', JSON.stringify(remainingQueue));
+    setOfflineQueue(remainingQueue);
+  };
 
   const fetchData = async () => {
     try {
@@ -159,17 +209,44 @@ const EmployeeDashboard = () => {
 
   const sendDataToBackend = async (loc) => {
     setActionMsg('Submitting securely to Admin server...');
+    const payload = {
+      projectId: selectedProject,
+      lat: loc.lat,
+      lng: loc.lng,
+      accuracy: loc.accuracy,
+      expenseAmount: Number(expenseAmount) || 0,
+      expenseDescription: expenseDesc,
+      offlineTimestamp: new Date().toISOString()
+    };
+
+    if (!isOnline) {
+      const newQueue = [...offlineQueue, payload];
+      localStorage.setItem('offlineVisits_queue', JSON.stringify(newQueue));
+      setOfflineQueue(newQueue);
+      
+      toast.success('Offline mode: Visit saved locally!');
+      setActionMsg('Offline mode: Visit saved locally!');
+      
+      const p = projects.find(p => p._id === payload.projectId);
+      const fakeVisit = {
+        _id: 'local-' + Date.now(),
+        project: p ? { name: p.title || p.name } : { name: 'Unknown Project' },
+        time: payload.offlineTimestamp,
+        location: { lat: payload.lat, lng: payload.lng },
+        expenseAmount: payload.expenseAmount,
+        isOffline: true
+      };
+      setVisits([fakeVisit, ...visits]);
+      
+      setSelectedProject('');
+      setImageSrc(null);
+      setExpenseAmount('');
+      setExpenseDesc('');
+      return;
+    }
+
     try {
       const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
-      const payload = {
-        projectId: selectedProject,
-        lat: loc.lat,
-        lng: loc.lng,
-        accuracy: loc.accuracy,
-        expenseAmount: Number(expenseAmount) || 0,
-        expenseDescription: expenseDesc
-      };
-
       const res = await axios.post(`${API_URL}/v2/site-visits/log`, payload, { headers });
       
       toast.success('Visit logged successfully!');
@@ -198,6 +275,13 @@ const EmployeeDashboard = () => {
   return (
     <div className={styles.portalWrapper}>
       <div className={styles.layout}>
+        {/* Offline Banner */}
+        {!isOnline && (
+          <div style={{ backgroundColor: '#f59e0b', color: 'white', padding: '0.5rem', textAlign: 'center', fontWeight: '600', fontSize: '0.9rem', width: '100%', position: 'absolute', top: 0, zIndex: 1000 }}>
+            ⚠️ You are offline. Data is being saved locally. 
+            {offlineQueue.length > 0 && ` (${offlineQueue.length} pending sync)`}
+          </div>
+        )}
         {/* Sidebar */}
         <aside className={styles.sidebar}>
           <div className={styles.brand}>OS Portal.</div>
