@@ -126,17 +126,17 @@ const About = () => {
           </div>
           <div className="team-card">
             <div className="team-card-img"><img
-                src="" alt="Ashy Deshmukha"
+                src="" alt="Tejaswini Jadhav"
                 loading="lazy" /></div>
-            <h4> Ashy Deshmukha</h4>
-            <p className="team-card-role">Senior Design Director</p>
+            <h4>Tejaswini Jadhav</h4>
+            <p className="team-card-role">Commercial Designer</p>
           </div>
           <div className="team-card">
             <div className="team-card-img"><img
-                src="" alt="Ajay Jadhav" />
+                src="" alt="Miss Aysha Bhandari" />
             </div>
-            <h4>Ajay Jadhav</h4>
-            <p className="team-card-role">Head of Project Delivery</p>
+            <h4>Miss Aysha Bhandari</h4>
+            <p className="team-card-role">Residential Designer</p>
           </div>
         </div>
       </div>
@@ -193,9 +193,24 @@ const About = () => {
       </div>
     </section>
 
-    
+    {/* Location */}
+    <section style={{background: 'var(--charcoal)', padding: '80px 0', borderTop: '1px solid rgba(255,255,255,0.05)'}}>
+      <div className="container">
+        <div className="section-header reveal">
+          <span className="label">Visit Us</span>
+          <h2>Our <em style={{fontStyle: 'italic', color: 'var(--gold)'}}>Studio</em></h2>
+          <div className="gold-line center"></div>
+        </div>
+        <div style={{textAlign: 'center', maxWidth: '600px', margin: '0 auto'}} className="reveal">
+          <p style={{fontSize: '1.2rem', lineHeight: '1.8', color: 'var(--text-secondary)'}}>
+            Shop no 56, 2nd floor, Xth Central Mall<br/>
+            Next to D-Mart, Mahavir Nagar<br/>
+            Kandivali West, Mumbai - 400067
+          </p>
+        </div>
+      </div>
+    </section>
 
-  
     </main>
   );
 };
