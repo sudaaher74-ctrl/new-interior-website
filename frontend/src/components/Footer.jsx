@@ -41,7 +41,7 @@ const Footer = () => {
             <h4 className="footer-col-title">Contact</h4>
             <ul className="footer-links">
               <li><a>+91 97735 97150</a></li>
-              <li><a>OS_Interior@gmail.com</a></li>
+              <li><a href="mailto:Team@os-interiors.in">Team@os-interiors.in</a></li>
               <li><a>Level 12, Wwork, Belapur CBD<br />Navi Mumbai 400 051</a></li>
             </ul>
           </div>

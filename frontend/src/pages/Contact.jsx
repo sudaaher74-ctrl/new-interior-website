@@ -189,7 +189,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <div className="contact-info-label">Email</div>
-                  <div className="contact-info-value">hello@osinteriors.com<br />careers@osinteriors.com</div>
+                  <div className="contact-info-value">Team@os-interiors.in</div>
                 </div>
               </div>
               <div className="contact-info-item">
