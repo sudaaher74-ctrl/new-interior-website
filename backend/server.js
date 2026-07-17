@@ -44,7 +44,6 @@ mongoose.connect(MONGODB_URI)
 // ── ROUTES ──────────────────────────────────────────────────
 
 // 1. New Moduler ERP APIs (v2)
-app.use('/api/v2/auth', require('./routes/auth'));
 app.use('/api/v2/projects', require('./routes/projects'));
 app.use('/api/v2/leads', require('./routes/leads'));
 app.use('/api/v2/attendance', require('./routes/attendance'));
@@ -59,13 +58,7 @@ app.use('/api/leads', require('./routes/leads'));
 // Use v2 projects router for /api/projects as well so it uses the same bypass logic
 app.use('/api/projects', require('./routes/projects'));
 
-// 1. Auth Routes
-// Replaced by modular auth logic inside v2/auth
-app.post('/api/auth/login', loginLimiter, async (req, res) => {
-  res.status(400).json({ msg: 'Please use /api/v2/auth/login' });
-});
 
-// Legacy inline routes for leads and projects have been replaced by modular ones.
 
 // Global Error Handler
 app.use((err, req, res, next) => {

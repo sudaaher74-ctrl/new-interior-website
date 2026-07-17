@@ -8,7 +8,7 @@ import About from './pages/About';
 import Projects from './pages/Projects';
 import Contact from './pages/Contact';
 import ProjectDetail from './pages/ProjectDetail';
-import Login from './pages/Login';
+
 import AdminDashboard from './pages/AdminDashboard';
 import EmployeeDashboard from './pages/EmployeeDashboard';
 import PremiumPage from './pages/PremiumPage';
@@ -71,7 +71,7 @@ function App() {
       <Toaster position="top-right" />
       <Layout>
         <Routes>
-          <Route path="/login" element={<Login />} />
+
           <Route path="/admin/*" element={<AdminDashboard />} />
           <Route path="/employee/*" element={<EmployeeDashboard />} />
           <Route path="/premium" element={<PremiumPage />} />
