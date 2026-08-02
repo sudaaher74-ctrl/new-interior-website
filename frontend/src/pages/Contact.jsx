@@ -13,6 +13,8 @@ const EMPTY = {
   area: '',
   city: '',
   message: '',
+  // Honeypot — hidden from people, tempting to bots that autofill everything.
+  website: '',
 };
 
 const DETAILS = [
@@ -77,6 +79,7 @@ const Contact = () => {
           email: form.email.trim(),
           projectType: form.projectType,
           message: [form.message.trim(), ...context].filter(Boolean).join('\n'),
+          website: form.website,
         }),
       });
       if (!res.ok) throw new Error(`Request failed (${res.status})`);
@@ -146,6 +149,21 @@ const Contact = () => {
           <div className="reveal">
             <div className="form-card">
               <form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
+                {/* Honeypot. Hidden from sight and from assistive tech, and
+                    skipped in the tab order, so only a bot ever fills it. */}
+                <div className="hp-field" aria-hidden="true">
+                  <label htmlFor="website">Website</label>
+                  <input
+                    id="website"
+                    name="website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={form.website}
+                    onChange={update('website')}
+                  />
+                </div>
+
                 {field('name', 'Full name')}
 
                 <div className="grid-2" style={{ gap: '24px' }}>

@@ -7,26 +7,45 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      workbox: {
+        // The dashboards are lazy-loaded on purpose (see App.jsx). Precaching
+        // them would pull the whole ERP and the PDF stack down in the
+        // background on a marketing visit, undoing the code splitting.
+        globIgnores: [
+          '**/AdminDashboard-*',
+          '**/EmployeeDashboard-*',
+          '**/PremiumPage-*',
+          '**/html2canvas-*',
+          '**/index.es-*',
+          '**/purify.es-*',
+          // Legacy scripts from the pre-React static site; no longer loaded.
+          'script.js',
+          'admin.js',
+        ],
+      },
       manifest: {
-        name: 'OS Portal',
-        short_name: 'OS Portal',
-        description: 'OS Interior Project Tracking',
+        name: 'OS Interiors',
+        short_name: 'OS Interiors',
+        description: 'Commercial interior and turnkey fit-out contractor, Mumbai.',
         theme_color: '#f5ead8',
         background_color: '#f5ead8',
         display: 'standalone',
+        start_url: '/',
         icons: [
           {
-            src: 'https://via.placeholder.com/192x192.png?text=OS',
-            sizes: '192x192',
-            type: 'image/png'
+            src: '/favicon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'any',
           },
           {
-            src: 'https://via.placeholder.com/512x512.png?text=OS',
-            sizes: '512x512',
-            type: 'image/png'
-          }
-        ]
-      }
+            src: '/favicon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'maskable',
+          },
+        ],
+      },
     })
   ],
 })

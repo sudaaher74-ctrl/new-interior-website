@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 const Lead = require('../models/Lead');
@@ -11,10 +12,37 @@ const authAdmin = async (req, res, next) => {
   next();
 };
 
+// This endpoint is public, so cap how fast one address can file enquiries.
+const leadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: { msg: 'Too many enquiries from this address. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Create a new lead (public endpoint, from contact form)
-router.post('/', async (req, res) => {
+router.post('/', leadLimiter, async (req, res) => {
   try {
-    const lead = new Lead(req.body);
+    // `website` is a honeypot: the form renders it hidden, so a human never
+    // fills it in and a bot that autofills every field does. Answer 200 so the
+    // bot has no signal that it was rejected.
+    if (req.body.website) return res.json({ ok: true });
+
+    const { name, phone, email, projectType, message } = req.body;
+    if (!name || !phone) {
+      return res.status(400).json({ msg: 'Name and phone are required.' });
+    }
+
+    // Whitelist the fields rather than passing req.body straight to the model,
+    // which would let a caller set status, source and notes themselves.
+    const lead = new Lead({
+      name: String(name).slice(0, 120),
+      phone: String(phone).slice(0, 40),
+      email: email ? String(email).slice(0, 160) : undefined,
+      projectType: projectType ? String(projectType).slice(0, 80) : undefined,
+      message: message ? String(message).slice(0, 4000) : undefined,
+    });
     await lead.save();
     res.json(lead);
   } catch (err) {

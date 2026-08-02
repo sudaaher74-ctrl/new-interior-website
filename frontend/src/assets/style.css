@@ -865,6 +865,16 @@ textarea.field-input {
   font-weight: 500;
   color: var(--accent-deep);
 }
+/* Honeypot wrapper. Positioned off-screen rather than display:none, since some
+   bots skip fields that are outright hidden. */
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 .form-card {
   background-color: var(--surface-card);
   padding: 48px;

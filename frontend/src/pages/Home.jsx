@@ -2,16 +2,23 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import StructuredData from '../components/StructuredData';
 import { SERVICE_CATEGORIES, CAPABILITIES, TURNKEY_SCOPE, SECTORS } from '../data/services';
+import { localBusinessSchema, faqSchema } from '../data/business';
 
 const CLIENTS =
   'Bombay Barbeque, Copper Chimney, The Irish House, Indira IVF, D Y Patil University, ' +
   'Kokilaben Ambani Hospital, Urban Burger, St Regis Mumbai, Nirlon, Pearl Academy, Lite Bite Foods.';
 
+const FOUNDED = 2014;
+
+// Derived rather than hardcoded so the figures can't drift from the data or go
+// stale with the calendar — the old list claimed "10 sectors served" against a
+// SECTORS array of six, and a fixed "10+ years".
 const STATS = [
-  { value: '2014', label: 'operating since' },
-  { value: '10+', label: 'years' },
-  { value: '10', label: 'sectors served' },
+  { value: String(FOUNDED), label: 'operating since' },
+  { value: `${new Date().getFullYear() - FOUNDED}`, label: 'years in business' },
+  { value: String(SECTORS.length), label: 'sectors served' },
   { value: '1', label: 'contract covers design, MEP, fit-out and handover' },
 ];
 
@@ -81,6 +88,10 @@ const FAQS = [
   },
 ];
 
+// Built once at module scope: StructuredData keys its effect on `data`, so a
+// fresh object each render would tear the script tag down and rebuild it.
+const FAQ_SCHEMA = faqSchema(FAQS);
+
 const Home = () => {
   useScrollReveal();
   useDocumentTitle(
@@ -90,6 +101,9 @@ const Home = () => {
 
   return (
     <main>
+      <StructuredData id="ld-business" data={localBusinessSchema} />
+      <StructuredData id="ld-faq" data={FAQ_SCHEMA} />
+
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="container mt-6">
         <div className="hero reveal">
