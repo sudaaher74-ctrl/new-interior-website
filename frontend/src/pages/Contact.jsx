@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import Photo from '../components/Photo';
 import { PROJECT_TYPES } from '../data/services';
 
@@ -23,6 +24,10 @@ const DETAILS = [
 
 const Contact = () => {
   useScrollReveal();
+  useDocumentTitle(
+    'Request a quote',
+    'Tell us the sector, the site and what you need. We reply with next steps — usually a site visit — within one working day.'
+  );
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [sending, setSending] = useState(false);

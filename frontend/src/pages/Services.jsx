@@ -1,10 +1,15 @@
 import React from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import Photo from '../components/Photo';
 import { SERVICE_CATEGORIES, TURNKEY_SCOPE, CAPABILITIES } from '../data/services';
 
 const Services = () => {
   useScrollReveal();
+  useDocumentTitle(
+    'Services',
+    'Commercial interiors, restaurants, retail and showrooms, healthcare and education — plus turnkey fit-out, MEP services and painting and exteriors.'
+  );
 
   return (
     <main>

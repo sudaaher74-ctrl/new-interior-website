@@ -1,33 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://sudaaher74-ctrl.github.io/new-interior-website/</loc>
-    <lastmod>2026-04-29</lastmod>
+    <loc>https://www.osinteriors.in/</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://sudaaher74-ctrl.github.io/new-interior-website/#page-about</loc>
-    <lastmod>2026-04-29</lastmod>
+    <loc>https://www.osinteriors.in/services</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://sudaaher74-ctrl.github.io/new-interior-website/#page-projects</loc>
-    <lastmod>2026-04-29</lastmod>
+    <loc>https://www.osinteriors.in/portfolio</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://sudaaher74-ctrl.github.io/new-interior-website/#page-contact</loc>
-    <lastmod>2026-04-29</lastmod>
+    <loc>https://www.osinteriors.in/about</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://sudaaher74-ctrl.github.io/new-interior-website/admin.html</loc>
-    <lastmod>2026-04-29</lastmod>
+    <loc>https://www.osinteriors.in/process</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.3</priority>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.osinteriors.in/contact</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.osinteriors.in/portfolio/bombay-barbeque</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.osinteriors.in/portfolio/netwin-ventures</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.osinteriors.in/portfolio/99-wok-street</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.osinteriors.in/portfolio/juice-crush</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.osinteriors.in/portfolio/radhakrishna-cuisine</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.osinteriors.in/portfolio/boomerang-park</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.osinteriors.in/portfolio/la-loco-grill</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.osinteriors.in/portfolio/caravan-menu</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.osinteriors.in/portfolio/exterior-facade-work</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>

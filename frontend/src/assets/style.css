@@ -360,6 +360,13 @@ button.chip-light:hover {
   color: var(--page-ground);
 }
 
+/* Selected state for chips that really are controls (the portfolio filters). */
+.chip-active,
+.chip-active:hover {
+  background-color: var(--accent);
+  color: #fff;
+}
+
 .chip-outline {
   display: inline-flex;
   align-items: center;
@@ -947,12 +954,6 @@ textarea.field-input {
   width: 28px;
   height: 28px;
   fill: #fff;
-}
-
-/* Legacy cursor helpers from the static site — no longer rendered */
-.cursor,
-.cursor-follower {
-  display: none;
 }
 
 /* ── Motion preferences ───────────────────────────────── */

@@ -1,10 +1,15 @@
 import React from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import Photo from '../components/Photo';
 import { CAPABILITIES, SERVICE_CATEGORIES } from '../data/services';
 
 const About = () => {
   useScrollReveal();
+  useDocumentTitle(
+    'About',
+    'A premium commercial interior and exterior contractor based in India since 2014, with design, engineering, project management and craftsmanship under one roof.'
+  );
 
   return (
     <main>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { SERVICE_CATEGORIES, CAPABILITIES, TURNKEY_SCOPE, SECTORS } from '../data/services';
 
 const CLIENTS =
@@ -82,6 +83,10 @@ const FAQS = [
 
 const Home = () => {
   useScrollReveal();
+  useDocumentTitle(
+    'Commercial Interior & Turnkey Fit-Out Contractor, Mumbai',
+    'Design, engineering and execution under one roof — restaurants, offices, retail, healthcare and hospitality, handed over ready to trade. Operating since 2014.'
+  );
 
   return (
     <main>

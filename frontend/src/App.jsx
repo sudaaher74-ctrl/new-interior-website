@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
@@ -11,9 +11,12 @@ import Process from './pages/Process';
 import Contact from './pages/Contact';
 import ProjectDetail from './pages/ProjectDetail';
 
-import AdminDashboard from './pages/AdminDashboard';
-import EmployeeDashboard from './pages/EmployeeDashboard';
-import PremiumPage from './pages/PremiumPage';
+// The dashboards are a separate application from the marketing site and drag in
+// the PDF stack with them. Loading them lazily keeps ~1.3MB of ERP code out of
+// the bundle a visitor downloads to read about interior design.
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const EmployeeDashboard = lazy(() => import('./pages/EmployeeDashboard'));
+const PremiumPage = lazy(() => import('./pages/PremiumPage'));
 
 // The dashboards style themselves with CSS modules; admin.css is legacy global
 // CSS from the old static admin page and only clobbered the site's own tokens.
@@ -47,16 +50,22 @@ function ScrollToTop() {
   return null;
 }
 
+// Dashboards are behind a login and load on their own route, so a plain text
+// fallback is enough — nothing here is on the marketing critical path.
+const Lazily = ({ children }) => (
+  <Suspense fallback={<div style={{ padding: '48px' }}>Loading…</div>}>{children}</Suspense>
+);
+
 function App() {
   return (
     <Router>
       <ScrollToTop />
       <Toaster position="top-right" />
       <Routes>
-        <Route path="/admin/*" element={<AdminDashboard />} />
-        <Route path="/employee/*" element={<EmployeeDashboard />} />
-        <Route path="/premium" element={<PremiumPage />} />
-        
+        <Route path="/admin/*" element={<Lazily><AdminDashboard /></Lazily>} />
+        <Route path="/employee/*" element={<Lazily><EmployeeDashboard /></Lazily>} />
+        <Route path="/premium" element={<Lazily><PremiumPage /></Lazily>} />
+
         {/* Marketing Website Routes */}
         <Route path="*" element={
           <>

@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { projects, FILTERS } from '../data/projects';
 
 const Portfolio = () => {
   const [activeFilter, setActiveFilter] = useState('All');
   useScrollReveal([activeFilter]);
+  useDocumentTitle(
+    'Portfolio',
+    'Trading spaces we designed, engineered and built across dining, workplace, retail and care in Mumbai.'
+  );
 
   const filtered =
     activeFilter === 'All'
@@ -29,8 +34,7 @@ const Portfolio = () => {
                 type="button"
                 onClick={() => setActiveFilter(filter)}
                 aria-pressed={isActive}
-                className={isActive ? 'chip' : 'chip-outline'}
-                style={isActive ? { backgroundColor: 'var(--accent)', color: '#fff' } : undefined}
+                className={isActive ? 'chip chip-active' : 'chip-outline'}
               >
                 {filter}
               </button>
@@ -58,8 +62,8 @@ const Portfolio = () => {
                 className="reveal"
                 style={{ display: 'block' }}
               >
-                <div className="tile" style={{ height: '300px', marginBottom: '16px' }}>
-                  <img src={project.img} alt={project.title} loading="lazy" />
+                <div className="tile" style={{ aspectRatio: '4 / 3', marginBottom: '16px' }}>
+                  <img src={project.img} alt={project.title} loading="lazy" decoding="async" />
                 </div>
                 <h2 className="h4-card mb-1">{project.title}</h2>
                 <div style={{ fontSize: '14px', color: 'var(--text-meta)' }}>{project.meta}</div>

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import Photo from '../components/Photo';
 import { getProject } from '../data/projects';
 
 const SpecRow = ({ label, value }) => (
@@ -14,6 +16,13 @@ const ProjectDetail = () => {
   const { id } = useParams();
   const project = getProject(id);
   useScrollReveal([id]);
+  // Called before the not-found return so the hook order stays stable.
+  useDocumentTitle(
+    project ? `${project.title}, ${project.location}` : 'Project not found',
+    project
+      ? `${project.sector} project in ${project.location} — delivered as a ${project.scope.toLowerCase()} contract by OS Interiors.`
+      : undefined
+  );
 
   if (!project) {
     return (
@@ -37,9 +46,14 @@ const ProjectDetail = () => {
           ← Back to portfolio
         </Link>
 
-        <div className="tile reveal" style={{ height: '600px', marginBottom: '64px', borderRadius: 'var(--radius-lg)' }}>
-          <img src={project.img} alt={`${project.title} — ${project.sector}, ${project.location}`} />
-        </div>
+        <Photo
+          src={project.img}
+          alt={`${project.title} — ${project.sector}, ${project.location}`}
+          ratio="16 / 9"
+          className="reveal"
+          priority
+          style={{ marginBottom: '64px', borderRadius: 'var(--radius-lg)' }}
+        />
 
         <div className="grid-2 mb-12">
           <div className="reveal">

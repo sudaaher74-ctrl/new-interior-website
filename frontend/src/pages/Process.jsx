@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import Photo from '../components/Photo';
 import { TURNKEY_SCOPE } from '../data/services';
 
@@ -20,6 +21,10 @@ const STEPS = [
 
 const Process = () => {
   useScrollReveal();
+  useDocumentTitle(
+    'Process',
+    'From requirement discussion and site visit through 3D visualisation, BOQ and execution to final handover — eleven steps on one programme.'
+  );
 
   return (
     <main>
