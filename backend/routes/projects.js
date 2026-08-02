@@ -1,23 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const Project = require('../models/Project');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
-
 const User = require('../models/User'); // Need User model for bypass
-
-// Admin middleware
-const authAdmin = async (req, res, next) => {
-  req.user = { role: 'Super Admin', id: 'dummy_admin_id' };
-  next();
-};
-
-// Generic Auth middleware (for both employees and admins)
-const auth = async (req, res, next) => {
-  req.user = { role: 'Employee', id: 'dummy_employee_id' };
-  next();
-};
+const { auth, authAdmin } = require('../middleware/auth');
 
 // Create a project
 router.post('/', authAdmin, async (req, res) => {

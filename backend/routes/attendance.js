@@ -1,17 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const Attendance = require('../models/Attendance');
 const Project = require('../models/Project');
 const User = require('../models/User');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
+const { auth } = require('../middleware/auth');
 
 // Middleware to verify token
-const auth = async (req, res, next) => {
-  req.user = { role: 'Employee', id: 'dummy_employee_id' };
-  next();
-};
 
 // Get Today's Status
 router.get('/today', auth, async (req, res) => {

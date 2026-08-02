@@ -1,16 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const rateLimit = require('express-rate-limit');
-const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 const Lead = require('../models/Lead');
 const User = require('../models/User');
-
-// Admin middleware
-const authAdmin = async (req, res, next) => {
-  req.user = { role: 'Super Admin', id: 'dummy_admin_id' };
-  next();
-};
+const { authAdmin } = require('../middleware/auth');
 
 // This endpoint is public, so cap how fast one address can file enquiries.
 const leadLimiter = rateLimit({

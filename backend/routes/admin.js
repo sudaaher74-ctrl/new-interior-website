@@ -1,18 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Project = require('../models/Project');
 const Attendance = require('../models/Attendance');
 const SiteVisit = require('../models/SiteVisit');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
-
-// Admin middleware
-const authAdmin = async (req, res, next) => {
-  req.user = { role: 'Super Admin', id: 'dummy_admin_id' };
-  next();
-};
+const { authAdmin } = require('../middleware/auth');
 
 // Get Dashboard Stats
 router.get('/stats', authAdmin, async (req, res) => {

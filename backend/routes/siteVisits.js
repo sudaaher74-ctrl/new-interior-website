@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const SiteVisit = require('../models/SiteVisit');
 const cloudinary = require('cloudinary').v2;
+const { auth } = require('../middleware/auth');
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -10,13 +10,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
-
 // Middleware to verify token
-const auth = async (req, res, next) => {
-  req.user = { role: 'Employee', id: 'dummy_employee_id' };
-  next();
-};
 
 // Log a new Site Visit
 router.post('/log', auth, async (req, res) => {

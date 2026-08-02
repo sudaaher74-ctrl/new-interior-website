@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
+import RequireAuth from './components/RequireAuth';
 import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';
@@ -18,6 +19,7 @@ import ProjectDetail from './pages/ProjectDetail';
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const EmployeeDashboard = lazy(() => import('./pages/EmployeeDashboard'));
 const PremiumPage = lazy(() => import('./pages/PremiumPage'));
+const Login = lazy(() => import('./pages/Login'));
 
 // The dashboards style themselves with CSS modules; admin.css is legacy global
 // CSS from the old static admin page and only clobbered the site's own tokens.
@@ -63,9 +65,37 @@ function App() {
       <ScrollToTop />
       <Toaster position="top-right" />
       <Routes>
-        <Route path="/admin/*" element={<Lazily><AdminDashboard /></Lazily>} />
-        <Route path="/employee/*" element={<Lazily><EmployeeDashboard /></Lazily>} />
-        <Route path="/premium" element={<Lazily><PremiumPage /></Lazily>} />
+        <Route path="/login" element={<Lazily><Login /></Lazily>} />
+        <Route
+          path="/admin/*"
+          element={
+            <Lazily>
+              <RequireAuth adminOnly>
+                <AdminDashboard />
+              </RequireAuth>
+            </Lazily>
+          }
+        />
+        <Route
+          path="/employee/*"
+          element={
+            <Lazily>
+              <RequireAuth>
+                <EmployeeDashboard />
+              </RequireAuth>
+            </Lazily>
+          }
+        />
+        <Route
+          path="/premium"
+          element={
+            <Lazily>
+              <RequireAuth>
+                <PremiumPage />
+              </RequireAuth>
+            </Lazily>
+          }
+        />
 
         {/* Marketing Website Routes */}
         <Route path="*" element={

@@ -40,11 +40,6 @@ const EmployeeDashboard = () => {
     const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     setCurrentDate(new Date().toLocaleDateString(undefined, dateOptions));
     
-    let token = localStorage.getItem('token');
-    if (!token || token === 'dummy_token' || token === 'dummy_admin_token') {
-      localStorage.setItem('token', 'dummy_employee_token');
-      token = 'dummy_employee_token';
-    }
 
     fetchData();
 

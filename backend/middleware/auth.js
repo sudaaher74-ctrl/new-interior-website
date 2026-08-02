@@ -1,0 +1,49 @@
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// Fail loudly rather than silently falling back to a guessable default — a
+// predictable secret lets anyone mint their own admin token.
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET is not set. Refusing to start with a default secret.');
+}
+
+const ADMIN_ROLES = ['Super Admin', 'Owner'];
+
+function readToken(req) {
+  const header = req.header('Authorization') || '';
+  if (!header.startsWith('Bearer ')) return null;
+  return header.slice(7).trim() || null;
+}
+
+/**
+ * Verifies the JWT and attaches the caller to req.user.
+ *
+ * Tokens are signed as { user: { id, role, fullName } } — see routes/auth.js.
+ */
+const auth = (req, res, next) => {
+  const token = readToken(req);
+  if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (!decoded.user || !decoded.user.role) {
+      return res.status(401).json({ msg: 'Token is not valid' });
+    }
+    req.user = decoded.user;
+    next();
+  } catch {
+    res.status(401).json({ msg: 'Token is not valid' });
+  }
+};
+
+/** As above, but additionally requires an administrative role. */
+const authAdmin = (req, res, next) =>
+  auth(req, res, () => {
+    if (!ADMIN_ROLES.includes(req.user.role)) {
+      return res.status(403).json({ msg: 'Access denied: administrators only' });
+    }
+    next();
+  });
+
+module.exports = { auth, authAdmin, ADMIN_ROLES, JWT_SECRET };
