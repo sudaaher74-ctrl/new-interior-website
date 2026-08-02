@@ -41,12 +41,16 @@
   --shadow-lg: 0 3px 10px rgba(46, 43, 37, .16);
 
   /* Layout */
-  --max-width: 1280px;
-  --gutter: 40px;
+  --max-width: 1160px;
+  --gutter: 48px;
+}
+
+@media (max-width: 1240px) {
+  :root { --gutter: 40px; }
 }
 
 @media (max-width: 768px) {
-  :root { --gutter: 20px; }
+  :root { --gutter: 24px; }
 }
 
 /* Reset & Base */
@@ -372,14 +376,17 @@ button {
   position: sticky;
   top: 0;
   z-index: 100;
-}
-
-.navbar {
+  /* Bar tint spans the full width; its contents align to the content column. */
   background-color: rgba(245, 234, 216, .92);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  padding: 16px var(--gutter);
   border-bottom: 1px solid var(--border-hairline);
+}
+
+.navbar {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 16px var(--gutter);
   display: flex;
   align-items: center;
   gap: 32px;
