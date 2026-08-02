@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { SERVICE_CATEGORIES, CAPABILITIES } from '../data/services';
 
 const Footer = () => {
   return (
@@ -44,13 +45,11 @@ const Footer = () => {
         <div className="footer-col reveal">
           <h4>Services</h4>
           <ul>
-            <li><Link to="/services">Restaurant Interiors</Link></li>
-            <li><Link to="/services">Office & Corporate</Link></li>
-            <li><Link to="/services">Retail & Showrooms</Link></li>
-            <li><Link to="/services">Healthcare & Education</Link></li>
-            <li><Link to="/services">Turnkey fit-out</Link></li>
-            <li><Link to="/services">MEP services</Link></li>
-            <li><Link to="/services">Exteriors & painting</Link></li>
+            {[...SERVICE_CATEGORIES, ...CAPABILITIES].map((item) => (
+              <li key={item.slug}>
+                <Link to={`/services#${item.slug}`}>{item.title}</Link>
+              </li>
+            ))}
           </ul>
         </div>
         

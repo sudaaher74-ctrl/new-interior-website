@@ -88,7 +88,15 @@ const Home = () => {
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="container mt-6">
         <div className="hero reveal">
-          <img className="hero-img" src="/images/bombayB1.jpeg" alt="Commercial restaurant interior by OS Interiors" />
+          <img
+            className="hero-img"
+            src="/images/bombayB1.jpeg"
+            alt="Commercial restaurant interior by OS Interiors"
+            width="1182"
+            height="665"
+            fetchPriority="high"
+            decoding="sync"
+          />
           <div className="scrim-left" style={{ position: 'absolute', inset: 0 }}></div>
 
           <div className="hero-inner">
@@ -165,8 +173,8 @@ const Home = () => {
         <div className="grid-4">
           {SERVICES.map((s) => (
             <div key={s.n} className="reveal">
-              <div className="tile" style={{ height: '300px', marginBottom: '16px' }}>
-                <img src={s.img} alt={s.title} loading="lazy" />
+              <div className="tile" style={{ aspectRatio: '4 / 3', marginBottom: '16px' }}>
+                <img src={s.img} alt={s.title} loading="lazy" decoding="async" />
                 <span className="tile-badge">{s.n}</span>
               </div>
               <h3 className="h4-card mb-2" style={{ fontSize: '24px' }}>{s.title}</h3>
@@ -195,18 +203,18 @@ const Home = () => {
             <p className="body-text mb-8">
               Trading spaces we designed, engineered and built — across dining, workplace, retail and care.
             </p>
-            <Link to="/portfolio/netwin-ventures" className="tile" style={{ height: '340px' }}>
+            <Link to="/portfolio/netwin-ventures" className="tile mosaic-tile">
               <img src="/images/BelapurC3.jpeg" alt="NETWIN Ventures, CBD Belapur" loading="lazy" />
               <span className="tile-caption">NETWIN Ventures · CBD Belapur</span>
             </Link>
           </div>
 
           <div className="flex-col gap-6 reveal">
-            <Link to="/portfolio/bombay-barbeque" className="tile" style={{ height: '340px' }}>
+            <Link to="/portfolio/bombay-barbeque" className="tile mosaic-tile">
               <img src="/images/bombayB2.jpeg" alt="Bombay Barbeque, Malad" loading="lazy" />
               <span className="tile-caption">Bombay Barbeque · Malad</span>
             </Link>
-            <Link to="/portfolio/99-wok-street" className="tile" style={{ height: '292px' }}>
+            <Link to="/portfolio/99-wok-street" className="tile mosaic-tile-short">
               <img src="/images/Kandivali!.jpeg" alt="99 Wok Street, Kandivali" loading="lazy" />
               <span className="tile-caption">99 Wok Street · Kandivali</span>
             </Link>
@@ -215,8 +223,7 @@ const Home = () => {
           <div className="reveal flex-col items-center gap-6">
             <Link
               to="/portfolio/exterior-facade-work"
-              className="tile w-full"
-              style={{ height: '552px' }}
+              className="tile w-full mosaic-tile-tall"
             >
               <img src="/images/IMG_2695.JPG" alt="Commercial facade, Mumbai" loading="lazy" />
               <span className="tile-caption">Commercial facade · Mumbai</span>

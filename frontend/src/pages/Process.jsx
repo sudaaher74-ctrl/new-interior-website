@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import Photo from '../components/Photo';
 import { TURNKEY_SCOPE } from '../data/services';
 
 const STEPS = [
@@ -51,14 +52,13 @@ const Process = () => {
           </div>
         </div>
 
-        <div className="reveal" style={{ height: '460px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', marginTop: '48px' }}>
-          <img
-            src="/images/IMG_2706.JPG"
-            alt="Finishing works in progress on an OS Interiors site"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            loading="lazy"
-          />
-        </div>
+        <Photo
+          src="/images/IMG_2706.JPG"
+          alt="Finishing works in progress on an OS Interiors site"
+          ratio="16 / 9"
+          className="reveal"
+          style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', marginTop: '48px' }}
+        />
 
         <div className="surface-block reveal mt-12 flex-col items-start gap-4">
           <h2 className="h2-section">Ready to start?</h2>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import Photo from '../components/Photo';
 import { CAPABILITIES, SERVICE_CATEGORIES } from '../data/services';
 
 const About = () => {
@@ -19,10 +20,14 @@ const About = () => {
               Creativity, engineering, project management and craftsmanship sit under one roof, which is why our spaces open on time and keep performing years later.
             </p>
           </div>
-          <div style={{ position: 'relative', height: '520px' }}>
-            {/* Using a general image for team portrait placeholder */}
-            <img src="/images/IMG_2701.JPG" alt="OS Interiors Team" className="img-rounded-lg" style={{ height: '100%' }} />
-          </div>
+          {/* Using a general image for team portrait placeholder */}
+          <Photo
+            src="/images/IMG_2701.JPG"
+            alt="OS Interiors Team"
+            ratio="4 / 3"
+            className="img-rounded-lg"
+            priority
+          />
         </div>
       </section>
 

@@ -19,12 +19,31 @@ import PremiumPage from './pages/PremiumPage';
 // CSS from the old static admin page and only clobbered the site's own tokens.
 import './assets/style.css';
 
-// Land at the top of each new page instead of keeping the previous scroll offset.
+// Land at the top of each new page instead of keeping the previous scroll
+// offset — unless the link carried a hash, in which case go to that section.
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
+
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    if (!hash) {
+      window.scrollTo(0, 0);
+      return undefined;
+    }
+
+    // The target may belong to a page that is still mounting, so look for it
+    // after the paint rather than synchronously.
+    const timer = setTimeout(() => {
+      const target = document.getElementById(hash.slice(1));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        window.scrollTo(0, 0);
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [pathname, hash]);
+
   return null;
 }
 
@@ -41,16 +60,21 @@ function App() {
         {/* Marketing Website Routes */}
         <Route path="*" element={
           <>
+            {/* Seven nav links sit ahead of the content on every page, so
+                keyboard and screen-reader users get a way past them. */}
+            <a className="skip-link" href="#main-content">Skip to content</a>
             <Navbar />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/portfolio" element={<Portfolio />} />
-              <Route path="/portfolio/:id" element={<ProjectDetail />} />
-              <Route path="/process" element={<Process />} />
-              <Route path="/contact" element={<Contact />} />
-            </Routes>
+            <div id="main-content" tabIndex={-1}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/portfolio" element={<Portfolio />} />
+                <Route path="/portfolio/:id" element={<ProjectDetail />} />
+                <Route path="/process" element={<Process />} />
+                <Route path="/contact" element={<Contact />} />
+              </Routes>
+            </div>
             <Footer />
           </>
         } />

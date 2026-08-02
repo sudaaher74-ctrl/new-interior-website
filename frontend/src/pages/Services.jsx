@@ -1,5 +1,6 @@
 import React from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import Photo from '../components/Photo';
 import { SERVICE_CATEGORIES, TURNKEY_SCOPE, CAPABILITIES } from '../data/services';
 
 const Services = () => {
@@ -13,7 +14,7 @@ const Services = () => {
 
         <div className="grid-2">
           {SERVICE_CATEGORIES.map((service) => (
-            <div key={service.n} className="surface-card flex-col gap-4">
+            <div key={service.n} id={service.slug} className="surface-card flex-col gap-4">
               <div className="num-circle num-circle-md">{service.n}</div>
               <h3 className="h3-card">{service.title}</h3>
               <p className="body-text">{service.copy}</p>
@@ -43,10 +44,8 @@ const Services = () => {
       <section className="container section-spacing reveal">
         <div className="grid-3">
           {CAPABILITIES.map((cap) => (
-            <div key={cap.title} className="flex-col gap-4">
-              <div style={{ height: '360px' }}>
-                <img src={cap.img} alt={cap.title} className="img-rounded" style={{ height: '100%' }} />
-              </div>
+            <div key={cap.title} id={cap.slug} className="flex-col gap-4">
+              <Photo src={cap.img} alt={cap.title} ratio="4 / 3" className="img-rounded" />
               <h3 style={{ fontSize: '26px' }} className="h3-card">{cap.title}</h3>
               <p className="body-text">{cap.copy}</p>
             </div>

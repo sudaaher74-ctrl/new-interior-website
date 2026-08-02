@@ -8,7 +8,10 @@
   --text-primary: #201e1d;
   --text-secondary: #474238;
   --text-muted: #645c50;
-  --text-meta: #82796a;
+  /* Darkened from #82796a, which sat at 3.6:1 on the cream ground — under the
+     4.5:1 minimum for the 13–15px text this is used for. Now ≥4.76:1 on every
+     surface colour above. */
+  --text-meta: #675e50;
 
   --border-color: rgba(32, 30, 29, 0.16);
   --border-strong: rgba(32, 30, 29, 0.25);
@@ -102,6 +105,34 @@ button {
 
 ::selection {
   background-color: var(--accent-tint);
+}
+
+/* Anchor targets clear the sticky navbar instead of hiding under it. */
+[id] {
+  scroll-margin-top: 96px;
+}
+
+/* Off-screen until focused, then it drops into the top-left corner. */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 200;
+  transform: translateY(-150%);
+  background-color: var(--cta-band);
+  color: var(--page-ground);
+  padding: 12px 22px;
+  border-radius: var(--radius-pill);
+  font-size: 15px;
+  font-weight: 700;
+  transition: transform .2s ease;
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+  color: var(--page-ground);
+}
+#main-content:focus {
+  outline: none;
 }
 
 /* Typography Classes */
@@ -299,7 +330,10 @@ button {
   color: var(--text-secondary);
   transition: background-color .2s ease;
 }
-.chip:hover {
+/* Chips are overwhelmingly plain <span> labels. Only shift on hover when the
+   chip is genuinely clickable, so they stop advertising an action they lack. */
+a.chip:hover,
+button.chip:hover {
   background-color: var(--sand);
   color: var(--text-secondary);
 }
@@ -309,7 +343,8 @@ button {
   font-size: 15px;
   padding: 9px 18px;
 }
-.chip-light:hover {
+a.chip-light:hover,
+button.chip-light:hover {
   background-color: #fff;
 }
 
@@ -319,6 +354,7 @@ button {
   font-size: 15px;
   padding: 9px 18px;
 }
+/* chip-dark is always a label; it deliberately holds its colour on hover. */
 .chip-dark:hover {
   background-color: var(--cta-band);
   color: var(--page-ground);
@@ -440,13 +476,18 @@ button {
   background-color: var(--chip-fill);
   color: var(--text-primary);
 }
-/* Active pages carry a terracotta dot beneath the label */
+/* Active pages carry a terracotta dot beneath the label. The dot alone would be
+   a colour-only cue, so the active label also goes heavier and darker. */
 .nav-link::after {
   content: '';
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background-color: transparent;
+}
+.nav-link.active {
+  font-weight: 800;
+  background-color: var(--chip-fill);
 }
 .nav-link.active::after {
   background-color: var(--accent);
@@ -559,7 +600,9 @@ button {
   grid-template-columns: 1fr 1fr;
   gap: 40px;
 }
-@media (max-width: 768px) {
+/* Collapses at 900px, not 768px — two 44px-padded cards in a ~360px column
+   leaves almost no room for the text between them. */
+@media (max-width: 900px) {
   .grid-2 { grid-template-columns: 1fr; }
 }
 
@@ -568,7 +611,11 @@ button {
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
-@media (max-width: 900px) {
+/* Steps down 3 → 2 → 1 so tablets get a real grid rather than one long column. */
+@media (max-width: 1000px) {
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 620px) {
   .grid-3 { grid-template-columns: 1fr; }
 }
 
@@ -584,16 +631,12 @@ button {
   .grid-4 { grid-template-columns: 1fr; }
 }
 
+/* Auto-fitting rather than stepping through fixed counts: the core-values list
+   packs to whatever fits instead of stranding a single item on its own row. */
 .grid-5 {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 16px;
-}
-@media (max-width: 1100px) {
-  .grid-5 { grid-template-columns: repeat(3, 1fr); }
-}
-@media (max-width: 640px) {
-  .grid-5 { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ── Hero ─────────────────────────────────────────────── */
@@ -650,6 +693,12 @@ button {
 @media (max-width: 700px) {
   .mosaic { grid-template-columns: 1fr; }
 }
+
+/* Mosaic tiles scale with the viewport rather than sitting at a fixed pixel
+   height — a 552px tile is most of a phone screen once the grid is one column. */
+.mosaic-tile { height: clamp(220px, 27vw, 340px); }
+.mosaic-tile-short { height: clamp(200px, 23vw, 292px); }
+.mosaic-tile-tall { height: clamp(300px, 44vw, 552px); }
 
 /* Image tile with a cream caption pill */
 .tile { position: relative; overflow: hidden; border-radius: var(--radius-md); display: block; }

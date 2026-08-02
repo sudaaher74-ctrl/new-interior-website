@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import Photo from '../components/Photo';
 import { PROJECT_TYPES } from '../data/services';
 
 const EMPTY = {
@@ -129,14 +130,12 @@ const Contact = () => {
               ))}
             </div>
 
-            <div style={{ height: '320px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', marginTop: '32px' }}>
-              <img
-                src="/images/carvan2.jpeg"
-                alt="Completed OS Interiors project"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                loading="lazy"
-              />
-            </div>
+            <Photo
+              src="/images/carvan2.jpeg"
+              alt="Completed OS Interiors project"
+              ratio="16 / 10"
+              style={{ borderRadius: 'var(--radius-lg)', marginTop: '32px' }}
+            />
           </div>
 
           <div className="reveal">
