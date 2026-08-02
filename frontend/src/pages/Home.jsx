@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
-
-const SECTORS = ['Restaurants', 'Corporate offices', 'Retail', 'Healthcare', 'Education', 'Hospitality'];
+import { SERVICE_CATEGORIES, CAPABILITIES, TURNKEY_SCOPE, SECTORS } from '../data/services';
 
 const CLIENTS =
   'Bombay Barbeque, Copper Chimney, The Irish House, Indira IVF, D Y Patil University, ' +
@@ -15,11 +14,16 @@ const STATS = [
   { value: '1', label: 'contract covers design, MEP, fit-out and handover' },
 ];
 
+const category = (title) => SERVICE_CATEGORIES.find((s) => s.title === title);
+const capability = (title) => CAPABILITIES.find((c) => c.title === title);
+
+// The four we lead with on the home page — two sectors, two capabilities —
+// with home-page imagery layered over the shared copy.
 const SERVICES = [
-  { n: '01', title: 'Restaurant Interiors', copy: 'Fine dining, cafés, bars, QSR, cloud kitchens.', img: '/images/caffe.jpeg' },
-  { n: '02', title: 'Office & Corporate', copy: 'HQs, startup floors, co-working, cabins, conference.', img: '/images/BelapurC2.jpeg' },
-  { n: '03', title: 'Turnkey Fit-Out', copy: 'Ceilings, flooring, partitions, joinery, glass, lighting, signage.', img: '/images/IMG_2705.JPG' },
-  { n: '04', title: 'Exteriors & Facades', copy: 'Elevation, ACP and stone cladding, waterproofing, coatings.', img: '/images/IMG_2696.JPG' },
+  { n: '01', title: 'Restaurant Interiors', copy: category('Restaurant Interior Design').short, img: '/images/caffe.jpeg' },
+  { n: '02', title: 'Office & Corporate', copy: category('Commercial Interior Design').short, img: '/images/BelapurC2.jpeg' },
+  { n: '03', title: 'Turnkey Fit-Out', copy: capability('Fit-out solutions').short, img: capability('Fit-out solutions').img },
+  { n: '04', title: 'Exteriors & Facades', copy: capability('Painting & exteriors').short, img: capability('Painting & exteriors').img },
 ];
 
 const STEPS = [
@@ -169,6 +173,17 @@ const Home = () => {
               <p className="body-text" style={{ fontSize: '16px' }}>{s.copy}</p>
             </div>
           ))}
+        </div>
+
+        <div className="surface-block reveal mt-12">
+          <div className="eyebrow mb-4">One contract covers</div>
+          <div className="flex flex-wrap gap-2">
+            {TURNKEY_SCOPE.map((stage, i) => (
+              <span key={stage} className={i === TURNKEY_SCOPE.length - 1 ? 'chip chip-dark' : 'chip chip-light'}>
+                {stage}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 

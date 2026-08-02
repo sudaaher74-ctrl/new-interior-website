@@ -1,5 +1,6 @@
 import React from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { CAPABILITIES, SERVICE_CATEGORIES } from '../data/services';
 
 const About = () => {
   useScrollReveal();
@@ -48,6 +49,30 @@ const About = () => {
           {['Integrity', 'Innovation', 'Quality', 'Transparency', 'Craftsmanship', 'Client satisfaction', 'Professionalism', 'Sustainability', 'Safety', 'Commitment'].map((value, i) => (
             <div key={i} style={{ padding: '32px 24px', backgroundColor: 'var(--surface-card)', borderRadius: 'var(--radius-md)', textAlign: 'center', fontWeight: 600, color: 'var(--text-primary)' }}>
               {value}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="container section-spacing">
+        <h2 className="h2-section mb-8 reveal">Sectors we build for</h2>
+        <div className="grid-4 reveal">
+          {SERVICE_CATEGORIES.map((service) => (
+            <div key={service.n} className="surface-card" style={{ padding: '40px' }}>
+              <h4 className="h4-card mb-2">{service.title}</h4>
+              <p className="body-text">{service.short}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="container section-spacing">
+        <h2 className="h2-section mb-8 reveal">What we deliver in-house</h2>
+        <div className="grid-3 reveal">
+          {CAPABILITIES.map((cap) => (
+            <div key={cap.title} className="surface-block" style={{ padding: '40px' }}>
+              <h4 className="h4-card mb-2">{cap.title}</h4>
+              <p className="body-text">{cap.copy}</p>
             </div>
           ))}
         </div>

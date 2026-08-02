@@ -1,17 +1,7 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useScrollReveal } from '../hooks/useScrollReveal';
-
-const PROJECT_TYPES = [
-  'Restaurant / Café / Bar',
-  'Office / Corporate',
-  'Retail / Showroom',
-  'Healthcare',
-  'Educational',
-  'Hospitality',
-  'Residential luxury',
-  'Exterior / Facade',
-];
+import { PROJECT_TYPES } from '../data/services';
 
 const EMPTY = {
   name: '',

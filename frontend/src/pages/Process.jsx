@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { TURNKEY_SCOPE } from '../data/services';
 
 const STEPS = [
   { num: '01', title: 'Requirement discussion', desc: 'Understanding your vision, operational needs and constraints before anything is drawn.' },
@@ -37,6 +38,17 @@ const Process = () => {
               <p className="body-text">{step.desc}</p>
             </div>
           ))}
+        </div>
+
+        <div className="surface-block reveal mt-12">
+          <h2 className="h2-section mb-8">Included in the programme</h2>
+          <div className="flex flex-wrap gap-2">
+            {TURNKEY_SCOPE.map((stage, i) => (
+              <span key={stage} className={i === TURNKEY_SCOPE.length - 1 ? 'chip chip-dark' : 'chip chip-light'}>
+                {stage}
+              </span>
+            ))}
+          </div>
         </div>
 
         <div className="reveal" style={{ height: '460px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', marginTop: '48px' }}>
