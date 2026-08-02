@@ -1,75 +1,110 @@
 import React from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const ProjectDetail = () => {
-  useScrollReveal();
-  // Using static data matching the prompt for Bombay Barbeque
-  // In a real app, we'd fetch based on useParams().id
+  const navigate = useNavigate();
+  const { id } = useParams();
 
   return (
-    <main>
-      <section className="container mt-8 mb-8 reveal">
-        <Link to="/portfolio" style={{ fontWeight: 600, color: 'var(--text-meta)', marginBottom: '32px', display: 'inline-block' }}>
-          ← Back to portfolio
-        </Link>
-
-        <div style={{ position: 'relative', height: '600px', marginBottom: '64px' }}>
-          <img src="/images/bombayB1.jpeg" alt="Bombay Barbeque Hero" className="img-rounded-lg" style={{ height: '100%' }} />
+    <main id="page-project-detail">
+      <div className="project-detail-hero" style={{paddingTop: '80px'}}>
+        <img id="detail-hero-img" src="" alt="" />
+        <div className="project-detail-hero-content">
+          <span className="label" id="detail-category-tag"></span>
+          <div className="gold-line"></div>
+          <h1 id="detail-title">Project {id}</h1>
         </div>
+      </div>
 
-        <div className="grid-2 mb-12">
-          <div>
-            <h1 className="h1-page mb-6">Bombay Barbeque, Malad</h1>
-            <p className="body-large mb-4">
-              A turnkey full-service restaurant project where operational efficiency was as critical as aesthetic impact. Covers and kitchen flow were planned first to maximise throughput without compromising the dining experience.
-            </p>
-            <p className="body-large">
-              We integrated warm lighting, natural stone, wood and custom joinery into a cohesive environment. Civil, electrical, plumbing, HVAC, fire fighting, acoustics, furniture and signage were all executed under one contract, with a dedicated project manager reporting weekly to the client.
-            </p>
+      <section>
+        <div className="container">
+          <div style={{marginBottom: '32px'}}>
+            <button className="btn-outline" onClick={() => navigate('/projects')} style={{fontSize: '0.6rem'}}>
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+              Back to Projects
+            </button>
           </div>
-          
-          <div style={{ backgroundColor: 'var(--section-surface)', borderRadius: 'var(--radius-lg)', padding: '48px' }}>
-            <div className="flex justify-between mb-4 pb-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
-              <span className="eyebrow" style={{ color: 'var(--text-primary)' }}>Sector</span>
-              <span className="body-text" style={{ fontWeight: 500, color: 'var(--text-primary)' }}>Restaurant</span>
-            </div>
-            <div className="flex justify-between mb-4 pb-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
-              <span className="eyebrow" style={{ color: 'var(--text-primary)' }}>Scope</span>
-              <span className="body-text" style={{ fontWeight: 500, color: 'var(--text-primary)' }}>Turnkey</span>
-            </div>
-            <div className="flex justify-between mb-4 pb-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
-              <span className="eyebrow" style={{ color: 'var(--text-primary)' }}>Location</span>
-              <span className="body-text" style={{ fontWeight: 500, color: 'var(--text-primary)' }}>Malad, Mumbai</span>
-            </div>
-            <div className="flex justify-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
-              <span className="eyebrow" style={{ color: 'var(--text-primary)' }}>Status</span>
-              <span className="body-text" style={{ fontWeight: 500, color: 'var(--text-primary)' }}>Completed</span>
-            </div>
-            
-            <div className="eyebrow mb-4" style={{ color: 'var(--text-primary)' }}>Delivered</div>
-            <div className="flex gap-2 flex-wrap">
-              <span className="chip" style={{ backgroundColor: '#fff' }}>Civil</span>
-              <span className="chip" style={{ backgroundColor: '#fff' }}>MEP</span>
-              <span className="chip" style={{ backgroundColor: '#fff' }}>Joinery</span>
-              <span className="chip" style={{ backgroundColor: '#fff' }}>Furniture</span>
-              <span className="chip" style={{ backgroundColor: '#fff' }}>Lighting</span>
-              <span className="chip" style={{ backgroundColor: '#fff' }}>Signage</span>
-            </div>
-          </div>
-        </div>
+          <div className="project-detail-body">
+            <div>
+              {/* Gallery Slider */}
+              <div className="project-gallery-slider">
+                <div className="project-gallery-track" id="gallery-track"></div>
+                <div className="project-gallery-controls">
+                  <div className="project-gallery-dots" id="gallery-dots"></div>
+                  <div style={{display: 'flex', gap: '8px'}}>
+                    <button className="btn-icon" onClick={() => window.slideGallery(-1)} style={{width: '40px', height: '40px'}}>
+                      <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                        <line x1="19" y1="12" x2="5" y2="12" />
+                        <polyline points="12 19 5 12 12 5" />
+                      </svg>
+                    </button>
+                    <button className="btn-icon" onClick={() => window.slideGallery(1)} style={{width: '40px', height: '40px'}}>
+                      <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
 
-        <div className="grid-2 mb-8">
-          <div style={{ height: '420px' }}>
-            <img src="/images/bombayB2.jpeg" alt="Gallery image 1" className="img-rounded" style={{ height: '100%' }} />
+              {/* Description */}
+              <div style={{marginBottom: '40px'}}>
+                <span className="label">About This Project</span>
+                <div className="gold-line"></div>
+                <p id="detail-description" style={{fontSize: '0.95rem', lineHeight: '1.9', color: 'var(--text-secondary)', marginTop: '16px'}}></p>
+              </div>
+
+              {/* Tags */}
+              <div id="detail-tags" style={{display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '48px'}}></div>
+
+              {/* Testimonial */}
+              <div className="project-testimonial">
+                <blockquote id="detail-testimonial-text"></blockquote>
+                <p style={{fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: '500', marginBottom: '2px'}} id="detail-testimonial-name"></p>
+                <p style={{fontSize: '0.65rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gold)'}} id="detail-testimonial-role"></p>
+              </div>
+            </div>
+
+            {/* Sidebar Specs */}
+            <div className="project-specs">
+              <h4 style={{fontSize: '0.65rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '24px'}}>
+                Project Details
+              </h4>
+              <div className="spec-item">
+                <div className="spec-label">Category</div>
+                <div className="spec-value" id="spec-category"></div>
+              </div>
+              <div className="spec-item">
+                <div className="spec-label">Location</div>
+                <div className="spec-value" id="spec-location"></div>
+              </div>
+              <div className="spec-item">
+                <div className="spec-label">Budget Range</div>
+                <div className="spec-value" id="spec-budget"></div>
+              </div>
+              <div className="spec-item">
+                <div className="spec-label">Area</div>
+                <div className="spec-value" id="spec-area"></div>
+              </div>
+              <div className="spec-item">
+                <div className="spec-label">Completion</div>
+                <div className="spec-value" id="spec-date"></div>
+              </div>
+              <div className="spec-item">
+                <div className="spec-label">Project Views</div>
+                <div className="spec-value" id="spec-views"></div>
+              </div>
+              <div style={{marginTop: '32px'}}>
+                <button className="btn-primary" onClick={() => navigate('/contact')} style={{width: '100%', justifyContent: 'center'}}>
+                  Start Similar Project
+                </button>
+              </div>
+            </div>
           </div>
-          <div style={{ height: '420px' }}>
-            <img src="/images/IMG_2706.JPG" alt="Gallery image 2" className="img-rounded" style={{ height: '100%' }} />
-          </div>
-        </div>
-        
-        <div style={{ height: '520px' }}>
-          <img src="/images/IMG_2695.JPG" alt="Gallery image 3" className="img-rounded-lg" style={{ height: '100%' }} />
         </div>
       </section>
     </main>
