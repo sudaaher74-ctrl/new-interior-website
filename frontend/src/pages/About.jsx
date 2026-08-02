@@ -1,216 +1,87 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 
 const About = () => {
-  const navigate = useNavigate();
+  useScrollReveal();
+
   return (
-    <main id="page-about">
-      
-
-    <div className="about-hero" style={{paddingTop: '80px'}}>
-      <div className="about-hero-bg"
-        style={{backgroundImage: `url('/images/IMG_2697.JPG')`}}></div>
-      <div className="about-hero-content">
-        <span className="label">About OS Interiors</span>
-        <h1>A Decade of <em style={{color: 'var(--gold)', fontStyle: 'italic'}}>Excellence</em></h1>
-      </div>
-    </div>
-
-    <section>
-      <div className="container">
-        <div className="about-story reveal">
-          <div className="about-story-img">
-            <img src="/images/IMG_2695.JPG" alt="OS Interiors Studio"
-              loading="lazy" />
-          </div>
+    <main>
+      <section className="container section-spacing">
+        <div className="grid-2 items-center reveal">
           <div>
-            <span className="label">Our Story</span>
-            <div className="gold-line"></div>
-            <h2 style={{fontSize: '2.4rem', marginBottom: '24px'}}>Born from a Belief That <em
-                style={{color: 'var(--gold)', fontStyle: 'italic'}}>Space Shapes Life</em></h2>
-            <p style={{marginBottom: '20px'}}>OS Interiors was founded in 2014 by Ajay Jadhav with a singular
-              conviction: that exceptional design is not a luxury reserved for the few, but a fundamental right that
-              transforms how we live, work, and experience the world.</p>
-            <p style={{marginBottom: '20px'}}>Beginning with a single residential project in South Mumbai, we have grown
-              into a 48-person studio delivering ₹500 crore+ of interior transformation across India. Our portfolio
-              spans penthouses in Mumbai to corporate campuses in Hyderabad, boutique hotels in Goa to family villas in
-              Lonavala.</p>
-            <p style={{marginBottom: '40px'}}>Through it all, one thing has remained constant: our obsessive attention to
-              detail and our belief that every project deserves our very best.</p>
-            <button className="btn-outline" >
-              See Our Work
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>
-            </button>
+            <div className="eyebrow mb-4">ABOUT US</div>
+            <h1 className="h1-page mb-6">One team for design, engineering and execution</h1>
+            <p className="body-large mb-4">
+              OS Interiors is a premium commercial interior and exterior contracting company based in India, operating since 2014. We design, engineer and execute world-class commercial spaces — and we do it without handing our clients off to a chain of contractors.
+            </p>
+            <p className="body-large">
+              Creativity, engineering, project management and craftsmanship sit under one roof, which is why our spaces open on time and keep performing years later.
+            </p>
+          </div>
+          <div style={{ position: 'relative', height: '520px' }}>
+            {/* Using a general image for team portrait placeholder */}
+            <img src="/images/IMG_2701.JPG" alt="OS Interiors Team" className="img-rounded-lg" style={{ height: '100%' }} />
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    {/* Founder Message */}
-    <section style={{background: 'var(--charcoal)', padding: '80px 0'}}>
-      <div className="container">
-        <div className="founder-card reveal">
-          <div className="founder-card-grid">
-            <img className="founder-avatar" src=""
-              alt="Ajay Jadhav" />
-            <div>
-              <span className="label">Founder's Message</span>
-              <div className="gold-line"></div>
-              <p className="founder-quote">"Every space we touch carries a responsibility — to the person who will inhabit
-                it, to the craft of design, and to the idea that beautiful environments make better human beings. We
-                take that responsibility with tremendous seriousness and even greater joy."</p>
-              <p style={{fontSize: '0.9rem', color: 'var(--text-primary)', marginBottom: '4px', fontWeight: '500'}}>Ajay Jadhav
-              </p>
-              <p style={{fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gold)'}}>Founder &
-                Principal Designer</p>
-            </div>
+      <section className="container mb-8">
+        <div className="grid-2 reveal">
+          <div style={{ backgroundColor: 'var(--section-surface)', borderRadius: 'var(--radius-lg)', padding: '64px' }}>
+            <h3 className="h3-card mb-4">Our vision</h3>
+            <p className="body-text">
+              To become India's most trusted commercial interior and turnkey execution company, creating world-class spaces that inspire businesses and enhance customer experiences.
+            </p>
+          </div>
+          <div style={{ backgroundColor: 'var(--chip-fill)', borderRadius: 'var(--radius-lg)', padding: '64px' }}>
+            <h3 className="h3-card mb-4">Our mission</h3>
+            <p className="body-text">
+              Deliver innovative, functional and aesthetically exceptional commercial environments through creativity, engineering excellence, quality craftsmanship and timely project execution.
+            </p>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    {/* Achievements */}
-    <section>
-      <div className="container">
-        <div className="section-header reveal">
-          <span className="label">By the Numbers</span>
-          <h2>A Decade of <em style={{fontStyle: 'italic', color: 'var(--gold)'}}>Impact</em></h2>
-          <div className="gold-line center"></div>
+      <section className="container section-spacing">
+        <h2 className="h2-section mb-8 reveal">Core values</h2>
+        <div className="grid-5 reveal">
+          {['Integrity', 'Innovation', 'Quality', 'Transparency', 'Craftsmanship', 'Client satisfaction', 'Professionalism', 'Sustainability', 'Safety', 'Commitment'].map((value, i) => (
+            <div key={i} style={{ padding: '32px 24px', backgroundColor: '#fff', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', textAlign: 'center', fontWeight: 600 }}>
+              {value}
+            </div>
+          ))}
         </div>
-        <div className="achievements-grid reveal">
-          <div className="achievement-item">
-            <div className="achievement-number">200+</div>
-            <div className="achievement-label">Projects Completed</div>
-          </div>
-          <div className="achievement-item">
-            <div className="achievement-number">2</div>
-            <div className="achievement-label">Design Professionals</div>
-          </div>
-          <div className="achievement-item">
-            <div className="achievement-number">₹50Cr</div>
-            <div className="achievement-label">Project Value Delivered</div>
-          </div>
-          <div className="achievement-item">
-            <div className="achievement-number">1</div>
-            <div className="achievement-label">Industry Awards</div>
-          </div>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    {/* Team */}
-    <section style={{background: 'var(--charcoal)'}}>
-      <div className="container">
-        <div className="section-header reveal">
-          <span className="label">The Team</span>
-          <h2>Creative <em style={{fontStyle: 'italic', color: 'var(--gold)'}}>Minds</em></h2>
-          <div className="gold-line center"></div>
-          <p>48 designers, architects, and project managers united by a single standard: perfection.</p>
-        </div>
-        <div className="team-grid reveal">
-          <div className="team-card">
-            <div className="team-card-img"><img
-                src="" alt="Ajay Jadhav" />
-            </div>
-            <h4>Ajay Jadhav</h4>
-            <p className="team-card-role">Founder & Principal Designer</p>
+      <section className="container section-spacing">
+        <h2 className="h2-section mb-8 reveal">Why clients choose us</h2>
+        <div className="grid-3 reveal">
+          <div style={{ padding: '40px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+            <h4 className="h4-card mb-2">Design + execution in one</h4>
+            <p className="body-text">No miscommunication between architect and contractor. We handle both.</p>
           </div>
-          <div className="team-card">
-            <div className="team-card-img"><img src=""
-                alt="Rushikesh Patil" loading="lazy" /></div>
-            <h4>Rushikesh Patil</h4>
-            <p className="team-card-role">Head of Corporate Projects</p>
+          <div style={{ padding: '40px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+            <h4 className="h4-card mb-2">Restaurant expertise</h4>
+            <p className="body-text">Deep understanding of kitchen flow, covers, HVAC and acoustic needs.</p>
           </div>
-          <div className="team-card">
-            <div className="team-card-img"><img
-                src="" alt="Tejaswini Jadhav"
-                loading="lazy" /></div>
-            <h4>Tejaswini Jadhav</h4>
-            <p className="team-card-role">Commercial Designer</p>
+          <div style={{ padding: '40px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+            <h4 className="h4-card mb-2">MEP integrated</h4>
+            <p className="body-text">Mechanical, electrical and plumbing are engineered in-house.</p>
           </div>
-          <div className="team-card">
-            <div className="team-card-img"><img
-                src="" alt="Miss Aysha Bhandari" />
-            </div>
-            <h4>Miss Aysha Bhandari</h4>
-            <p className="team-card-role">Residential Designer</p>
+          <div style={{ padding: '40px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+            <h4 className="h4-card mb-2">Professional project management</h4>
+            <p className="body-text">Dedicated managers, strict timelines, and weekly progress reports.</p>
+          </div>
+          <div style={{ padding: '40px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+            <h4 className="h4-card mb-2">Premium finish quality</h4>
+            <p className="body-text">Sourcing the finest materials and deploying skilled craftsmen.</p>
+          </div>
+          <div style={{ padding: '40px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+            <h4 className="h4-card mb-2">Transparent pricing</h4>
+            <p className="body-text">Detailed BOQ before commencement. No hidden costs or sudden variations.</p>
           </div>
         </div>
-      </div>
-    </section>
-
-    {/* Timeline */}
-    <section>
-      <div className="container">
-        <div className="section-header reveal">
-          <span className="label">Our Journey</span>
-          <h2>A Story of <em style={{fontStyle: 'italic', color: 'var(--gold)'}}>Growth</em></h2>
-          <div className="gold-line center"></div>
-        </div>
-        <div style={{maxWidth: '640px', margin: '0 auto'}} className="reveal">
-          <div className="timeline">
-            <div className="timeline-item">
-              <div className="timeline-year">2014</div>
-              <h4>The Beginning</h4>
-              <p> Rushikesh Patil founded OS Interiors from a 200 sq ft studio in Bandra. First project: a 900 sq ft
-                apartment in Khar.</p>
-            </div>
-            <div className="timeline-item">
-              <div className="timeline-year">2016</div>
-              <h4>Corporate Entry</h4>
-              <p>Secured first major corporate contract — a 5,000 sq ft office for a fintech startup in Andheri. The
-                project won the FOAID Award for Best Commercial Interior.</p>
-            </div>
-            <div className="timeline-item">
-              <div className="timeline-year">2018</div>
-              <h4>Team Expansion</h4>
-              <p>Grew to 20 designers. Launched the Turnkey division. Delivered our first project outside Maharashtra —
-                a Bangalore villa.</p>
-            </div>
-            <div className="timeline-item">
-              <div className="timeline-year">2020</div>
-              <h4>Resilience & Innovation</h4>
-              <p>During the pandemic, pioneered virtual design consultations and 3D walkthrough presentations. Delivered
-                14 projects remotely.</p>
-            </div>
-            <div className="timeline-item">
-              <div className="timeline-year">2022</div>
-              <h4>National Presence</h4>
-              <p>Opened offices in Navi Mumbai and Pune . Surpassed ₹100 Cr in annual project value. Named in
-                Architectural Digest's "Top 50 Design Studios" list.</p>
-            </div>
-            <div className="timeline-item">
-              <div className="timeline-year">2024</div>
-              <h4>Present Day</h4>
-              <p>48-person studio. 20+ projects delivered. 18 industry awards. ₹50 Cr+ in project value. And counting.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    {/* Location */}
-    <section style={{background: 'var(--charcoal)', padding: '80px 0', borderTop: '1px solid rgba(255,255,255,0.05)'}}>
-      <div className="container">
-        <div className="section-header reveal">
-          <span className="label">Visit Us</span>
-          <h2>Our <em style={{fontStyle: 'italic', color: 'var(--gold)'}}>Studio</em></h2>
-          <div className="gold-line center"></div>
-        </div>
-        <div style={{textAlign: 'center', maxWidth: '600px', margin: '0 auto'}} className="reveal">
-          <p style={{fontSize: '1.2rem', lineHeight: '1.8', color: 'var(--text-secondary)'}}>
-            Shop no 56, 2nd floor, Xth Central Mall<br/>
-            Next to D-Mart, Mahavir Nagar<br/>
-            Kandivali West, Mumbai - 400067
-          </p>
-        </div>
-      </div>
-    </section>
-
+      </section>
     </main>
   );
 };
