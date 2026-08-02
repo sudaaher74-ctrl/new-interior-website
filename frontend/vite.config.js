@@ -11,8 +11,8 @@ export default defineConfig({
         name: 'OS Portal',
         short_name: 'OS Portal',
         description: 'OS Interior Project Tracking',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
+        theme_color: '#f5ead8',
+        background_color: '#f5ead8',
         display: 'standalone',
         icons: [
           {

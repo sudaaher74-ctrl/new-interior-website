@@ -15,8 +15,9 @@ import AdminDashboard from './pages/AdminDashboard';
 import EmployeeDashboard from './pages/EmployeeDashboard';
 import PremiumPage from './pages/PremiumPage';
 
+// The dashboards style themselves with CSS modules; admin.css is legacy global
+// CSS from the old static admin page and only clobbered the site's own tokens.
 import './assets/style.css';
-import './assets/admin.css';
 
 // Land at the top of each new page instead of keeping the previous scroll offset.
 function ScrollToTop() {

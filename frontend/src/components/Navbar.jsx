@@ -20,7 +20,7 @@ const Navbar = () => {
   const navClass = ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`;
 
   return (
-    <>
+    <div className="nav-shell">
       <nav className="navbar">
         <Link to="/" className="nav-brand">
           <div className="nav-dot"></div>
@@ -35,7 +35,7 @@ const Navbar = () => {
           ))}
         </div>
 
-        <Link to="/contact" className="pill-btn-black">Request a Quote</Link>
+        <Link to="/contact" className="btn-primary">Request a quote</Link>
 
         <button
           type="button"
@@ -57,9 +57,9 @@ const Navbar = () => {
             {label}
           </NavLink>
         ))}
-        <Link to="/contact" className="pill-btn-black">Request a Quote</Link>
+        <Link to="/contact" className="btn-primary">Request a quote</Link>
       </div>
-    </>
+    </div>
   );
 };
 

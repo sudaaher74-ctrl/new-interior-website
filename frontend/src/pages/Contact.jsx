@@ -117,7 +117,7 @@ const Contact = () => {
       <section className="container mt-8 mb-12">
         <div className="grid-2">
           <div className="reveal">
-            <div className="eyebrow mb-4">CONTACT</div>
+            <div className="eyebrow mb-4">Contact</div>
             <h1 className="h1-page mb-6">Request a quote</h1>
             <p className="body-large mb-12">
               Tell us the sector, the site and roughly what you need. We reply with next steps — usually a site
@@ -129,14 +129,23 @@ const Contact = () => {
                 <div key={d.label}>
                   <div className="eyebrow mb-1">{d.label}</div>
                   {d.href ? (
-                    <a href={d.href} className="body-large" style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
+                    <a href={d.href} className="body-large" style={{ fontWeight: 700 }}>
                       {d.value}
                     </a>
                   ) : (
-                    <p className="body-large" style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{d.value}</p>
+                    <p className="body-large" style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{d.value}</p>
                   )}
                 </div>
               ))}
+            </div>
+
+            <div style={{ height: '320px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', marginTop: '32px' }}>
+              <img
+                src="/images/carvan2.jpeg"
+                alt="Completed OS Interiors project"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                loading="lazy"
+              />
             </div>
           </div>
 
@@ -184,7 +193,7 @@ const Contact = () => {
                 </div>
 
                 <div className="flex items-center gap-6 flex-wrap mt-4">
-                  <button type="submit" className="pill-btn-black" disabled={sending}>
+                  <button type="submit" className="btn-primary" disabled={sending}>
                     {sending ? 'Sending…' : 'Send request'}
                   </button>
                   <span style={{ fontSize: '14px', color: 'var(--text-meta)' }}>We never share your details.</span>

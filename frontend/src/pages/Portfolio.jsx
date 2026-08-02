@@ -16,7 +16,7 @@ const Portfolio = () => {
     <main>
       <section className="container mt-8 mb-12">
         <div className="reveal">
-          <div className="eyebrow mb-4">PORTFOLIO</div>
+          <div className="eyebrow mb-4">Portfolio</div>
           <h1 className="h1-page mb-8">Our portfolio of pioneering design</h1>
         </div>
 
@@ -30,7 +30,7 @@ const Portfolio = () => {
                 onClick={() => setActiveFilter(filter)}
                 aria-pressed={isActive}
                 className={isActive ? 'chip' : 'chip-outline'}
-                style={isActive ? { backgroundColor: '#1a1a18', color: '#fff' } : undefined}
+                style={isActive ? { backgroundColor: 'var(--accent)', color: '#fff' } : undefined}
               >
                 {filter}
               </button>
@@ -44,7 +44,7 @@ const Portfolio = () => {
             <button
               type="button"
               onClick={() => setActiveFilter('All')}
-              style={{ fontWeight: 600, color: 'var(--text-primary)', textDecoration: 'underline' }}
+              style={{ fontWeight: 700, color: 'var(--accent-deep)', textDecoration: 'underline' }}
             >
               Show all projects
             </button>

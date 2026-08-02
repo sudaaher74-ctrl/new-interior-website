@@ -21,7 +21,7 @@ const ProjectDetail = () => {
         <section className="container mt-8 mb-12">
           <h1 className="h1-page mb-4">Project not found</h1>
           <p className="body-large mb-8">That project isn’t in our portfolio.</p>
-          <Link to="/portfolio" className="pill-btn-black">Back to portfolio</Link>
+          <Link to="/portfolio" className="btn-primary">Back to portfolio</Link>
         </section>
       </main>
     );
@@ -32,7 +32,7 @@ const ProjectDetail = () => {
       <section className="container mt-8 mb-8">
         <Link
           to="/portfolio"
-          style={{ fontWeight: 600, color: 'var(--text-meta)', marginBottom: '32px', display: 'inline-block' }}
+          className="link-arrow" style={{ marginBottom: '32px', display: 'inline-block' }}
         >
           ← Back to portfolio
         </Link>
@@ -58,7 +58,7 @@ const ProjectDetail = () => {
             )}
           </div>
 
-          <div className="reveal" style={{ backgroundColor: 'var(--section-surface)', borderRadius: 'var(--radius-lg)', padding: '48px' }}>
+          <div className="reveal" style={{ backgroundColor: 'var(--surface-block)', borderRadius: 'var(--radius-lg)', padding: '48px' }}>
             <SpecRow label="Sector" value={project.sector} />
             <SpecRow label="Scope" value={project.scope} />
             <SpecRow label="Location" value={`${project.location}, Mumbai`} />
@@ -67,7 +67,7 @@ const ProjectDetail = () => {
             <div className="eyebrow mb-4 mt-8" style={{ color: 'var(--text-primary)' }}>Delivered</div>
             <div className="flex gap-2 flex-wrap">
               {project.delivered.map((item) => (
-                <span key={item} className="chip" style={{ backgroundColor: '#fff' }}>{item}</span>
+                <span key={item} className="chip chip-light">{item}</span>
               ))}
             </div>
           </div>

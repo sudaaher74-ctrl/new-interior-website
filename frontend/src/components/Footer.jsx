@@ -6,14 +6,14 @@ const Footer = () => {
     <footer className="container">
       <div className="footer-cta reveal">
         <div className="footer-cta-content">
-          <h2 className="h2-section" style={{ color: '#fff', marginBottom: '16px' }}>
+          <h2 className="h2-section" style={{ color: 'var(--page-ground)', maxWidth: '640px' }}>
             Planning a new space? Let's scope it together.
           </h2>
-          <p className="body-large" style={{ color: '#fff', maxWidth: '480px', marginBottom: '32px' }}>
+          <p className="body-large" style={{ color: 'var(--sand)', maxWidth: '520px' }}>
             Design, MEP, fit-out and handover — one contract, one accountable team.
           </p>
-          <Link to="/contact" className="pill-btn-black" style={{ backgroundColor: '#1a1a18', color: '#fff' }}>
-            Request a Quote
+          <Link to="/contact" className="btn-primary btn-lg" style={{ marginTop: '12px' }}>
+            Request a quote
           </Link>
         </div>
       </div>
