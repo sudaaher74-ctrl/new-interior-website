@@ -58,7 +58,7 @@ const Process = () => {
         </div>
 
         <Photo
-          src="/images/IMG_2706.JPG"
+          src="/images/IMG_2706.webp"
           alt="Finishing works in progress on an OS Interiors site"
           ratio="16 / 9"
           className="reveal-stagger"

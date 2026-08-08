@@ -28,8 +28,8 @@ const capability = (title) => CAPABILITIES.find((c) => c.title === title);
 // The four we lead with on the home page — two sectors, two capabilities —
 // with home-page imagery layered over the shared copy.
 const SERVICES = [
-  { n: '01', title: 'Restaurant Interiors', copy: category('Restaurant Interior Design').short, img: '/images/caffe.jpeg' },
-  { n: '02', title: 'Office & Corporate', copy: category('Commercial Interior Design').short, img: '/images/BelapurC2.jpeg' },
+  { n: '01', title: 'Restaurant Interiors', copy: category('Restaurant Interior Design').short, img: '/images/caffe.webp' },
+  { n: '02', title: 'Office & Corporate', copy: category('Commercial Interior Design').short, img: '/images/BelapurC2.webp' },
   { n: '03', title: 'Turnkey Fit-Out', copy: capability('Fit-out solutions').short, img: capability('Fit-out solutions').img },
   { n: '04', title: 'Exteriors & Facades', copy: capability('Painting & exteriors').short, img: capability('Painting & exteriors').img },
 ];
@@ -212,18 +212,18 @@ const Home = () => {
               Trading spaces we designed, engineered and built — across dining, workplace, retail and care.
             </p>
             <Link to="/portfolio/netwin-ventures" className="tile mosaic-tile">
-              <img src="/images/BelapurC3.jpeg" alt="NETWIN Ventures, CBD Belapur" loading="lazy" />
+              <img src="/images/BelapurC3.webp" alt="NETWIN Ventures, CBD Belapur" loading="lazy" />
               <span className="tile-caption">NETWIN Ventures · CBD Belapur</span>
             </Link>
           </div>
 
           <div className="flex-col gap-6 reveal-stagger">
             <Link to="/portfolio/bombay-barbeque" className="tile mosaic-tile">
-              <img src="/images/bombayB2.jpeg" alt="Bombay Barbeque, Malad" loading="lazy" />
+              <img src="/images/bombayB2.webp" alt="Bombay Barbeque, Malad" loading="lazy" />
               <span className="tile-caption">Bombay Barbeque · Malad</span>
             </Link>
             <Link to="/portfolio/99-wok-street" className="tile mosaic-tile-short">
-              <img src="/images/Kandivali!.jpeg" alt="99 Wok Street, Kandivali" loading="lazy" />
+              <img src="/images/Kandivali!.webp" alt="99 Wok Street, Kandivali" loading="lazy" />
               <span className="tile-caption">99 Wok Street · Kandivali</span>
             </Link>
           </div>
@@ -233,7 +233,7 @@ const Home = () => {
               to="/portfolio/exterior-facade-work"
               className="tile w-full mosaic-tile-tall"
             >
-              <img src="/images/IMG_2695.JPG" alt="Commercial facade, Mumbai" loading="lazy" />
+              <img src="/images/IMG_2695.webp" alt="Commercial facade, Mumbai" loading="lazy" />
               <span className="tile-caption">Commercial facade · Mumbai</span>
             </Link>
             <Link to="/portfolio" className="btn-outline">See more projects</Link>

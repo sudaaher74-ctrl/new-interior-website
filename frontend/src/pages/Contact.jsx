@@ -139,7 +139,7 @@ const Contact = () => {
             </div>
 
             <Photo
-              src="/images/carvan2.jpeg"
+              src="/images/carvan2.webp"
               alt="Completed OS Interiors project"
               ratio="16 / 10"
               style={{ borderRadius: 'var(--radius-lg)', marginTop: '32px' }}

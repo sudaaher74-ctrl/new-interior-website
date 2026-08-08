@@ -27,7 +27,7 @@ const About = () => {
           </div>
           {/* Using a general image for team portrait placeholder */}
           <Photo
-            src="/images/IMG_2701.JPG"
+            src="/images/IMG_2701.webp"
             alt="OS Interiors Team"
             ratio="4 / 3"
             className="img-rounded-lg"
