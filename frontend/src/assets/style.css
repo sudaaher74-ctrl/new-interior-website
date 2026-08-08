@@ -790,6 +790,9 @@ button.chip-light:hover {
   font-weight: 600;
   padding: 8px 14px;
   border-radius: var(--radius-pill);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .tile-badge {
   position: absolute;

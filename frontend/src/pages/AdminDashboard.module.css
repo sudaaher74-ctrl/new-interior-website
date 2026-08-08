@@ -428,6 +428,18 @@
 }
 
 @media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+  .dateDisplay {
+    font-size: 0.85rem;
+  }
   .layout {
     flex-direction: column;
   }
