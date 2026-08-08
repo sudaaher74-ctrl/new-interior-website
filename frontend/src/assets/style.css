@@ -27,8 +27,8 @@
   --cta-band: #020617; /* Very dark slate for CTA */
 
   /* Typography */
-  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 
   /* Shapes */
   --radius-lg: 32px;
