@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';
 import CustomCursor from './components/CustomCursor';
+import InstallPWA from './components/InstallPWA';
 import Portfolio from './pages/Portfolio';
 import Process from './pages/Process';
 import Contact from './pages/Contact';
@@ -64,6 +65,7 @@ function App() {
   return (
     <Router>
       <CustomCursor />
+      <InstallPWA />
       <ScrollToTop />
       <Toaster position="top-right" />
       <Routes>

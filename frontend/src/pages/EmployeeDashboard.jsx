@@ -290,9 +290,25 @@ const EmployeeDashboard = () => {
       <div className={styles.layout}>
         {/* Offline Banner */}
         {!isOnline && (
-          <div style={{ backgroundColor: '#f59e0b', color: 'white', padding: '0.5rem', textAlign: 'center', fontWeight: '600', fontSize: '0.9rem', width: '100%', position: 'absolute', top: 0, zIndex: 1000 }}>
-            ⚠️ You are offline. Data is being saved locally. 
-            {offlineQueue.length > 0 && ` (${offlineQueue.length} pending sync)`}
+          <div style={{ 
+            backgroundColor: '#f59e0b', 
+            color: 'white', 
+            padding: '12px', 
+            textAlign: 'center', 
+            fontWeight: '600', 
+            fontSize: '0.9rem', 
+            width: '100%', 
+            position: 'sticky', 
+            top: 0, 
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+          }}>
+            <span>⚠️</span> Offline Mode Active — Data saved locally
+            {offlineQueue.length > 0 && <span style={{backgroundColor: 'rgba(0,0,0,0.2)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem'}}>{offlineQueue.length} pending</span>}
           </div>
         )}
         {/* Sidebar */}

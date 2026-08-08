@@ -27,8 +27,8 @@ export default defineConfig({
         name: 'OS Interiors',
         short_name: 'OS Interiors',
         description: 'Commercial interior and turnkey fit-out contractor, Mumbai.',
-        theme_color: '#f5ead8',
-        background_color: '#f5ead8',
+        theme_color: '#f8fafc',
+        background_color: '#f8fafc',
         display: 'standalone',
         start_url: '/',
         icons: [
