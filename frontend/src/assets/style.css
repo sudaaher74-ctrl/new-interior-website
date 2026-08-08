@@ -258,21 +258,26 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
   color: #fff;
   padding: 12px 24px;
   border-radius: var(--radius-pill);
   font-size: 15px;
   font-weight: 700;
-  transition: background-color .2s ease;
+  box-shadow: 0 4px 14px 0 rgba(15, 23, 42, 0.25);
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
 }
 .btn-primary:hover {
-  background-color: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.3);
+  filter: brightness(1.1);
   color: #fff;
 }
 .btn-primary:disabled {
   opacity: .6;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .btn-lg {
@@ -284,18 +289,22 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: none;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: var(--text-primary);
   border: 1px solid var(--border-strong);
   padding: 12px 24px;
   border-radius: var(--radius-pill);
   font-size: 15px;
   font-weight: 700;
-  transition: background-color .2s ease;
+  transition: all .2s ease;
 }
 .btn-outline:hover {
-  background-color: var(--chip-fill);
+  background: rgba(255, 255, 255, 0.8);
   color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.05);
 }
 
 /* Outline button sitting on a photograph */
@@ -321,12 +330,17 @@ button {
   display: inline-flex;
   align-items: center;
   padding: 8px 16px;
-  background-color: var(--chip-fill);
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: var(--radius-pill);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
   color: var(--text-secondary);
-  transition: background-color .2s ease;
+  transition: all .2s ease;
 }
 /* Chips are overwhelmingly plain <span> labels. Only shift on hover when the
    chip is genuinely clickable, so they stop advertising an action they lack. */
@@ -841,25 +855,32 @@ button.chip-light:hover {
 /* ── Cards ────────────────────────────────────────────── */
 .card-outline {
   padding: 40px;
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: var(--radius-lg);
-  background-color: var(--surface-card);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .card-outline:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-hover);
+  border-color: rgba(255, 255, 255, 0.8);
 }
 .card-shadow {
-  background-color: var(--surface-card);
+  background-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: var(--radius-lg);
   padding: 40px;
   box-shadow: var(--shadow-sm);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .card-shadow:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-hover);
+  border-color: rgba(255, 255, 255, 0.8);
 }
 .surface-block {
   background-color: var(--surface-block);

@@ -23,6 +23,8 @@ router.post('/log', auth, async (req, res) => {
     if (photoBase64 && process.env.CLOUDINARY_CLOUD_NAME) {
       const uploadRes = await cloudinary.uploader.upload(photoBase64, { folder: 'os_interior_visits' });
       finalPhotoUrl = uploadRes.secure_url;
+    } else if (photoBase64) {
+      finalPhotoUrl = photoBase64;
     }
 
     const visit = new SiteVisit({

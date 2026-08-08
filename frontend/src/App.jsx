@@ -8,6 +8,7 @@ import RequireAuth from './components/RequireAuth';
 import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';
+import CustomCursor from './components/CustomCursor';
 import Portfolio from './pages/Portfolio';
 import Process from './pages/Process';
 import Contact from './pages/Contact';
@@ -62,6 +63,7 @@ const Lazily = ({ children }) => (
 function App() {
   return (
     <Router>
+      <CustomCursor />
       <ScrollToTop />
       <Toaster position="top-right" />
       <Routes>
