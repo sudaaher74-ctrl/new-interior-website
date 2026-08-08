@@ -106,27 +106,16 @@ const Home = () => {
 
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="container mt-6">
-        <div className="hero reveal">
-          <img
-            className="hero-img"
-            src="/images/bombayB1.jpeg"
-            alt="Commercial restaurant interior by OS Interiors"
-            width="1182"
-            height="665"
-            fetchPriority="high"
-            decoding="sync"
-          />
-          <div className="scrim-left" style={{ position: 'absolute', inset: 0 }}></div>
-
-          <div className="hero-inner">
+        <div className="hero reveal-stagger gradient-mesh" style={{ borderRadius: 'var(--radius-lg)' }}>
+          <div className="hero-inner" style={{ position: 'relative', zIndex: 10 }}>
             <div className="hero-copy">
-              <div className="eyebrow hero-eyebrow">
+              <div className="eyebrow hero-eyebrow" style={{ color: 'var(--text-meta)' }}>
                 Commercial interiors · Exteriors · Turnkey since 2014
               </div>
-              <h1 className="h1-hero" style={{ color: '#fff' }}>
+              <h1 className="h1-hero" style={{ color: 'var(--text-primary)' }}>
                 Designing spaces that perform &amp; endure
               </h1>
-              <p className="body-large" style={{ color: 'var(--chip-fill)', maxWidth: '560px', fontSize: '20px' }}>
+              <p className="body-large" style={{ color: 'var(--text-secondary)', maxWidth: '560px', fontSize: '20px' }}>
                 Design, engineering and execution under one roof — restaurants, offices, retail, healthcare and
                 hospitality, handed over ready to trade.
               </p>
@@ -134,7 +123,7 @@ const Home = () => {
 
             <div className="hero-actions">
               <Link to="/contact" className="btn-primary btn-lg">Request a quote</Link>
-              <Link to="/portfolio" className="btn-on-image">See our work</Link>
+              <Link to="/portfolio" className="btn-outline">See our work</Link>
             </div>
           </div>
         </div>
@@ -142,7 +131,7 @@ const Home = () => {
 
       {/* ── Stats ────────────────────────────────────────── */}
       <section className="container" style={{ paddingTop: '56px' }}>
-        <div className="grid-4 reveal">
+        <div className="grid-4 reveal-stagger">
           {STATS.map((stat) => (
             <div key={stat.value + stat.label}>
               <div className="stat-figure">{stat.value}</div>
@@ -155,7 +144,7 @@ const Home = () => {
       {/* ── About ────────────────────────────────────────── */}
       <section className="container section-spacing">
         <div className="grid-2 gap-8">
-          <div className="reveal">
+          <div className="reveal-stagger">
             <h2 className="h2-section mb-4">About OS Interiors</h2>
             <p className="body-large mb-4">
               We are a premium commercial interior and exterior contractor based in India, operating since 2014.
@@ -175,7 +164,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="surface-block reveal flex-col gap-4" style={{ padding: '44px' }}>
+          <div className="surface-block reveal-stagger flex-col gap-4" style={{ padding: '44px' }}>
             <div className="eyebrow">Trusted by</div>
             <p style={{ fontSize: '19px', lineHeight: 1.7, color: 'var(--text-primary)' }}>{CLIENTS}</p>
           </div>
@@ -184,14 +173,14 @@ const Home = () => {
 
       {/* ── Services ─────────────────────────────────────── */}
       <section className="container section-spacing">
-        <div className="flex justify-between items-end gap-6 flex-wrap mb-8 reveal">
+        <div className="flex justify-between items-end gap-6 flex-wrap mb-8 reveal-stagger">
           <h2 className="h2-section">Services we provide</h2>
           <Link to="/services" className="link-arrow">All services →</Link>
         </div>
 
         <div className="grid-4">
           {SERVICES.map((s) => (
-            <div key={s.n} className="reveal">
+            <div key={s.n} className="reveal-stagger">
               <div className="tile" style={{ aspectRatio: '4 / 3', marginBottom: '16px' }}>
                 <img src={s.img} alt={s.title} loading="lazy" decoding="async" />
                 <span className="tile-badge">{s.n}</span>
@@ -202,7 +191,7 @@ const Home = () => {
           ))}
         </div>
 
-        <div className="surface-block reveal mt-12">
+        <div className="surface-block reveal-stagger mt-12">
           <div className="eyebrow mb-4">One contract covers</div>
           <div className="flex flex-wrap gap-2">
             {TURNKEY_SCOPE.map((stage, i) => (
@@ -217,7 +206,7 @@ const Home = () => {
       {/* ── Portfolio mosaic ─────────────────────────────── */}
       <section className="container section-spacing">
         <div className="mosaic">
-          <div className="reveal">
+          <div className="reveal-stagger">
             <h2 className="h2-section h2-compact mb-4">Our portfolio of commercial work</h2>
             <p className="body-text mb-8">
               Trading spaces we designed, engineered and built — across dining, workplace, retail and care.
@@ -228,7 +217,7 @@ const Home = () => {
             </Link>
           </div>
 
-          <div className="flex-col gap-6 reveal">
+          <div className="flex-col gap-6 reveal-stagger">
             <Link to="/portfolio/bombay-barbeque" className="tile mosaic-tile">
               <img src="/images/bombayB2.jpeg" alt="Bombay Barbeque, Malad" loading="lazy" />
               <span className="tile-caption">Bombay Barbeque · Malad</span>
@@ -239,7 +228,7 @@ const Home = () => {
             </Link>
           </div>
 
-          <div className="reveal flex-col items-center gap-6">
+          <div className="reveal-stagger flex-col items-center gap-6">
             <Link
               to="/portfolio/exterior-facade-work"
               className="tile w-full mosaic-tile-tall"
@@ -254,7 +243,7 @@ const Home = () => {
 
       {/* ── Process teaser ───────────────────────────────── */}
       <section className="container section-spacing">
-        <div className="surface-block reveal">
+        <div className="surface-block reveal-stagger">
           <div className="flex justify-between items-end gap-6 flex-wrap mb-12">
             <h2 className="h2-section">How we work</h2>
             <Link to="/process" className="link-arrow">Full process →</Link>
@@ -275,7 +264,7 @@ const Home = () => {
       <section className="container section-spacing">
         <div className="grid-3">
           {TESTIMONIALS.map((t) => (
-            <figure key={t.role} className="card-shadow reveal flex-col justify-between gap-8">
+            <figure key={t.role} className="card-shadow reveal-stagger flex-col justify-between gap-8">
               <blockquote className="body-large" style={{ fontSize: '18px', color: 'var(--text-primary)' }}>
                 “{t.quote}”
               </blockquote>
@@ -293,7 +282,7 @@ const Home = () => {
 
       {/* ── FAQ ──────────────────────────────────────────── */}
       <section className="container section-spacing">
-        <div className="grid-2 items-start reveal">
+        <div className="grid-2 items-start reveal-stagger">
           <h2 className="h2-section">Frequently asked</h2>
           <div>
             {FAQS.map((item) => (

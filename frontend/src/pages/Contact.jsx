@@ -115,7 +115,7 @@ const Contact = () => {
     <main>
       <section className="container mt-8 mb-12">
         <div className="grid-2">
-          <div className="reveal">
+          <div className="reveal-stagger">
             <div className="eyebrow mb-4">Contact</div>
             <h1 className="h1-page mb-6">Request a quote</h1>
             <p className="body-large mb-12">
@@ -146,7 +146,7 @@ const Contact = () => {
             />
           </div>
 
-          <div className="reveal">
+          <div className="reveal-stagger">
             <div className="form-card">
               <form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
                 {/* Honeypot. Hidden from sight and from assistive tech, and

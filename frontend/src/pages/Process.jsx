@@ -29,7 +29,7 @@ const Process = () => {
   return (
     <main>
       <section className="container mt-8">
-        <div className="reveal">
+        <div className="reveal-stagger">
           <div className="eyebrow mb-4">Process</div>
           <h1 className="h1-page mb-12" style={{ maxWidth: '900px' }}>
             From site visit to keys, on one programme
@@ -38,7 +38,7 @@ const Process = () => {
 
         <div className="flex-col gap-6">
           {STEPS.map((step) => (
-            <div key={step.num} className="process-row reveal">
+            <div key={step.num} className="process-row reveal-stagger">
               <span className="num-circle num-circle-xl">{step.num}</span>
               <h2 className="h3-card" style={{ fontSize: '30px' }}>{step.title}</h2>
               <p className="body-text">{step.desc}</p>
@@ -46,7 +46,7 @@ const Process = () => {
           ))}
         </div>
 
-        <div className="surface-block reveal mt-12">
+        <div className="surface-block reveal-stagger mt-12">
           <h2 className="h2-section mb-8">Included in the programme</h2>
           <div className="flex flex-wrap gap-2">
             {TURNKEY_SCOPE.map((stage, i) => (
@@ -61,11 +61,11 @@ const Process = () => {
           src="/images/IMG_2706.JPG"
           alt="Finishing works in progress on an OS Interiors site"
           ratio="16 / 9"
-          className="reveal"
+          className="reveal-stagger"
           style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', marginTop: '48px' }}
         />
 
-        <div className="surface-block reveal mt-12 flex-col items-start gap-4">
+        <div className="surface-block reveal-stagger mt-12 flex-col items-start gap-4">
           <h2 className="h2-section">Ready to start?</h2>
           <p className="body-large" style={{ maxWidth: '520px' }}>
             Send the location, area and target opening date. We come back with a scope, a programme and an

@@ -50,13 +50,13 @@ const ProjectDetail = () => {
           src={project.img}
           alt={`${project.title} — ${project.sector}, ${project.location}`}
           ratio="16 / 9"
-          className="reveal"
+          className="reveal-stagger"
           priority
           style={{ marginBottom: '64px', borderRadius: 'var(--radius-lg)' }}
         />
 
         <div className="grid-2 mb-12">
-          <div className="reveal">
+          <div className="reveal-stagger">
             <h1 className="h1-page mb-6">
               {project.title}, {project.location}
             </h1>
@@ -72,7 +72,7 @@ const ProjectDetail = () => {
             )}
           </div>
 
-          <div className="reveal" style={{ backgroundColor: 'var(--surface-block)', borderRadius: 'var(--radius-lg)', padding: '48px' }}>
+          <div className="reveal-stagger" style={{ backgroundColor: 'var(--surface-block)', borderRadius: 'var(--radius-lg)', padding: '48px' }}>
             <SpecRow label="Sector" value={project.sector} />
             <SpecRow label="Scope" value={project.scope} />
             <SpecRow label="Location" value={`${project.location}, Mumbai`} />
@@ -89,13 +89,13 @@ const ProjectDetail = () => {
 
         <div className="grid-2 mb-8">
           {project.gallery.map((src, i) => (
-            <div key={src + i} className="tile reveal" style={{ height: '420px' }}>
+            <div key={src + i} className="tile reveal-stagger" style={{ height: '420px' }}>
               <img src={src} alt={`${project.title} interior view ${i + 1}`} loading="lazy" />
             </div>
           ))}
         </div>
 
-        <div className="tile reveal" style={{ height: '520px', borderRadius: 'var(--radius-lg)' }}>
+        <div className="tile reveal-stagger" style={{ height: '520px', borderRadius: 'var(--radius-lg)' }}>
           <img src={project.galleryWide} alt={`${project.title} — wide view`} loading="lazy" />
         </div>
       </section>

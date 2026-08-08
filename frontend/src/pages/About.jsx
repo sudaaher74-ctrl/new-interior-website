@@ -14,7 +14,7 @@ const About = () => {
   return (
     <main>
       <section className="container section-spacing">
-        <div className="grid-2 items-center reveal">
+        <div className="grid-2 items-center reveal-stagger">
           <div>
             <div className="eyebrow mb-4">About</div>
             <h1 className="h1-page mb-6">One team for design, engineering and execution</h1>
@@ -37,7 +37,7 @@ const About = () => {
       </section>
 
       <section className="container mb-8">
-        <div className="grid-2 reveal">
+        <div className="grid-2 reveal-stagger">
           <div className="surface-block" style={{ padding: '56px' }}>
             <h3 className="h3-card mb-4">Our vision</h3>
             <p className="body-text">
@@ -55,7 +55,7 @@ const About = () => {
 
       <section className="container section-spacing">
         <h2 className="h2-section mb-8 reveal">Core values</h2>
-        <div className="grid-5 reveal">
+        <div className="grid-5 reveal-stagger">
           {['Integrity', 'Innovation', 'Quality', 'Transparency', 'Craftsmanship', 'Client satisfaction', 'Professionalism', 'Sustainability', 'Safety', 'Commitment'].map((value, i) => (
             <div key={i} style={{ padding: '32px 24px', backgroundColor: 'var(--surface-card)', borderRadius: 'var(--radius-md)', textAlign: 'center', fontWeight: 600, color: 'var(--text-primary)' }}>
               {value}
@@ -66,7 +66,7 @@ const About = () => {
 
       <section className="container section-spacing">
         <h2 className="h2-section mb-8 reveal">Sectors we build for</h2>
-        <div className="grid-4 reveal">
+        <div className="grid-4 reveal-stagger">
           {SERVICE_CATEGORIES.map((service) => (
             <div key={service.n} className="surface-card" style={{ padding: '40px' }}>
               <h4 className="h4-card mb-2">{service.title}</h4>
@@ -78,7 +78,7 @@ const About = () => {
 
       <section className="container section-spacing">
         <h2 className="h2-section mb-8 reveal">What we deliver in-house</h2>
-        <div className="grid-3 reveal">
+        <div className="grid-3 reveal-stagger">
           {CAPABILITIES.map((cap) => (
             <div key={cap.title} className="surface-block" style={{ padding: '40px' }}>
               <h4 className="h4-card mb-2">{cap.title}</h4>
@@ -90,7 +90,7 @@ const About = () => {
 
       <section className="container section-spacing">
         <h2 className="h2-section mb-8 reveal">Why clients choose us</h2>
-        <div className="grid-3 reveal">
+        <div className="grid-3 reveal-stagger">
           <div className="surface-card" style={{ padding: '40px' }}>
             <h4 className="h4-card mb-2">Design + execution in one</h4>
             <p className="body-text">No miscommunication between architect and contractor. We handle both.</p>

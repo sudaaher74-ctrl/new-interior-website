@@ -5,22 +5,22 @@ import { SERVICE_CATEGORIES, CAPABILITIES } from '../data/services';
 const Footer = () => {
   return (
     <footer className="container">
-      <div className="footer-cta reveal">
+      <div className="footer-cta reveal-stagger" style={{ backgroundColor: 'var(--cta-band)', borderRadius: 'var(--radius-lg)' }}>
         <div className="footer-cta-content">
-          <h2 className="h2-section" style={{ color: 'var(--page-ground)', maxWidth: '640px' }}>
+          <h2 className="h2-section" style={{ color: 'white', maxWidth: '640px' }}>
             Planning a new space? Let's scope it together.
           </h2>
-          <p className="body-large" style={{ color: 'var(--sand)', maxWidth: '520px' }}>
+          <p className="body-large" style={{ color: 'var(--text-muted)', maxWidth: '520px' }}>
             Design, MEP, fit-out and handover — one contract, one accountable team.
           </p>
-          <Link to="/contact" className="btn-primary btn-lg" style={{ marginTop: '12px' }}>
+          <Link to="/contact" className="btn-primary btn-lg" style={{ marginTop: '12px', backgroundColor: 'white', color: 'black' }}>
             Request a quote
           </Link>
         </div>
       </div>
 
       <div className="footer-main">
-        <div className="footer-col reveal">
+        <div className="footer-col reveal-stagger">
           <div className="nav-brand" style={{ marginBottom: '16px' }}>
             <div className="nav-dot"></div>
             OS Interiors
@@ -30,7 +30,7 @@ const Footer = () => {
           </p>
         </div>
         
-        <div className="footer-col reveal">
+        <div className="footer-col reveal-stagger">
           <h4>Pages</h4>
           <ul>
             <li><Link to="/">Home</Link></li>
@@ -42,7 +42,7 @@ const Footer = () => {
           </ul>
         </div>
         
-        <div className="footer-col reveal">
+        <div className="footer-col reveal-stagger">
           <h4>Services</h4>
           <ul>
             {[...SERVICE_CATEGORIES, ...CAPABILITIES].map((item) => (
@@ -53,7 +53,7 @@ const Footer = () => {
           </ul>
         </div>
         
-        <div className="footer-col reveal">
+        <div className="footer-col reveal-stagger">
           <h4>Contact</h4>
           <ul>
             <li><a href="tel:+918767067884">+91 8767067884</a></li>
@@ -64,7 +64,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="footer-legal reveal">
+      <div className="footer-legal reveal-stagger">
         <div>© 2026 OS Interiors. All rights reserved.</div>
         <div>Commercial interiors · Turnkey execution · India</div>
       </div>

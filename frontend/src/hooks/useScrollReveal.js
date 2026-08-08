@@ -12,7 +12,7 @@ export function useScrollReveal(deps = []) {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const nodes = () => Array.from(document.querySelectorAll('.reveal:not(.is-visible)'));
+    const nodes = () => Array.from(document.querySelectorAll('.reveal:not(.is-visible), .reveal-stagger:not(.is-visible)'));
 
     // Honour the OS "reduce motion" setting: show everything, skip the animation.
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

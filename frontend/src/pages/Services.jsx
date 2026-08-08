@@ -13,7 +13,7 @@ const Services = () => {
 
   return (
     <main>
-      <section className="container mt-8 mb-8 reveal">
+      <section className="container mt-8 mb-8 reveal-stagger">
         <div className="eyebrow mb-4">Services</div>
         <h1 className="h1-page mb-12">Everything a commercial space needs, from one contract</h1>
 
@@ -33,7 +33,7 @@ const Services = () => {
         </div>
       </section>
 
-      <section className="container section-spacing reveal">
+      <section className="container section-spacing reveal-stagger">
         <div className="surface-block">
           <h2 className="h2-section mb-8">Turnkey execution</h2>
           <div className="flex flex-wrap gap-2">
@@ -46,7 +46,7 @@ const Services = () => {
         </div>
       </section>
 
-      <section className="container section-spacing reveal">
+      <section className="container section-spacing reveal-stagger">
         <div className="grid-3">
           {CAPABILITIES.map((cap) => (
             <div key={cap.title} id={cap.slug} className="flex-col gap-4">

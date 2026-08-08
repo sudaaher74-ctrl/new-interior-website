@@ -20,12 +20,12 @@ const Portfolio = () => {
   return (
     <main>
       <section className="container mt-8 mb-12">
-        <div className="reveal">
+        <div className="reveal-stagger">
           <div className="eyebrow mb-4">Portfolio</div>
           <h1 className="h1-page mb-8">Our portfolio of pioneering design</h1>
         </div>
 
-        <div className="flex gap-2 flex-wrap mb-12 reveal" role="group" aria-label="Filter projects by sector">
+        <div className="flex gap-2 flex-wrap mb-12 reveal-stagger" role="group" aria-label="Filter projects by sector">
           {FILTERS.map((filter) => {
             const isActive = activeFilter === filter;
             return (
@@ -59,7 +59,7 @@ const Portfolio = () => {
               <Link
                 to={`/portfolio/${project.slug}`}
                 key={project.slug}
-                className="reveal"
+                className="reveal-stagger"
                 style={{ display: 'block' }}
               >
                 <div className="tile" style={{ aspectRatio: '4 / 3', marginBottom: '16px' }}>
