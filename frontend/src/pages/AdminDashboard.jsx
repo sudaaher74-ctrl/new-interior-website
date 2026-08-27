@@ -29,6 +29,9 @@ const AdminDashboard = () => {
   const [siteVisits, setSiteVisits] = useState([]);
   const [leads, setLeads] = useState([]);
   const [portfolioProjects, setPortfolioProjects] = useState([]);
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [showBlogModal, setShowBlogModal] = useState(false);
+  const [newBlogPost, setNewBlogPost] = useState({ slug: '', title: '', author: 'OS Interiors', content: '', coverImage: '', tags: '', isPublished: false });
   const [showPortfolioModal, setShowPortfolioModal] = useState(false);
   const [newPortfolioProject, setNewPortfolioProject] = useState({ slug: '', title: '', category: 'Restaurants', img: '', altText: '' });
   const [projects, setProjects] = useState([]);
@@ -211,6 +214,34 @@ const AdminDashboard = () => {
   };
 
   
+  
+  const handleSaveBlog = async (e) => {
+    e.preventDefault();
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      toast.loading('Saving blog post...', { id: 'save-blog' });
+      const payload = { ...newBlogPost, tags: typeof newBlogPost.tags === 'string' ? newBlogPost.tags.split(',').map(t => t.trim()) : newBlogPost.tags };
+      await axios.post(`${API_URL}/v2/blog`, payload, { headers });
+      toast.success('Blog post created!', { id: 'save-blog' });
+      setShowBlogModal(false);
+      setNewBlogPost({ slug: '', title: '', author: 'OS Interiors', content: '', coverImage: '', tags: '', isPublished: false });
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to save post', { id: 'save-blog' });
+    }
+  };
+
+  const handleBlogImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setNewBlogPost({ ...newBlogPost, coverImage: reader.result });
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSavePortfolio = async (e) => {
     e.preventDefault();
     try {
@@ -667,6 +698,51 @@ const AdminDashboard = () => {
   };
 
   
+  
+  const renderBlogTab = () => (
+    <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
+      <div className={styles.tableHeader}>
+        <h2 className={styles.pageTitle} style={{fontSize: '1.5rem', margin: 0}}>Blog Posts</h2>
+        <button className={styles.btn} onClick={() => setShowBlogModal(true)}>+ Write Post</button>
+      </div>
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {blogPosts.map((post) => (
+            <tr key={post._id} className="hover-float">
+              <td style={{fontWeight: '500'}}>{post.title}</td>
+              <td>{post.author}</td>
+              <td>
+                <span style={{ 
+                  padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem',
+                  background: post.isPublished ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)',
+                  color: post.isPublished ? '#10b981' : '#f59e0b'
+                }}>
+                  {post.isPublished ? 'Published' : 'Draft'}
+                </span>
+              </td>
+              <td>{new Date(post.createdAt).toLocaleDateString()}</td>
+              <td>
+                <button className={styles.btnSecondary} onClick={() => toast('Edit coming soon!')} style={{padding: '0.2rem 0.5rem', fontSize: '0.8rem'}}>Edit</button>
+              </td>
+            </tr>
+          ))}
+          {blogPosts.length === 0 && (
+            <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>No blog posts found.</td></tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
   const renderPortfolioTab = () => (
     <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
       <div className={styles.tableHeader}>
@@ -1069,6 +1145,7 @@ const AdminDashboard = () => {
             <button className={`${styles.navItem} ${activeTab === 'attendance' ? styles.active : ''}`} onClick={() => setActiveTab('attendance')}><span>⏰</span> Attendance Logs</button>
             <button className={`${styles.navItem} ${activeTab === 'expenses' ? styles.active : ''}`} onClick={() => setActiveTab('expenses')}><span>💰</span> Expenses</button>
             <button className={`${styles.navItem} ${activeTab === 'portfolio' ? styles.active : ''}`} onClick={() => setActiveTab('portfolio')}><span>🖼️</span> Portfolio Projects</button>
+            <button className={`${styles.navItem} ${activeTab === 'blog' ? styles.active : ''}`} onClick={() => setActiveTab('blog')}><span>✍️</span> Blog Content</button>
           </nav>
 
           <div className={styles.userProfile}>
@@ -1095,6 +1172,7 @@ const AdminDashboard = () => {
           {activeTab === 'attendance' && renderAttendanceTab()}
           {activeTab === 'expenses' && renderExpensesTab()}
           {activeTab === 'portfolio' && renderPortfolioTab()}
+          {activeTab === 'blog' && renderBlogTab()}
           
         </main>
       </div>

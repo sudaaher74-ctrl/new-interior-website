@@ -14,6 +14,8 @@ import Portfolio from './pages/Portfolio';
 import Process from './pages/Process';
 import Contact from './pages/Contact';
 import ProjectDetail from './pages/ProjectDetail';
+import Blog from './pages/Blog';
+import BlogPostDetail from './pages/BlogPostDetail';
 
 // The dashboards are a separate application from the marketing site and drag in
 // the PDF stack with them. Loading them lazily keeps ~1.3MB of ERP code out of
