@@ -13,7 +13,6 @@ export default defineConfig({
         // background on a marketing visit, undoing the code splitting.
         globIgnores: [
           '**/AdminDashboard-*',
-          '**/EmployeeDashboard-*',
           '**/PremiumPage-*',
           '**/html2canvas-*',
           '**/index.es-*',
@@ -21,6 +20,22 @@ export default defineConfig({
           // Legacy scripts from the pre-React static site; no longer loaded.
           'script.js',
           'admin.js',
+        ],
+        runtimeCaching: [
+          {
+            urlPattern: /\/api\/.*(projects|site-visits).*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 7, // 1 week
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
         ],
       },
       manifest: {
@@ -44,6 +59,18 @@ export default defineConfig({
             type: 'image/svg+xml',
             purpose: 'maskable',
           },
+          {
+            src: '/favicon.svg',
+            sizes: '192x192',
+            type: 'image/svg+xml',
+            purpose: 'any maskable',
+          },
+          {
+            src: '/favicon.svg',
+            sizes: '512x512',
+            type: 'image/svg+xml',
+            purpose: 'any maskable',
+          }
         ],
       },
     })

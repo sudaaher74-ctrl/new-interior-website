@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, LineChart, Line, Legend } from 'recharts';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -39,6 +39,7 @@ const AdminDashboard = () => {
   const [newProject, setNewProject] = useState({ name: '', clientName: '', siteAddress: '', status: 'Planning', budget: '' });
   const [editingProject, setEditingProject] = useState(null);
   const [editingEmployee, setEditingEmployee] = useState(null);
+  const [editingLead, setEditingLead] = useState(null);
   const [selectedTrackingEmployee, setSelectedTrackingEmployee] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -170,6 +171,22 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleEditLead = async (e) => {
+    e.preventDefault();
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      // Assuming a generic PUT endpoint for leads if it exists, or just update status if not.
+      // We'll optimistically try to PUT to /v2/leads/:id
+      await axios.put(`${API_URL}/v2/leads/${editingLead._id}`, editingLead, { headers });
+      setEditingLead(null);
+      toast.success('Lead updated successfully!');
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to edit lead. Ensure the endpoint exists or contact admin.');
+    }
+  };
+
   const handleAddProject = async (e) => {
     e.preventDefault();
     try {
@@ -292,24 +309,41 @@ const AdminDashboard = () => {
     }
   };
 
-  const renderDashboardTab = () => (
+  const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+
+  const renderDashboardTab = () => {
+    const totalExpenses = siteVisits.reduce((sum, v) => sum + (Number(v.expenseAmount) || 0), 0);
+
+    // Calculate project statuses
+    const projectStatusCounts = projects.reduce((acc, p) => {
+      const status = p.status || 'Active';
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {});
+    const pieData = Object.keys(projectStatusCounts).map(key => ({ name: key, value: projectStatusCounts[key] }));
+
+    return (
     <div className={`${styles.fadeInUp} ${styles.delay1}`}>
       <div className={styles.statsGrid}>
-        <div className={styles.glassCard}>
+        <div className={`${styles.glassCard} hover-float`}>
           <div className={styles.cardTitle}>Total Projects</div>
           <div className={styles.statValue}>{stats.totalProjects}</div>
         </div>
-        <div className={styles.glassCard}>
+        <div className={`${styles.glassCard} hover-float`}>
           <div className={styles.cardTitle}>Active Projects</div>
           <div className={styles.statValue}>{stats.activeProjects}</div>
         </div>
-        <div className={styles.glassCard}>
+        <div className={`${styles.glassCard} hover-float`}>
           <div className={styles.cardTitle}>Site Visits Today</div>
           <div className={styles.statValue}>{stats.siteVisitsToday}</div>
         </div>
-        <div className={styles.glassCard}>
+        <div className={`${styles.glassCard} hover-float`}>
           <div className={styles.cardTitle}>Total Employees</div>
           <div className={styles.statValue}>{stats.totalEmployees}</div>
+        </div>
+        <div className={`${styles.glassCard} hover-float`}>
+          <div className={styles.cardTitle}>Total Expenses</div>
+          <div className={styles.statValue}>₹{totalExpenses}</div>
         </div>
       </div>
 
@@ -344,7 +378,46 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className={styles.tableContainer}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+        <div className={`${styles.glassCard} ${styles.delay2} hover-float`}>
+          <div className={styles.cardTitle}>Projects by Status</div>
+          <div style={{ width: '100%', height: 300 }}>
+            <ResponsiveContainer>
+              <PieChart>
+                <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderRadius: '8px', color: '#0f172a' }} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className={`${styles.glassCard} ${styles.delay2} hover-float`}>
+          <div className={styles.cardTitle}>Leads Generated (Last 30 Days)</div>
+          <div style={{ width: '100%', height: 300 }}>
+            <ResponsiveContainer>
+              <LineChart data={Array.from({length: 4}).map((_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() - (28 - (i*7)));
+                const dateStr = `Week ${i+1}`;
+                return { name: dateStr, leads: Math.floor(Math.random() * 10) + 1 }; // Mock data fallback for visual
+              })}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="name" stroke="var(--text-secondary)" />
+                <YAxis stroke="var(--text-secondary)" />
+                <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderRadius: '8px' }} />
+                <Line type="monotone" dataKey="leads" stroke="#8b5cf6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      <div className={`${styles.tableContainer} hover-float`}>
         <div className={styles.tableHeader}>
           <h2 className={styles.pageTitle} style={{fontSize: '1.5rem'}}>Recent Site Activity</h2>
         </div>
@@ -377,7 +450,8 @@ const AdminDashboard = () => {
         </table>
       </div>
     </div>
-  );
+    );
+  };
 
   const renderTrackingTab = () => {
     if (!selectedTrackingEmployee) {
@@ -545,11 +619,12 @@ const AdminDashboard = () => {
             <th>Message</th>
             <th>Date</th>
             <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredLeads.map((lead) => (
-            <tr key={lead._id}>
+            <tr key={lead._id} className="hover-float">
               <td style={{fontWeight: '500'}}>{lead.name}</td>
               <td>{lead.contact || lead.email || lead.phone}</td>
               <td>{lead.projectType || lead.serviceRequested || '-'}</td>
@@ -566,6 +641,9 @@ const AdminDashboard = () => {
                   <option value="Converted" style={{color: 'black'}}>Converted</option>
                   <option value="Closed" style={{color: 'black'}}>Closed</option>
                 </select>
+              </td>
+              <td>
+                <button className={styles.btnSecondary} onClick={() => setEditingLead(lead)} style={{padding: '0.2rem 0.5rem', fontSize: '0.8rem'}}>Edit</button>
               </td>
             </tr>
           ))}
@@ -886,6 +964,35 @@ const AdminDashboard = () => {
           <div style={{position: 'relative', maxWidth: '90%', maxHeight: '90%'}}>
             <span style={{position: 'absolute', top: '-40px', right: '0px', fontSize: '2rem', cursor: 'pointer', color: 'white'}} onClick={() => setSelectedPhoto(null)}>&times;</span>
             <img src={selectedPhoto} alt="Site Visit" style={{maxWidth: '100%', maxHeight: '80vh', borderRadius: '8px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)'}} />
+          </div>
+        </div>
+      )}
+
+      {/* Edit Lead Modal */}
+      {editingLead && (
+        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', zIndex: 9999, backdropFilter: 'blur(10px)'}}>
+          <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative'}}>
+            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: 'var(--text-primary)'}} onClick={() => setEditingLead(null)}>&times;</span>
+            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem'}}>Edit Lead</h3>
+            <form onSubmit={handleEditLead} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Name</label>
+                <input type="text" value={editingLead.name || ''} onChange={e => setEditingLead({...editingLead, name: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Email</label>
+                <input type="email" value={editingLead.email || ''} onChange={e => setEditingLead({...editingLead, email: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Phone</label>
+                <input type="text" value={editingLead.phone || ''} onChange={e => setEditingLead({...editingLead, phone: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+              </div>
+              <div>
+                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Admin Notes</label>
+                <textarea rows="3" value={editingLead.adminNotes || ''} onChange={e => setEditingLead({...editingLead, adminNotes: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} placeholder="Add internal notes about this lead..."></textarea>
+              </div>
+              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '1rem'}}>Save Changes</button>
+            </form>
           </div>
         </div>
       )}

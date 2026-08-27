@@ -34,6 +34,9 @@ const EmployeeDashboard = () => {
     const saved = localStorage.getItem('offlineVisits_queue');
     return saved ? JSON.parse(saved) : [];
   });
+  
+  // PWA Install State
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
 
   const API_URL = window.API_CONFIG?.BASE_URL || '/api'; // fallback to /api for local dev proxy
   
@@ -50,12 +53,19 @@ const EmployeeDashboard = () => {
     };
     const handleOffline = () => setIsOnline(false);
 
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       // Cleanup camera on unmount
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
@@ -103,9 +113,15 @@ const EmployeeDashboard = () => {
       try {
         const projRes = await axios.get(`${API_URL}/projects`, { headers });
         setProjects(projRes.data);
+        localStorage.setItem('cached_projects', JSON.stringify(projRes.data));
       } catch (err) {
-        console.error("Failed to fetch projects, setting empty");
-        setProjects([]);
+        console.error("Failed to fetch projects from API, falling back to cache");
+        const cached = localStorage.getItem('cached_projects');
+        if (cached) {
+          setProjects(JSON.parse(cached));
+        } else {
+          setProjects([]);
+        }
       }
 
       try {
@@ -293,6 +309,16 @@ const EmployeeDashboard = () => {
     }
   };
 
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    }
+  };
+
   return (
     <div className={styles.portalWrapper}>
       <div className={styles.layout}>
@@ -339,6 +365,17 @@ const EmployeeDashboard = () => {
               <span className={styles.userRole}>{user.role}</span>
             </div>
           </div>
+          {deferredPrompt && (
+            <div style={{ padding: '1rem', borderTop: '1px solid var(--border-color)' }}>
+              <button 
+                onClick={handleInstallClick} 
+                className={`${styles.btn} ${styles.btnPrimary}`} 
+                style={{ width: '100%', fontSize: '0.9rem', padding: '0.6rem' }}
+              >
+                📲 Install App
+              </button>
+            </div>
+          )}
         </aside>
 
         {/* Main Content */}
