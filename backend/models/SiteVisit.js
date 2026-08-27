@@ -12,6 +12,8 @@ const SiteVisitSchema = new mongoose.Schema({
   photoUrl: { type: String }, // Optional, historically Base64 or URL
   expenseAmount: { type: Number, default: 0 },
   expenseDescription: { type: String },
+  expenseStatus: { type: String, enum: ['Pending', 'Approved', 'Rejected'], default: 'Pending' },
+  expenseAdminComment: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 

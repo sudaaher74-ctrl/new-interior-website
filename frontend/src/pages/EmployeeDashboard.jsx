@@ -696,6 +696,8 @@ const EmployeeDashboard = () => {
                         <th style={{ padding: '8px' }}>Date</th>
                         <th style={{ padding: '8px' }}>Project</th>
                         <th style={{ padding: '8px' }}>Description</th>
+                        <th style={{ padding: '8px' }}>Status</th>
+                        <th style={{ padding: '8px' }}>Notes</th>
                         <th style={{ padding: '8px' }}>Amount (₹)</th>
                       </tr>
                     </thead>
