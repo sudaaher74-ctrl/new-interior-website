@@ -1,9 +1,7 @@
-# One group only — a second "User-agent: *" block would override this one
-# in most parsers rather than adding to it.
 User-agent: *
 Allow: /
-Disallow: /admin
 Disallow: /employee
-Disallow: /premium
+Disallow: /admin
+Disallow: /login
 
 Sitemap: https://www.osinteriors.in/sitemap.xml

@@ -66,7 +66,7 @@ const Portfolio = () => {
                 style={{ display: 'block' }}
               >
                 <div className="tile" style={{ aspectRatio: '16 / 9', marginBottom: '16px' }}>
-                  <img src={project.img} alt={project.title} loading="lazy" decoding="async" />
+                  <img src={project.img} alt={project.altText || project.title} loading="lazy" decoding="async" />
                 </div>
                 <h2 className="h4-card mb-1">{project.title}</h2>
                 <div style={{ fontSize: '14px', color: 'var(--text-meta)' }}>{project.meta}</div>

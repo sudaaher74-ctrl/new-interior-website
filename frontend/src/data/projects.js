@@ -22,6 +22,7 @@ export const projects = [
     ],
     gallery: ['/images/bombayB2.webp', '/images/IMG_2706.webp'],
     galleryWide: '/images/IMG_2695.webp',
+    altText: 'Modern turnkey restaurant interior for Bombay Barbeque in Malad with warm lighting and custom wood joinery',
   },
   {
     slug: 'netwin-ventures',
@@ -36,6 +37,7 @@ export const projects = [
     delivered: ['Civil', 'MEP', 'Joinery', 'Furniture', 'Lighting'],
     gallery: ['/images/BelapurC3.webp', '/images/IMG_2701.webp'],
     galleryWide: '/images/IMG_2702.webp',
+    altText: 'Premium corporate office fit-out for NETWIN Ventures in CBD Belapur featuring modern workstations',
   },
   {
     slug: '99-wok-street',
@@ -50,6 +52,7 @@ export const projects = [
     delivered: ['Civil', 'MEP', 'Joinery', 'Furniture', 'Lighting', 'Signage'],
     gallery: ['/images/caffe.webp', '/images/IMG_2697.webp'],
     galleryWide: '/images/IMG_2705.webp',
+    altText: 'Dynamic restaurant interior for 99 Wok Street in Kandivali with custom lighting and seating',
   },
   {
     slug: 'juice-crush',
@@ -64,6 +67,7 @@ export const projects = [
     delivered: ['Civil', 'Joinery', 'Furniture', 'Lighting', 'Signage'],
     gallery: ['/images/juice2.webp', '/images/juice3.webp'],
     galleryWide: '/images/IMG_2698.webp',
+    altText: 'Vibrant QSR outlet design for Juice Crush featuring bright signage and efficient counter space',
   },
   {
     slug: 'radhakrishna-cuisine',
@@ -78,6 +82,7 @@ export const projects = [
     delivered: ['Civil', 'MEP', 'Joinery', 'Furniture', 'Lighting'],
     gallery: ['/images/caravab1.webp', '/images/carvan2.webp'],
     galleryWide: '/images/carvan3.webp',
+    altText: 'Elegant dining area for RadhaKrishna Cuisine in Bhayandar with traditional yet modern aesthetics',
   },
   {
     slug: 'boomerang-park',
@@ -92,6 +97,7 @@ export const projects = [
     delivered: ['Civil', 'MEP', 'Furniture', 'Lighting'],
     gallery: ['/images/IMG_2697.webp', '/images/IMG_2702.webp'],
     galleryWide: '/images/IMG_2701.webp',
+    altText: 'Sophisticated hospitality interior at Boomerang Park in Sakinaka with premium MEP and lighting',
   },
   {
     slug: 'la-loco-grill',
@@ -106,6 +112,7 @@ export const projects = [
     delivered: ['Civil', 'MEP', 'Joinery', 'Furniture', 'Lighting', 'Signage'],
     gallery: ['/images/bombayB1.webp', '/images/caffe.webp'],
     galleryWide: '/images/IMG_2706.webp',
+    altText: 'La Loco Grill restaurant interior in Thane featuring custom joinery and ambient lighting',
   },
   {
     slug: 'caravan-menu',
@@ -120,6 +127,7 @@ export const projects = [
     delivered: ['Civil', 'MEP', 'Joinery', 'Furniture', 'Lighting'],
     gallery: ['/images/carvan2.webp', '/images/carvan3.webp'],
     galleryWide: '/images/caravab1.webp',
+    altText: 'Caravan Menu restaurant in Thane showing premium turnkey interior finishing and seating arrangements',
   },
   {
     slug: 'exterior-facade-work',
@@ -134,6 +142,7 @@ export const projects = [
     delivered: ['Cladding', 'Elevation', 'Waterproofing', 'Coatings'],
     gallery: ['/images/IMG_2695.webp', '/images/IMG_2705.webp'],
     galleryWide: '/images/IMG_2696.webp',
+    altText: 'Commercial exterior facade and ACP cladding elevation work in Mumbai by OS Interiors',
   },
 ];
 
