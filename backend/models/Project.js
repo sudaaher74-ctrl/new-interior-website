@@ -8,6 +8,7 @@ const ProjectSchema = new mongoose.Schema({
     lat: { type: Number },
     lng: { type: Number }
   },
+  geofenceRadius: { type: Number, default: 100 }, // Default 100 meters
   budget: { type: String },
   startDate: { type: Date },
   endDate: { type: Date },

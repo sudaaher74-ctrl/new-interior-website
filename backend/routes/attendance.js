@@ -3,7 +3,7 @@ const router = express.Router();
 const Attendance = require('../models/Attendance');
 const Project = require('../models/Project');
 const User = require('../models/User');
-const { auth } = require('../middleware/auth');
+const { auth, authorizeRoles } = require('../middleware/auth');
 
 // Middleware to verify token
 
@@ -20,6 +20,64 @@ router.get('/today', auth, async (req, res) => {
 
     res.json(attendance || { status: 'Not Checked In' });
   } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
+
+// Get Attendance History (Employee)
+router.get('/history', auth, async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    let query = { user: req.user.id };
+
+    if (startDate || endDate) {
+      query.date = {};
+      if (startDate) query.date.$gte = new Date(startDate);
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        query.date.$lte = end;
+      }
+    }
+
+    const records = await Attendance.find(query)
+      .populate('project', 'name')
+      .sort({ date: -1 });
+
+    res.json(records);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
+
+// Admin/PM View All Attendance
+router.get('/admin/all', [auth, authorizeRoles('Admin', 'Project Manager')], async (req, res) => {
+  try {
+    const { projectId, userId, startDate, endDate } = req.query;
+    let query = {};
+
+    if (projectId) query.project = projectId;
+    if (userId) query.user = userId;
+    
+    if (startDate || endDate) {
+      query.date = {};
+      if (startDate) query.date.$gte = new Date(startDate);
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        query.date.$lte = end;
+      }
+    }
+
+    const records = await Attendance.find(query)
+      .populate('user', 'name email role')
+      .populate('project', 'name')
+      .sort({ date: -1 });
+
+    res.json(records);
+  } catch (err) {
+    console.error(err);
     res.status(500).send('Server error');
   }
 });
@@ -48,11 +106,12 @@ router.post('/check-in', auth, async (req, res) => {
     const project = await Project.findById(projectId);
     if (!project) return res.status(404).json({ msg: 'Project not found' });
 
-    // Validate Radius (100 meters)
+    // Validate Radius
     if (project.coordinates && project.coordinates.lat && project.coordinates.lng) {
       const distance = getDistanceInMeters(lat, lng, project.coordinates.lat, project.coordinates.lng);
-      if (distance > 100) {
-        return res.status(400).json({ msg: 'You are not at the assigned site. Distance: ' + Math.round(distance) + 'm' });
+      const allowedRadius = project.geofenceRadius || 100;
+      if (distance > allowedRadius) {
+        return res.status(400).json({ msg: `You are not at the assigned site. Distance: ${Math.round(distance)}m. Allowed: ${allowedRadius}m` });
       }
     }
 
@@ -78,7 +137,17 @@ router.post('/check-in', auth, async (req, res) => {
       selfieUrl,
       deviceInfo
     };
-    attendance.status = 'Present';
+    
+    // Auto-resolve Late Arrival
+    const checkInTime = new Date();
+    const cutOffTime = new Date();
+    cutOffTime.setHours(10, 0, 0, 0); // 10:00 AM local time
+    
+    if (checkInTime > cutOffTime) {
+      attendance.status = 'Late Arrival';
+    } else {
+      attendance.status = 'Present';
+    }
 
     await attendance.save();
     res.json(attendance);
