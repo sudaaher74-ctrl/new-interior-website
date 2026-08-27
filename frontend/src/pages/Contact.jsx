@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import StructuredData from '../components/StructuredData';
+import { localBusinessSchema } from '../data/business';
 import Photo from '../components/Photo';
 import { PROJECT_TYPES } from '../data/services';
 
@@ -113,6 +115,7 @@ const Contact = () => {
 
   return (
     <main>
+      <StructuredData id="ld-business" data={localBusinessSchema} />
       <section className="container mt-8 mb-12">
         <div className="grid-2">
           <div className="reveal-stagger">

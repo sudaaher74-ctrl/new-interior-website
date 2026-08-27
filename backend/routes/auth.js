@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const User = require('../models/User');
-const { auth, JWT_SECRET } = require('../middleware/auth');
+const { auth, JWT_SECRET, JWT_ISSUER } = require('../middleware/auth');
 
 const TOKEN_TTL = '8h';
 
@@ -36,7 +36,7 @@ router.post('/login', loginLimiter, async (req, res) => {
     if (!matches) return res.status(401).json(invalid);
 
     const payload = { user: { id: user.id, role: user.role, fullName: user.fullName } };
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_TTL });
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_TTL, issuer: JWT_ISSUER });
 
     res.json({ token, user: payload.user });
   } catch (err) {

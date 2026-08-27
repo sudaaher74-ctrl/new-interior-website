@@ -1,10 +1,16 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import Sitemap from 'vite-plugin-sitemap'
+import { projects } from './src/data/projects.js'
 
 export default defineConfig({
   plugins: [
     react(),
+    Sitemap({
+      hostname: 'https://www.osinteriors.in',
+      dynamicRoutes: projects.map(p => `/portfolio/${p.slug}`)
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {

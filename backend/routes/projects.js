@@ -3,10 +3,10 @@ const router = express.Router();
 const Project = require('../models/Project');
 
 const User = require('../models/User'); // Need User model for bypass
-const { auth, authAdmin } = require('../middleware/auth');
+const { auth, authorizeRoles, ADMIN_ROLES } = require('../middleware/auth');
 
 // Create a project
-router.post('/', authAdmin, async (req, res) => {
+router.post('/', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), async (req, res) => {
   try {
     const project = new Project(req.body);
     await project.save();
@@ -28,7 +28,7 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Update a project
-router.put('/:id', authAdmin, async (req, res) => {
+router.put('/:id', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), async (req, res) => {
   try {
     const project = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(project);
@@ -38,7 +38,7 @@ router.put('/:id', authAdmin, async (req, res) => {
 });
 
 // Delete a project
-router.delete('/:id', authAdmin, async (req, res) => {
+router.delete('/:id', auth, authorizeRoles(...ADMIN_ROLES), async (req, res) => {
   try {
     await Project.findByIdAndDelete(req.params.id);
     res.json({ msg: 'Project removed' });

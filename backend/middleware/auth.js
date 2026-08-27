@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+const JWT_ISSUER = 'os-interiors-api';
+
 // Fail loudly rather than silently falling back to a guessable default — a
 // predictable secret lets anyone mint their own admin token.
 if (!JWT_SECRET) {
@@ -26,24 +28,32 @@ const auth = (req, res, next) => {
   if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET, { issuer: JWT_ISSUER });
     if (!decoded.user || !decoded.user.role) {
       return res.status(401).json({ msg: 'Token is not valid' });
     }
     req.user = decoded.user;
     next();
   } catch {
-    res.status(401).json({ msg: 'Token is not valid' });
+    res.status(401).json({ msg: 'Token is not valid or expired' });
   }
 };
 
-/** As above, but additionally requires an administrative role. */
-const authAdmin = (req, res, next) =>
-  auth(req, res, () => {
-    if (!ADMIN_ROLES.includes(req.user.role)) {
-      return res.status(403).json({ msg: 'Access denied: administrators only' });
+/** 
+ * Granular Role-Based Access Control (RBAC) middleware.
+ * Pass roles as strings. e.g., authorizeRoles('Super Admin', 'Project Manager')
+ */
+const authorizeRoles = (...allowedRoles) => {
+  return (req, res, next) => {
+    // We assume `auth` middleware has already run and attached `req.user`.
+    if (!req.user || !req.user.role) {
+      return res.status(401).json({ msg: 'Unauthorized' });
+    }
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ msg: 'Access denied: insufficient permissions' });
     }
     next();
-  });
+  };
+};
 
-module.exports = { auth, authAdmin, ADMIN_ROLES, JWT_SECRET };
+module.exports = { auth, authorizeRoles, ADMIN_ROLES, JWT_SECRET, JWT_ISSUER };

@@ -13,6 +13,7 @@ const LeadSchema = new mongoose.Schema({
     system: Boolean,
     date: { type: Date, default: Date.now }
   }],
+  adminNotes: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 

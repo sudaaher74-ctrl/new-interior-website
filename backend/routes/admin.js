@@ -4,10 +4,10 @@ const User = require('../models/User');
 const Project = require('../models/Project');
 const Attendance = require('../models/Attendance');
 const SiteVisit = require('../models/SiteVisit');
-const { authAdmin } = require('../middleware/auth');
+const { auth, authorizeRoles, ADMIN_ROLES } = require('../middleware/auth');
 
 // Get Dashboard Stats
-router.get('/stats', authAdmin, async (req, res) => {
+router.get('/stats', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), async (req, res) => {
   try {
     const totalProjects = await Project.countDocuments();
     const activeProjects = await Project.countDocuments({ status: 'Ongoing' });
@@ -31,8 +31,8 @@ router.get('/stats', authAdmin, async (req, res) => {
   }
 });
 
-// Get Site Visits Data (replaces live-tracking)
-router.get('/site-visits', authAdmin, async (req, res) => {
+// Get Site Visits
+router.get('/site-visits', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), async (req, res) => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -48,7 +48,7 @@ router.get('/site-visits', authAdmin, async (req, res) => {
 });
 
 // Get All Employees
-router.get('/employees', authAdmin, async (req, res) => {
+router.get('/employees', auth, authorizeRoles(...ADMIN_ROLES), async (req, res) => {
   try {
     const employees = await User.find({ role: 'Employee' }).select('-password').lean();
     res.json(employees);
@@ -58,7 +58,7 @@ router.get('/employees', authAdmin, async (req, res) => {
 });
 
 // Create Employee
-router.post('/employees', authAdmin, async (req, res) => {
+router.post('/employees', auth, authorizeRoles(...ADMIN_ROLES), async (req, res) => {
   const { fullName, email, password, mobileNumber, designation } = req.body;
   try {
     let user = await User.findOne({ email });
@@ -91,7 +91,7 @@ router.post('/employees', authAdmin, async (req, res) => {
 });
 
 // Update Employee
-router.put('/employees/:id', authAdmin, async (req, res) => {
+router.put('/employees/:id', auth, authorizeRoles(...ADMIN_ROLES), async (req, res) => {
   const { fullName, email, mobileNumber, designation, password } = req.body;
   try {
     let employee = await User.findById(req.params.id);
@@ -116,7 +116,7 @@ router.put('/employees/:id', authAdmin, async (req, res) => {
 });
 
 // Delete Employee
-router.delete('/employees/:id', authAdmin, async (req, res) => {
+router.delete('/employees/:id', auth, authorizeRoles(...ADMIN_ROLES), async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id);
     res.json({ msg: 'Employee removed' });

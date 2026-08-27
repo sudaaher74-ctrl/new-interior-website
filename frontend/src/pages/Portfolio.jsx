@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import StructuredData from '../components/StructuredData';
+import { collectionSchema } from '../data/business';
 import { projects, FILTERS } from '../data/projects';
 
 const Portfolio = () => {
@@ -19,6 +21,7 @@ const Portfolio = () => {
 
   return (
     <main>
+      <StructuredData id="ld-collection" data={collectionSchema(projects)} />
       <section className="container mt-8 mb-12">
         <div className="reveal-stagger">
           <div className="eyebrow mb-4">Portfolio</div>
@@ -62,7 +65,7 @@ const Portfolio = () => {
                 className="reveal-stagger"
                 style={{ display: 'block' }}
               >
-                <div className="tile" style={{ aspectRatio: '4 / 3', marginBottom: '16px' }}>
+                <div className="tile" style={{ aspectRatio: '16 / 9', marginBottom: '16px' }}>
                   <img src={project.img} alt={project.title} loading="lazy" decoding="async" />
                 </div>
                 <h2 className="h4-card mb-1">{project.title}</h2>

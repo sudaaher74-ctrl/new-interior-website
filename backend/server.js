@@ -5,17 +5,38 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 dotenv.config();
 
 const app = express();
 app.use(helmet({
-    contentSecurityPolicy: false // Allow external CDNs (Leaflet, Google Fonts)
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://unpkg.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+        imgSrc: ["'self'", "data:", "blob:", "https://*.basemaps.cartocdn.com", "https://res.cloudinary.com", "https://unpkg.com"],
+        connectSrc: ["'self'", "https://api.cloudinary.com"],
+      },
+    },
+    crossOriginEmbedderPolicy: false, // Prevents issues with external images/tiles
 }));
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, '../frontend'))); // Serve HTML pages locally
+
+// Global API Rate Limiter
+const apiLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: { msg: 'Too many requests from this IP, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/', apiLimiter);
 
 // The login limiter now lives with the login route itself, in routes/auth.js.
 

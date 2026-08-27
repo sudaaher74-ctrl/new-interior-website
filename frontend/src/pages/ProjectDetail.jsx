@@ -2,6 +2,8 @@ import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import StructuredData from '../components/StructuredData';
+import { itemSchema } from '../data/business';
 import Photo from '../components/Photo';
 import { getProject } from '../data/projects';
 
@@ -38,6 +40,7 @@ const ProjectDetail = () => {
 
   return (
     <main>
+      <StructuredData id="ld-item" data={itemSchema(project)} />
       <section className="container mt-8 mb-8">
         <Link
           to="/portfolio"

@@ -3,7 +3,7 @@ const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const Lead = require('../models/Lead');
 const User = require('../models/User');
-const { authAdmin } = require('../middleware/auth');
+const { auth, authorizeRoles, ADMIN_ROLES } = require('../middleware/auth');
 
 // This endpoint is public, so cap how fast one address can file enquiries.
 const leadLimiter = rateLimit({
@@ -44,7 +44,7 @@ router.post('/', leadLimiter, async (req, res) => {
 });
 
 // Get all leads (admin only)
-router.get('/', authAdmin, async (req, res) => {
+router.get('/', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), async (req, res) => {
   try {
     const leads = await Lead.find().sort({ createdAt: -1 });
     res.json(leads);
@@ -54,7 +54,7 @@ router.get('/', authAdmin, async (req, res) => {
 });
 
 // Update lead status (admin only)
-router.put('/:id/status', authAdmin, async (req, res) => {
+router.put('/:id/status', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), async (req, res) => {
   try {
     const lead = await Lead.findById(req.params.id);
     if (!lead) return res.status(404).json({ msg: 'Lead not found' });
@@ -67,8 +67,26 @@ router.put('/:id/status', authAdmin, async (req, res) => {
   }
 });
 
+// Update lead details (admin only)
+router.put('/:id', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), async (req, res) => {
+  try {
+    const lead = await Lead.findById(req.params.id);
+    if (!lead) return res.status(404).json({ msg: 'Lead not found' });
+    
+    if (req.body.name) lead.name = req.body.name;
+    if (req.body.email !== undefined) lead.email = req.body.email;
+    if (req.body.phone !== undefined) lead.phone = req.body.phone;
+    if (req.body.adminNotes !== undefined) lead.adminNotes = req.body.adminNotes;
+    
+    await lead.save();
+    res.json(lead);
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
+
 // Delete a lead (admin only)
-router.delete('/:id', authAdmin, async (req, res) => {
+router.delete('/:id', auth, authorizeRoles(...ADMIN_ROLES), async (req, res) => {
   try {
     await Lead.findByIdAndDelete(req.params.id);
     res.json({ msg: 'Lead removed' });

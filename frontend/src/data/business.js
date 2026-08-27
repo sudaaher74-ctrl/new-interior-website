@@ -61,3 +61,35 @@ export const faqSchema = (faqs) => ({
     acceptedAnswer: { '@type': 'Answer', text: item.a },
   })),
 });
+
+export const collectionSchema = (projects) => ({
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Portfolio of Commercial Interiors',
+  url: `${BUSINESS.url}/portfolio`,
+  description: 'Our portfolio of turnkey fit-out projects in Mumbai.',
+  hasPart: projects.map((p) => ({
+    '@type': 'CreativeWork',
+    name: p.title,
+    url: `${BUSINESS.url}/portfolio/${p.slug}`,
+    image: `${BUSINESS.url}${p.img}`,
+    about: p.meta
+  }))
+});
+
+export const itemSchema = (project) => ({
+  '@context': 'https://schema.org',
+  '@type': 'ItemPage',
+  name: project.title,
+  url: `${BUSINESS.url}/portfolio/${project.slug}`,
+  mainEntity: {
+    '@type': 'CreativeWork',
+    name: project.title,
+    image: `${BUSINESS.url}${project.img}`,
+    description: project.body?.[0] || project.meta,
+    author: {
+      '@type': 'Organization',
+      name: BUSINESS.name
+    }
+  }
+});
