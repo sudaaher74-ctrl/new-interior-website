@@ -38,13 +38,13 @@ const About = () => {
 
       <section className="container mb-8">
         <div className="grid-2 reveal-stagger">
-          <div className="surface-block" style={{ padding: '56px' }}>
+          <div className="surface-block hover-float" style={{ padding: '56px' }}>
             <h3 className="h3-card mb-4">Our vision</h3>
             <p className="body-text">
               To become India's most trusted commercial interior and turnkey execution company, creating world-class spaces that inspire businesses and enhance customer experiences.
             </p>
           </div>
-          <div className="surface-card" style={{ padding: '56px' }}>
+          <div className="surface-card hover-float" style={{ padding: '56px' }}>
             <h3 className="h3-card mb-4">Our mission</h3>
             <p className="body-text">
               Deliver innovative, functional and aesthetically exceptional commercial environments through creativity, engineering excellence, quality craftsmanship and timely project execution.
@@ -57,7 +57,7 @@ const About = () => {
         <h2 className="h2-section mb-8 reveal">Core values</h2>
         <div className="grid-5 reveal-stagger">
           {['Integrity', 'Innovation', 'Quality', 'Transparency', 'Craftsmanship', 'Client satisfaction', 'Professionalism', 'Sustainability', 'Safety', 'Commitment'].map((value, i) => (
-            <div key={i} style={{ padding: '32px 24px', backgroundColor: 'var(--surface-card)', borderRadius: 'var(--radius-md)', textAlign: 'center', fontWeight: 600, color: 'var(--text-primary)' }}>
+            <div key={i} className="hover-float" style={{ padding: '32px 24px', backgroundColor: 'var(--surface-card)', borderRadius: 'var(--radius-md)', textAlign: 'center', fontWeight: 600, color: 'var(--text-primary)' }}>
               {value}
             </div>
           ))}
@@ -68,7 +68,7 @@ const About = () => {
         <h2 className="h2-section mb-8 reveal">Sectors we build for</h2>
         <div className="grid-4 reveal-stagger">
           {SERVICE_CATEGORIES.map((service) => (
-            <div key={service.n} className="surface-card" style={{ padding: '40px' }}>
+            <div key={service.n} className="surface-card hover-float" style={{ padding: '40px' }}>
               <h4 className="h4-card mb-2">{service.title}</h4>
               <p className="body-text">{service.short}</p>
             </div>
@@ -80,7 +80,7 @@ const About = () => {
         <h2 className="h2-section mb-8 reveal">What we deliver in-house</h2>
         <div className="grid-3 reveal-stagger">
           {CAPABILITIES.map((cap) => (
-            <div key={cap.title} className="surface-block" style={{ padding: '40px' }}>
+            <div key={cap.title} className="surface-block hover-float" style={{ padding: '40px' }}>
               <h4 className="h4-card mb-2">{cap.title}</h4>
               <p className="body-text">{cap.copy}</p>
             </div>
@@ -91,27 +91,27 @@ const About = () => {
       <section className="container section-spacing">
         <h2 className="h2-section mb-8 reveal">Why clients choose us</h2>
         <div className="grid-3 reveal-stagger">
-          <div className="surface-card" style={{ padding: '40px' }}>
+          <div className="surface-card hover-float" style={{ padding: '40px' }}>
             <h4 className="h4-card mb-2">Design + execution in one</h4>
             <p className="body-text">No miscommunication between architect and contractor. We handle both.</p>
           </div>
-          <div className="surface-card" style={{ padding: '40px' }}>
+          <div className="surface-card hover-float" style={{ padding: '40px' }}>
             <h4 className="h4-card mb-2">Restaurant expertise</h4>
             <p className="body-text">Deep understanding of kitchen flow, covers, HVAC and acoustic needs.</p>
           </div>
-          <div className="surface-card" style={{ padding: '40px' }}>
+          <div className="surface-card hover-float" style={{ padding: '40px' }}>
             <h4 className="h4-card mb-2">MEP integrated</h4>
             <p className="body-text">Mechanical, electrical and plumbing are engineered in-house.</p>
           </div>
-          <div className="surface-card" style={{ padding: '40px' }}>
+          <div className="surface-card hover-float" style={{ padding: '40px' }}>
             <h4 className="h4-card mb-2">Professional project management</h4>
             <p className="body-text">Dedicated managers, strict timelines, and weekly progress reports.</p>
           </div>
-          <div className="surface-card" style={{ padding: '40px' }}>
+          <div className="surface-card hover-float" style={{ padding: '40px' }}>
             <h4 className="h4-card mb-2">Premium finish quality</h4>
             <p className="body-text">Sourcing the finest materials and deploying skilled craftsmen.</p>
           </div>
-          <div className="surface-card" style={{ padding: '40px' }}>
+          <div className="surface-card hover-float" style={{ padding: '40px' }}>
             <h4 className="h4-card mb-2">Transparent pricing</h4>
             <p className="body-text">Detailed BOQ before commencement. No hidden costs or sudden variations.</p>
           </div>

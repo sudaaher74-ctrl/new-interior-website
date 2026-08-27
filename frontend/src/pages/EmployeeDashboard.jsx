@@ -11,6 +11,7 @@ const EmployeeDashboard = () => {
   // Data State
   const [projects, setProjects] = useState([]);
   const [visits, setVisits] = useState([]);
+  const [allVisits, setAllVisits] = useState([]);
   const [user, setUser] = useState({ fullName: 'Loading...', role: 'Site Engineer' });
   
   // Form State
@@ -112,6 +113,13 @@ const EmployeeDashboard = () => {
         setVisits(visitRes.data);
       } catch (err) {
         setVisits([]);
+      }
+      
+      try {
+        const allVisitRes = await axios.get(`${API_URL}/v2/site-visits/my-visits`, { headers });
+        setAllVisits(allVisitRes.data);
+      } catch (err) {
+        setAllVisits([]);
       }
       
       const storedUser = localStorage.getItem('user');
@@ -476,19 +484,76 @@ const EmployeeDashboard = () => {
           {activeTab === 'photos' && (
             <div className={`${styles.glassCard} ${styles.fadeInUp}`}>
               <h2 className={styles.cardTitle}>Site Photos Gallery</h2>
-              <p style={{color: 'var(--text-secondary)'}}>Your uploaded site photos will appear here.</p>
+              <div className={styles.photosGrid} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+                {allVisits.filter(v => v.photoUrl).length === 0 ? (
+                  <p style={{color: 'var(--text-secondary)'}}>No photos found in your history.</p>
+                ) : (
+                  allVisits.filter(v => v.photoUrl).map((v, idx) => (
+                    <div key={idx} style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)', position: 'relative' }}>
+                      <img src={v.photoUrl} alt="Site" style={{ width: '100%', height: '150px', objectFit: 'cover' }} />
+                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.6)', color: 'white', fontSize: '0.8rem', padding: '4px 8px' }}>
+                        {v.project?.name || 'Unknown Project'} <br/> {new Date(v.time).toLocaleDateString()}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           )}
           {activeTab === 'reports' && (
             <div className={`${styles.glassCard} ${styles.fadeInUp}`}>
-              <h2 className={styles.cardTitle}>Daily Reports</h2>
-              <p style={{color: 'var(--text-secondary)'}}>A history of your submitted daily reports will appear here.</p>
+              <h2 className={styles.cardTitle}>Visit Reports History</h2>
+              <div style={{ marginTop: '1rem' }}>
+                {allVisits.length === 0 ? (
+                  <p style={{color: 'var(--text-secondary)'}}>No historical reports found.</p>
+                ) : (
+                  <div className={styles.visitsList}>
+                    {allVisits.map((v, idx) => (
+                      <div key={idx} className={styles.visitItem} style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1rem' }}>
+                        <div className={styles.visitHeader}>
+                          <span className={styles.visitProject}>{v.project?.name || 'Unknown Project'}</span>
+                          <span className={styles.visitTime}>{new Date(v.time).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</span>
+                        </div>
+                        <div className={styles.visitDetails} style={{ marginTop: '0.5rem' }}>
+                          <div>📍 Location: {v.location.lat.toFixed(4)}, {v.location.lng.toFixed(4)} (Accuracy: {Math.round(v.location.accuracy)}m)</div>
+                          {v.expenseAmount > 0 && <div>💰 Exp: ₹{v.expenseAmount} - {v.expenseDescription}</div>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
           {activeTab === 'expenses' && (
             <div className={`${styles.glassCard} ${styles.fadeInUp}`}>
               <h2 className={styles.cardTitle}>My Expenses</h2>
-              <p style={{color: 'var(--text-secondary)'}}>A history of your logged expenses will appear here.</p>
+              <div style={{ marginTop: '1rem' }}>
+                {allVisits.filter(v => v.expenseAmount > 0).length === 0 ? (
+                  <p style={{color: 'var(--text-secondary)'}}>No expenses logged yet.</p>
+                ) : (
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid var(--border-color)' }}>
+                        <th style={{ padding: '8px' }}>Date</th>
+                        <th style={{ padding: '8px' }}>Project</th>
+                        <th style={{ padding: '8px' }}>Description</th>
+                        <th style={{ padding: '8px' }}>Amount (₹)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {allVisits.filter(v => v.expenseAmount > 0).map((v, idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid var(--border-hairline)' }}>
+                          <td style={{ padding: '8px' }}>{new Date(v.time).toLocaleDateString()}</td>
+                          <td style={{ padding: '8px' }}>{v.project?.name || 'Unknown'}</td>
+                          <td style={{ padding: '8px' }}>{v.expenseDescription || 'N/A'}</td>
+                          <td style={{ padding: '8px', fontWeight: 'bold' }}>₹{v.expenseAmount}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
             </div>
           )}
         </main>

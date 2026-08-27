@@ -62,6 +62,20 @@ router.get('/my-today', auth, async (req, res) => {
   }
 });
 
+// Get all site visits for the logged-in employee (historical)
+router.get('/my-visits', auth, async (req, res) => {
+  try {
+    const visits = await SiteVisit.find({
+      user: req.user.id
+    }).populate('project', 'name').sort({ time: -1 }).lean();
+
+    res.json(visits);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
 // Get all site visits for Admin Live Tracking
 router.get('/all', auth, async (req, res) => {
   try {

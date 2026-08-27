@@ -181,7 +181,7 @@ const Home = () => {
         <div className="grid-4">
           {SERVICES.map((s) => (
             <div key={s.n} className="reveal-stagger">
-              <div className="tile" style={{ aspectRatio: '4 / 3', marginBottom: '16px' }}>
+              <div className="tile hover-float" style={{ aspectRatio: '4 / 3', marginBottom: '16px' }}>
                 <img src={s.img} alt={s.title} loading="lazy" decoding="async" />
                 <span className="tile-badge">{s.n}</span>
               </div>
@@ -211,18 +211,18 @@ const Home = () => {
             <p className="body-text mb-8">
               Trading spaces we designed, engineered and built — across dining, workplace, retail and care.
             </p>
-            <Link to="/portfolio/netwin-ventures" className="tile mosaic-tile">
+            <Link to="/portfolio/netwin-ventures" className="tile mosaic-tile hover-float">
               <img src="/images/BelapurC3.webp" alt="NETWIN Ventures, CBD Belapur" loading="lazy" />
               <span className="tile-caption">NETWIN Ventures · CBD Belapur</span>
             </Link>
           </div>
 
           <div className="flex-col gap-6 reveal-stagger">
-            <Link to="/portfolio/bombay-barbeque" className="tile mosaic-tile">
+            <Link to="/portfolio/bombay-barbeque" className="tile mosaic-tile hover-float">
               <img src="/images/bombayB2.webp" alt="Bombay Barbeque, Malad" loading="lazy" />
               <span className="tile-caption">Bombay Barbeque · Malad</span>
             </Link>
-            <Link to="/portfolio/99-wok-street" className="tile mosaic-tile-short">
+            <Link to="/portfolio/99-wok-street" className="tile mosaic-tile-short hover-float">
               <img src="/images/Kandivali!.webp" alt="99 Wok Street, Kandivali" loading="lazy" />
               <span className="tile-caption">99 Wok Street · Kandivali</span>
             </Link>
@@ -231,7 +231,7 @@ const Home = () => {
           <div className="reveal-stagger flex-col items-center gap-6">
             <Link
               to="/portfolio/exterior-facade-work"
-              className="tile w-full mosaic-tile-tall"
+              className="tile w-full mosaic-tile-tall hover-float"
             >
               <img src="/images/IMG_2695.webp" alt="Commercial facade, Mumbai" loading="lazy" />
               <span className="tile-caption">Commercial facade · Mumbai</span>
@@ -264,7 +264,7 @@ const Home = () => {
       <section className="container section-spacing">
         <div className="grid-3">
           {TESTIMONIALS.map((t) => (
-            <figure key={t.role} className="card-shadow reveal-stagger flex-col justify-between gap-8">
+            <figure key={t.role} className="card-shadow reveal-stagger flex-col justify-between gap-8 hover-float">
               <blockquote className="body-large" style={{ fontSize: '18px', color: 'var(--text-primary)' }}>
                 “{t.quote}”
               </blockquote>
