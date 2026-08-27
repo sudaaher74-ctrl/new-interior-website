@@ -1,8 +1,17 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import Photo from '../components/Photo';
-import { CAPABILITIES, SERVICE_CATEGORIES } from '../data/services';
+import { CAPABILITIES, SERVICE_CATEGORIES, SECTORS } from '../data/services';
+
+const FOUNDED = 2014;
+const STATS = [
+  { value: String(FOUNDED), label: 'operating since' },
+  { value: `${new Date().getFullYear() - FOUNDED}`, label: 'years in business' },
+  { value: String(SECTORS.length), label: 'sectors served' },
+  { value: '1', label: 'accountable contractor' },
+];
 
 const About = () => {
   useScrollReveal();
@@ -37,6 +46,17 @@ const About = () => {
       </section>
 
       <section className="container mb-8">
+        <div className="grid-4 reveal-stagger mb-12">
+          {STATS.map((stat, i) => (
+            <div key={i} className="surface-card hover-float" style={{ padding: '32px', textAlign: 'center' }}>
+              <div className="stat-figure mb-2">{stat.value}</div>
+              <div className="eyebrow">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="container mb-8">
         <div className="grid-2 reveal-stagger">
           <div className="surface-block hover-float" style={{ padding: '56px' }}>
             <h3 className="h3-card mb-4">Our vision</h3>
@@ -55,9 +75,9 @@ const About = () => {
 
       <section className="container section-spacing">
         <h2 className="h2-section mb-8 reveal">Core values</h2>
-        <div className="grid-5 reveal-stagger">
+        <div className="flex gap-2 flex-wrap reveal-stagger">
           {['Integrity', 'Innovation', 'Quality', 'Transparency', 'Craftsmanship', 'Client satisfaction', 'Professionalism', 'Sustainability', 'Safety', 'Commitment'].map((value, i) => (
-            <div key={i} className="hover-float" style={{ padding: '32px 24px', backgroundColor: 'var(--surface-card)', borderRadius: 'var(--radius-md)', textAlign: 'center', fontWeight: 600, color: 'var(--text-primary)' }}>
+            <div key={i} className="chip chip-light" style={{ fontSize: '16px', padding: '12px 24px', backgroundColor: 'var(--surface-card)', boxShadow: 'var(--shadow-sm)' }}>
               {value}
             </div>
           ))}
@@ -114,6 +134,16 @@ const About = () => {
           <div className="surface-card hover-float" style={{ padding: '40px' }}>
             <h4 className="h4-card mb-2">Transparent pricing</h4>
             <p className="body-text">Detailed BOQ before commencement. No hidden costs or sudden variations.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="container section-spacing mb-12">
+        <div className="footer-cta reveal hover-float" style={{ marginTop: '32px', backgroundColor: 'var(--surface-block)', color: 'var(--text-primary)' }}>
+          <div className="footer-cta-content" style={{ alignItems: 'center', textAlign: 'center', margin: '0 auto', maxWidth: '600px' }}>
+            <h2 className="h2-section mb-2">Ready to start your project?</h2>
+            <p className="body-large mb-4">We handle everything from space planning to execution. Let's discuss your requirements.</p>
+            <Link to="/contact" className="btn-primary btn-lg">Request a quote</Link>
           </div>
         </div>
       </section>
