@@ -5,7 +5,9 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import StructuredData from '../components/StructuredData';
 import { itemSchema } from '../data/business';
 import Photo from '../components/Photo';
-import { getProject } from '../data/projects';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { API_URL } from '../api/config';
 
 const SpecRow = ({ label, value }) => (
   <div className="spec-row">
@@ -26,6 +28,7 @@ const ProjectDetail = () => {
       : undefined
   );
 
+  if (loading) return <main style={{padding: '120px 20px', textAlign: 'center'}}>Loading project details...</main>;
   if (!project) {
     return (
       <main>

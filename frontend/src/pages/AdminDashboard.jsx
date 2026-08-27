@@ -28,6 +28,9 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState({ totalProjects: '-', activeProjects: '-', totalEmployees: '-', siteVisitsToday: '-' });
   const [siteVisits, setSiteVisits] = useState([]);
   const [leads, setLeads] = useState([]);
+  const [portfolioProjects, setPortfolioProjects] = useState([]);
+  const [showPortfolioModal, setShowPortfolioModal] = useState(false);
+  const [newPortfolioProject, setNewPortfolioProject] = useState({ slug: '', title: '', category: 'Restaurants', img: '', altText: '' });
   const [projects, setProjects] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [expenseRecords, setExpenseRecords] = useState([]);
@@ -205,6 +208,33 @@ const AdminDashboard = () => {
       console.error(err);
       toast.error('Failed to reset password: ' + (err.response?.data?.msg || err.message));
     }
+  };
+
+  
+  const handleSavePortfolio = async (e) => {
+    e.preventDefault();
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      toast.loading('Saving project (might take a moment to upload image)...', { id: 'save-portfolio' });
+      await axios.post(`${API_URL}/v2/portfolio`, newPortfolioProject, { headers });
+      toast.success('Portfolio project created!', { id: 'save-portfolio' });
+      setShowPortfolioModal(false);
+      setNewPortfolioProject({ slug: '', title: '', category: 'Restaurants', img: '', altText: '' });
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to save project', { id: 'save-portfolio' });
+    }
+  };
+
+  const handlePortfolioImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setNewPortfolioProject({ ...newPortfolioProject, img: reader.result });
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleUpdateLeadStatus = async (leadId, status) => {
@@ -636,6 +666,25 @@ const AdminDashboard = () => {
     );
   };
 
+  
+  const renderPortfolioTab = () => (
+    <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
+      <div className={styles.tableHeader}>
+        <h2 className={styles.pageTitle} style={{fontSize: '1.5rem', margin: 0}}>Portfolio Projects</h2>
+        <button className={styles.btn} onClick={() => setShowPortfolioModal(true)}>+ Add Project</button>
+      </div>
+      <div className="grid-3" style={{ padding: '1rem', gap: '1rem' }}>
+        {portfolioProjects.map(p => (
+          <div key={p._id} style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '1rem' }}>
+            <img src={p.img} alt={p.title} style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '4px', marginBottom: '0.5rem' }} />
+            <h4 style={{ margin: '0 0 0.5rem 0' }}>{p.title}</h4>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{p.category} | {p.location}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   const renderLeadsTab = () => {
     const filteredLeads = leads.filter(l => 
       (l.name && l.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -1019,6 +1068,7 @@ const AdminDashboard = () => {
             <button className={`${styles.navItem} ${activeTab === 'employees' ? styles.active : ''}`} onClick={() => setActiveTab('employees')}><span>👥</span> Employees</button>
             <button className={`${styles.navItem} ${activeTab === 'attendance' ? styles.active : ''}`} onClick={() => setActiveTab('attendance')}><span>⏰</span> Attendance Logs</button>
             <button className={`${styles.navItem} ${activeTab === 'expenses' ? styles.active : ''}`} onClick={() => setActiveTab('expenses')}><span>💰</span> Expenses</button>
+            <button className={`${styles.navItem} ${activeTab === 'portfolio' ? styles.active : ''}`} onClick={() => setActiveTab('portfolio')}><span>🖼️</span> Portfolio Projects</button>
           </nav>
 
           <div className={styles.userProfile}>
@@ -1044,6 +1094,7 @@ const AdminDashboard = () => {
           {activeTab === 'employees' && renderEmployeesTab()}
           {activeTab === 'attendance' && renderAttendanceTab()}
           {activeTab === 'expenses' && renderExpensesTab()}
+          {activeTab === 'portfolio' && renderPortfolioTab()}
           
         </main>
       </div>

@@ -4,10 +4,21 @@ import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import StructuredData from '../components/StructuredData';
 import { collectionSchema } from '../data/business';
-import { projects, FILTERS } from '../data/projects';
+import { FILTERS } from '../data/projects';
+import axios from 'axios';
+import { useEffect } from 'react';
+import { API_URL } from '../api/config';
 
 const Portfolio = () => {
   const [activeFilter, setActiveFilter] = useState('All');
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get(`${API_URL}/v2/portfolio`)
+      .then(res => { setProjects(res.data); setLoading(false); })
+      .catch(err => { console.error(err); setLoading(false); });
+  }, []);
   useScrollReveal([activeFilter]);
   useDocumentTitle(
     'Portfolio',
@@ -28,6 +39,7 @@ const Portfolio = () => {
           <h1 className="h1-page mb-8">Our portfolio of pioneering design</h1>
         </div>
 
+        {loading ? <p>Loading portfolio...</p> : null}
         <div className="flex gap-2 flex-wrap mb-12 reveal-stagger" role="group" aria-label="Filter projects by sector">
           {FILTERS.map((filter) => {
             const isActive = activeFilter === filter;
