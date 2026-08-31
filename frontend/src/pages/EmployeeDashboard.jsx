@@ -420,22 +420,24 @@ const EmployeeDashboard = () => {
       setActionMsg('Visit logged successfully!');
       
       // Ensure visit has populated project for UI
-      const newVisit = res.data;
+      const newVisit = res.data || {};
       if (!newVisit.project || typeof newVisit.project === 'string') {
-        const p = projects.find(p => p._id === newVisit.project);
-        newVisit.project = p ? { name: p.title || p.name } : { name: 'Unknown Project' };
+        const p = projects.find(p => p._id === newVisit.project || p.id === newVisit.project);
+        newVisit.project = p ? { name: p.title || p.name } : { name: 'Assigned Project' };
       }
       
-      setVisits([newVisit, ...visits]);
+      setVisits(prev => [newVisit, ...(Array.isArray(prev) ? prev : [])]);
+      setAllVisits(prev => [newVisit, ...(Array.isArray(prev) ? prev : [])]);
       
       setSelectedProject('');
       setImageSrc(null);
       setExpenseAmount('');
       setExpenseDesc('');
+      fetchData();
     } catch (err) {
-      console.error(err);
-      toast.error('Failed to submit visit. Server error.');
-      setActionMsg('Failed to submit visit. Server error.');
+      console.error('Visit submit error:', err);
+      toast.error('Failed to submit visit: ' + (err.response?.data?.msg || err.message));
+      setActionMsg('Failed to submit visit.');
     }
   };
 
@@ -646,21 +648,31 @@ const EmployeeDashboard = () => {
                 <div className={`${styles.glassCard} ${styles.delay3}`} style={{marginBottom: '2rem'}}>
                   <h3 className={styles.cardTitle}><span>🕒</span> Today's Visits</h3>
                   <div className={styles.visitsList}>
-                    {visits.map((v, idx) => (
-                      <div key={idx} className={styles.visitItem}>
-                        <div className={styles.visitHeader}>
-                          <span className={styles.visitProject}>{v.project?.name || 'Unknown Project'}</span>
-                          <span className={styles.visitTime}>{new Date(v.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    {visits.map((v, idx) => {
+                      const projName = v?.project?.name || v?.project?.title || 'Assigned Project';
+                      const vTime = v?.time || v?.createdAt ? new Date(v.time || v.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now';
+                      const latVal = typeof v?.location?.lat === 'number' ? v.location.lat : (typeof v?.lat === 'number' ? v.lat : 0);
+                      const lngVal = typeof v?.location?.lng === 'number' ? v.location.lng : (typeof v?.lng === 'number' ? v.lng : 0);
+                      const accVal = typeof v?.location?.accuracy === 'number' ? Math.round(v.location.accuracy) : (typeof v?.accuracy === 'number' ? Math.round(v.accuracy) : 0);
+                      const expAmt = v?.expenseAmount || 0;
+                      const expDesc = v?.expenseDescription || '';
+
+                      return (
+                        <div key={v?._id || idx} className={styles.visitItem}>
+                          <div className={styles.visitHeader}>
+                            <span className={styles.visitProject}>{projName}</span>
+                            <span className={styles.visitTime}>{vTime}</span>
+                          </div>
+                          <div className={styles.visitDetails}>
+                            <div>📍 Location: {latVal.toFixed(4)}, {lngVal.toFixed(4)}</div>
+                            <div>📏 Accuracy: {accVal} meters</div>
+                            {expAmt > 0 && (
+                              <div style={{color: 'var(--accent-1)', marginTop: '0.25rem'}}>💰 Exp: ₹{expAmt} {expDesc ? `(${expDesc})` : ''}</div>
+                            )}
+                          </div>
                         </div>
-                        <div className={styles.visitDetails}>
-                          <div>📍 Location: {v.location.lat.toFixed(4)}, {v.location.lng.toFixed(4)}</div>
-                          <div>📏 Accuracy: {Math.round(v.location.accuracy)} meters</div>
-                          {v.expenseAmount > 0 && (
-                            <div style={{color: 'var(--accent-1)', marginTop: '0.25rem'}}>💰 Exp: ₹{v.expenseAmount} ({v.expenseDescription})</div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                     {visits.length === 0 && (
                       <div style={{textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)'}}>
                         No visits logged today.
@@ -696,14 +708,14 @@ const EmployeeDashboard = () => {
             <div className={`${styles.glassCard} ${styles.fadeInUp}`}>
               <h2 className={styles.cardTitle}>Site Photos Gallery</h2>
               <div className={styles.photosGrid} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
-                {allVisits.filter(v => v.photoUrl).length === 0 ? (
+                {allVisits.filter(v => v?.photoUrl).length === 0 ? (
                   <p style={{color: 'var(--text-secondary)'}}>No photos found in your history.</p>
                 ) : (
-                  allVisits.filter(v => v.photoUrl).map((v, idx) => (
+                  allVisits.filter(v => v?.photoUrl).map((v, idx) => (
                     <div key={idx} style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)', position: 'relative' }}>
                       <img src={v.photoUrl} alt="Site" style={{ width: '100%', height: '150px', objectFit: 'cover' }} />
                       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.6)', color: 'white', fontSize: '0.8rem', padding: '4px 8px' }}>
-                        {v.project?.name || 'Unknown Project'} <br/> {new Date(v.time).toLocaleDateString()}
+                        {v?.project?.name || v?.project?.title || 'Site Visit'} <br/> {v?.time || v?.createdAt ? new Date(v.time || v.createdAt).toLocaleDateString() : ''}
                       </div>
                     </div>
                   ))
@@ -719,18 +731,28 @@ const EmployeeDashboard = () => {
                   <p style={{color: 'var(--text-secondary)'}}>No historical reports found.</p>
                 ) : (
                   <div className={styles.visitsList}>
-                    {allVisits.map((v, idx) => (
-                      <div key={idx} className={styles.visitItem} style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1rem' }}>
-                        <div className={styles.visitHeader}>
-                          <span className={styles.visitProject}>{v.project?.name || 'Unknown Project'}</span>
-                          <span className={styles.visitTime}>{new Date(v.time).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</span>
+                    {allVisits.map((v, idx) => {
+                      const projName = v?.project?.name || v?.project?.title || 'Site Visit';
+                      const vTime = v?.time || v?.createdAt ? new Date(v.time || v.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Logged';
+                      const latVal = typeof v?.location?.lat === 'number' ? v.location.lat : (typeof v?.lat === 'number' ? v.lat : 0);
+                      const lngVal = typeof v?.location?.lng === 'number' ? v.location.lng : (typeof v?.lng === 'number' ? v.lng : 0);
+                      const accVal = typeof v?.location?.accuracy === 'number' ? Math.round(v.location.accuracy) : (typeof v?.accuracy === 'number' ? Math.round(v.accuracy) : 0);
+                      const expAmt = v?.expenseAmount || 0;
+                      const expDesc = v?.expenseDescription || '';
+
+                      return (
+                        <div key={idx} className={styles.visitItem} style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1rem' }}>
+                          <div className={styles.visitHeader}>
+                            <span className={styles.visitProject}>{projName}</span>
+                            <span className={styles.visitTime}>{vTime}</span>
+                          </div>
+                          <div className={styles.visitDetails} style={{ marginTop: '0.5rem' }}>
+                            <div>📍 Location: {latVal.toFixed(4)}, {lngVal.toFixed(4)} (Accuracy: {accVal}m)</div>
+                            {expAmt > 0 && <div>💰 Exp: ₹{expAmt} {expDesc ? `- ${expDesc}` : ''}</div>}
+                          </div>
                         </div>
-                        <div className={styles.visitDetails} style={{ marginTop: '0.5rem' }}>
-                          <div>📍 Location: {v.location.lat.toFixed(4)}, {v.location.lng.toFixed(4)} (Accuracy: {Math.round(v.location.accuracy)}m)</div>
-                          {v.expenseAmount > 0 && <div>💰 Exp: ₹{v.expenseAmount} - {v.expenseDescription}</div>}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
