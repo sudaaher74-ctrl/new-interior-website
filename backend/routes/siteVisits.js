@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const SiteVisit = require('../models/SiteVisit');
 const cloudinary = require('cloudinary').v2;
-const { auth } = require('../middleware/auth');
+const { auth, authorizeRoles, ADMIN_ROLES } = require('../middleware/auth');
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -94,7 +94,7 @@ router.get('/all', auth, async (req, res) => {
 
 
 // Admin endpoint to update expense status
-router.put('/expense/:id', auth, authorizeRoles('Admin', 'PM'), async (req, res) => {
+router.put('/expense/:id', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), async (req, res) => {
   try {
     const { status, comment } = req.body;
     
