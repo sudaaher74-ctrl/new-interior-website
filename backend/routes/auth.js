@@ -8,7 +8,10 @@ const User = require('../models/User');
 const { auth, JWT_SECRET, JWT_ISSUER } = require('../middleware/auth');
 
 const TOKEN_TTL = '8h';
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const GOOGLE_CLIENT_ID =
+  process.env.GOOGLE_CLIENT_ID ||
+  '899995534575-m3pj4a35ud3rcrvvee62bed64sh678jt.apps.googleusercontent.com';
+const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 // Brute-force guard on endpoints that accept credentials.
 const loginLimiter = rateLimit({
@@ -66,9 +69,9 @@ router.post('/google', loginLimiter, async (req, res) => {
       return res.status(400).json({ msg: 'Google credential is required' });
     }
 
-    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientId = GOOGLE_CLIENT_ID;
     if (!clientId) {
-      console.error('GOOGLE_CLIENT_ID is not set in backend environment variables.');
+      console.error('GOOGLE_CLIENT_ID is not configured.');
       return res.status(500).json({ msg: 'Google Authentication is not configured on the server.' });
     }
 
