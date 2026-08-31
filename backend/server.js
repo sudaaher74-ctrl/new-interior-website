@@ -48,33 +48,44 @@ const MONGODB_URI = process.env.MONGODB_URI;
 let cachedDbPromise = null;
 const connectDb = async () => {
   if (mongoose.connection.readyState >= 1) return;
-  if (!MONGODB_URI) {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
     console.error('MONGODB_URI is not set in environment variables');
     return;
   }
   if (!cachedDbPromise) {
-    cachedDbPromise = mongoose.connect(MONGODB_URI).then((m) => {
+    cachedDbPromise = mongoose.connect(uri, {
+      bufferCommands: false,
+    }).then((m) => {
       console.log('Connected to MongoDB');
       return m;
     }).catch(err => {
       cachedDbPromise = null;
       console.error('MongoDB connection error:', err);
+      throw err;
     });
   }
   return cachedDbPromise;
 };
 
-if (MONGODB_URI) {
+if (process.env.MONGODB_URI) {
   connectDb();
 }
 
 app.use(async (req, res, next) => {
+  // Let health checks or OPTIONS pass without blocking
+  if (req.method === 'OPTIONS') return next();
+
+  if (!process.env.MONGODB_URI) {
+    return res.status(503).json({ msg: 'MONGODB_URI is missing in Vercel Environment Variables.' });
+  }
   try {
     await connectDb();
+    next();
   } catch (err) {
     console.error('DB connect middleware error:', err);
+    return res.status(503).json({ msg: 'Database connection failed. Please check MongoDB Atlas IP access whitelist.' });
   }
-  next();
 });
 // Models are loaded dynamically where needed via require('../models/...')
 
