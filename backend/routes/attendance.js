@@ -82,18 +82,73 @@ router.get('/history', auth, async (req, res) => {
 router.get('/admin/all', [auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager')], async (req, res) => {
   try {
     const { userId, startDate, endDate } = req.query;
-    let query = supabase
+
+    // --- 1. Fetch from attendance table ---
+    let attQuery = supabase
       .from('attendance')
       .select('*, users(id, full_name, email, role)')
       .order('date', { ascending: false });
 
-    if (userId) query = query.eq('user_id', userId);
-    if (startDate) query = query.gte('date', startDate);
-    if (endDate) query = query.lte('date', endDate);
+    if (userId) attQuery = attQuery.eq('user_id', userId);
+    if (startDate) attQuery = attQuery.gte('date', startDate);
+    if (endDate) attQuery = attQuery.lte('date', endDate);
 
-    const { data: records, error } = await query;
-    if (error) throw error;
-    res.json((records || []).map(formatAttendance));
+    const { data: attRecords } = await attQuery;
+    const formattedAtt = (attRecords || []).map(formatAttendance);
+
+    // --- 2. Fetch from site_visits table as fallback/supplement ---
+    let visitsQuery = supabase
+      .from('site_visits')
+      .select('*, users(id, full_name, email), projects(id, title, location)')
+      .order('created_at', { ascending: false });
+
+    if (userId) visitsQuery = visitsQuery.eq('user_id', userId);
+    if (startDate) visitsQuery = visitsQuery.gte('created_at', startDate + 'T00:00:00');
+    if (endDate) visitsQuery = visitsQuery.lte('created_at', endDate + 'T23:59:59');
+
+    const { data: visitRecords } = await visitsQuery;
+
+    // --- 3. Build a set of (user_id + date) already covered by attendance records ---
+    const coveredKeys = new Set(formattedAtt.map(a => `${a.userId}_${a.date}`));
+
+    // --- 4. Synthesize attendance from site_visits for days not already in attendance table ---
+    const synthByKey = {};
+    for (const v of (visitRecords || [])) {
+      const date = (v.created_at || '').split('T')[0];
+      const key = `${v.user_id}_${date}`;
+      if (!coveredKeys.has(key) && !synthByKey[key]) {
+        synthByKey[key] = {
+          _id: `sv_${v.id}`,
+          id: `sv_${v.id}`,
+          user: v.users ? {
+            _id: v.users.id,
+            id: v.users.id,
+            fullName: v.users.full_name,
+            name: v.users.full_name,
+            email: v.users.email,
+          } : { _id: v.user_id, fullName: 'Employee' },
+          userId: v.user_id,
+          date,
+          checkInTime: v.created_at,
+          checkOutTime: null,
+          status: 'Present',
+          location: { lat: v.lat, lng: v.lng, accuracy: v.accuracy },
+          notes: v.projects ? `On-site: ${v.projects.title || 'Project'}` : 'Verified via Site Visit Photo',
+          project: v.projects ? {
+            id: v.projects.id,
+            name: v.projects.title || 'Project',
+          } : null,
+          totalWorkingHours: 0,
+          createdAt: v.created_at,
+        };
+      }
+    }
+
+    // --- 5. Merge: real attendance records first, then synthesized ones ---
+    const merged = [...formattedAtt, ...Object.values(synthByKey)];
+    merged.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    res.json(merged);
   } catch (err) {
     console.error('Admin attendance error:', err);
     res.status(500).send('Server error');
