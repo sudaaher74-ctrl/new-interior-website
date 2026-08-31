@@ -226,8 +226,23 @@ router.post('/google', loginLimiter, async (req, res) => {
   }
 });
 
-// GET /api/auth/me — lets the client confirm a stored token is still valid.
-router.get('/me', auth, (req, res) => res.json({ user: req.user }));
+// GET /api/auth/me — lets the client confirm a stored token is still valid and fetch latest live role.
+router.get('/me', auth, async (req, res) => {
+  try {
+    const { data: user } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', req.user.id)
+      .maybeSingle();
+
+    if (user) {
+      return res.json({ user: formatUser(user) });
+    }
+    res.json({ user: req.user });
+  } catch {
+    res.json({ user: req.user });
+  }
+});
 
 // GET /api/auth/profile — fetch full employee profile
 router.get('/profile', auth, async (req, res) => {

@@ -4,7 +4,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'os_interiors_secret_key_2024';
 
 const JWT_ISSUER = 'os-interiors-api';
 
-const ADMIN_ROLES = ['Super Admin', 'Owner'];
+const ADMIN_ROLES = ['Super Admin', 'Owner', 'Admin'];
 
 function readToken(req) {
   const header = req.header('Authorization') || '';
