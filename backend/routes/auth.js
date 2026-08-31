@@ -141,7 +141,11 @@ router.post('/google', loginLimiter, async (req, res) => {
     } else {
       // Create new user with default 'Employee' role
       const count = await User.countDocuments();
-      const employeeId = 'EMP' + (count + 1).toString().padStart(3, '0');
+      let employeeId = 'EMP' + (count + 1).toString().padStart(3, '0');
+      let existingEmp = await User.findOne({ employeeId });
+      if (existingEmp) {
+        employeeId = 'EMP' + Date.now().toString().slice(-4);
+      }
 
       user = new User({
         employeeId,
@@ -171,7 +175,7 @@ router.post('/google', loginLimiter, async (req, res) => {
     res.json({ token, user: payload.user });
   } catch (err) {
     console.error('Google auth server error:', err);
-    res.status(500).json({ msg: 'Server error during Google authentication' });
+    res.status(500).json({ msg: err.message || 'Server error during Google authentication' });
   }
 });
 
