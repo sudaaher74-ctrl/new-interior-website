@@ -29,6 +29,10 @@ const EmployeeDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [attendanceHistory, setAttendanceHistory] = useState([]);
   const [workSummary, setWorkSummary] = useState('');
+
+  // Profile Edit State
+  const [mobileNumberInput, setMobileNumberInput] = useState('');
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
   
   // Offline Sync State
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -147,19 +151,59 @@ const EmployeeDashboard = () => {
         console.error("Failed to fetch attendance history", err);
       }
       
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        try {
-          setUser(JSON.parse(storedUser));
-        } catch (e) {
-          setUser({ fullName: 'Demo Employee', role: 'Site Engineer' });
+      try {
+        const profileRes = await axios.get(`${API_URL}/auth/profile`, { headers });
+        if (profileRes.data?.user) {
+          setUser(profileRes.data.user);
+          setMobileNumberInput(profileRes.data.user.mobileNumber || '');
+          localStorage.setItem('user', JSON.stringify(profileRes.data.user));
         }
-      } else {
-        setUser({ fullName: 'Demo Employee', role: 'Site Engineer' });
+      } catch (profileErr) {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          try {
+            const parsed = JSON.parse(storedUser);
+            setUser(parsed);
+            setMobileNumberInput(parsed.mobileNumber || '');
+          } catch (e) {
+            setUser({ fullName: 'Employee', role: 'Site Engineer' });
+          }
+        }
       }
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleUpdateMobile = async (e) => {
+    e.preventDefault();
+    if (!mobileNumberInput.trim()) {
+      toast.error('Please enter a valid mobile number');
+      return;
+    }
+    setIsSavingProfile(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.put(`${API_URL}/auth/profile`, { mobileNumber: mobileNumberInput.trim() }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data?.user) {
+        setUser(res.data.user);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+      }
+      toast.success('Mobile number saved successfully!');
+    } catch (err) {
+      toast.error(err.response?.data?.msg || 'Failed to update mobile number');
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    toast.success('Logged out successfully');
+    navigate('/login');
   };
 
   const startCamera = async () => {
@@ -402,16 +446,28 @@ const EmployeeDashboard = () => {
             <button className={`${styles.navItem} ${activeTab === 'reports' ? styles.active : ''}`} onClick={() => setActiveTab('reports')}><span>📝</span> Daily Reports</button>
             <button className={`${styles.navItem} ${activeTab === 'expenses' ? styles.active : ''}`} onClick={() => setActiveTab('expenses')}><span>💰</span> Expenses</button>
             <button className={`${styles.navItem} ${activeTab === 'attendance' ? styles.active : ''}`} onClick={() => setActiveTab('attendance')}><span>⏰</span> Attendance</button>
+            <button className={`${styles.navItem} ${activeTab === 'profile' ? styles.active : ''}`} onClick={() => setActiveTab('profile')}><span>👤</span> My Profile</button>
           </nav>
 
-          <div className={styles.userProfile}>
+          <div className={styles.userProfile} onClick={() => setActiveTab('profile')} style={{ cursor: 'pointer' }} title="View Profile">
             <div className={styles.avatar}>
-              {user.fullName.charAt(0)}
+              {user.profilePhoto ? (
+                <img src={user.profilePhoto} alt={user.fullName} className={styles.avatarImg} />
+              ) : (
+                user.fullName?.charAt(0) || 'E'
+              )}
             </div>
             <div className={styles.userInfo}>
               <span className={styles.userName}>{user.fullName}</span>
-              <span className={styles.userRole}>{user.role}</span>
+              <span className={styles.userRole}>{user.employeeId ? `${user.employeeId} • ${user.role}` : user.role}</span>
             </div>
+            <button 
+              className={styles.logoutBtn} 
+              onClick={(e) => { e.stopPropagation(); handleLogout(); }} 
+              title="Sign Out"
+            >
+              🚪
+            </button>
           </div>
           {deferredPrompt && (
             <div style={{ padding: '1rem', borderTop: '1px solid var(--border-color)' }}>
@@ -435,6 +491,7 @@ const EmployeeDashboard = () => {
               {activeTab === 'reports' && 'Daily Reports'}
               {activeTab === 'expenses' && 'My Expenses'}
               {activeTab === 'attendance' && 'Attendance & Time Tracking'}
+              {activeTab === 'profile' && 'My Profile & Account Details'}
             </h1>
             <div className={styles.dateDisplay}>{currentDate}</div>
           </header>
@@ -713,6 +770,192 @@ const EmployeeDashboard = () => {
                     </tbody>
                   </table>
                 )}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'profile' && (
+            <div className={`${styles.profileContainer} ${styles.fadeInUp}`}>
+              {/* Profile Hero Header */}
+              <div className={styles.profileHero}>
+                <div className={styles.profileAvatarLarge}>
+                  {user.profilePhoto ? (
+                    <img src={user.profilePhoto} alt={user.fullName} />
+                  ) : (
+                    user.fullName?.charAt(0) || 'E'
+                  )}
+                </div>
+                <div className={styles.profileDetails}>
+                  <h2 className={styles.profileName}>{user.fullName}</h2>
+                  <div className={styles.profileBadgeRow}>
+                    <span className={`${styles.badge} ${styles.badgeGoogle}`}>
+                      <svg width="14" height="14" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                      </svg>
+                      Google Verified
+                    </span>
+                    <span className={`${styles.badge} ${styles.badgeRole}`}>
+                      {user.employeeId || 'EMP001'} • {user.role}
+                    </span>
+                    <span className={`${styles.badge} ${styles.badgeActive}`}>
+                      ● Active Account
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Profile Details Grid */}
+              <div className={styles.profileGrid}>
+                {/* Personal Information */}
+                <div className={styles.profileSection}>
+                  <h3 className={styles.profileSectionTitle}>
+                    <span>👤</span> Employee Information
+                  </h3>
+                  
+                  <div className={styles.profileItem}>
+                    <span className={styles.profileItemLabel}>Full Name</span>
+                    <span className={styles.profileItemValue}>{user.fullName}</span>
+                  </div>
+
+                  <div className={styles.profileItem}>
+                    <span className={styles.profileItemLabel}>Employee ID</span>
+                    <span className={styles.profileItemValue} style={{ color: 'var(--accent-1)' }}>
+                      {user.employeeId || 'EMP001'}
+                    </span>
+                  </div>
+
+                  <div className={styles.profileItem}>
+                    <span className={styles.profileItemLabel}>Official Email</span>
+                    <span className={styles.profileItemValue}>{user.email}</span>
+                  </div>
+
+                  <div className={styles.profileItem}>
+                    <span className={styles.profileItemLabel}>Assigned Role</span>
+                    <span className={styles.profileItemValue}>{user.role}</span>
+                  </div>
+                </div>
+
+                {/* Google Authentication Credentials */}
+                <div className={styles.profileSection}>
+                  <h3 className={styles.profileSectionTitle}>
+                    <span>🔐</span> Google Authentication
+                  </h3>
+
+                  <div className={styles.profileItem}>
+                    <span className={styles.profileItemLabel}>Auth Method</span>
+                    <span className={styles.profileItemValue}>Google OAuth 2.0</span>
+                  </div>
+
+                  <div className={styles.profileItem}>
+                    <span className={styles.profileItemLabel}>Google ID (Subject UID)</span>
+                    <span className={styles.profileItemValue} style={{ fontSize: '0.88rem', fontFamily: 'monospace' }}>
+                      {user.googleId || 'Connected via Google'}
+                    </span>
+                  </div>
+
+                  <div className={styles.profileItem}>
+                    <span className={styles.profileItemLabel}>Security Protocol</span>
+                    <span className={styles.profileItemValue} style={{ color: '#059669' }}>
+                      JWT + Supabase PostgreSQL RLS
+                    </span>
+                  </div>
+
+                  <div className={styles.profileItem}>
+                    <span className={styles.profileItemLabel}>Account Isolation</span>
+                    <span className={styles.profileItemValue} style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                      Isolated portal workspace for each team member
+                    </span>
+                  </div>
+                </div>
+
+                {/* Mobile Number & Contact Settings */}
+                <div className={styles.profileSection}>
+                  <h3 className={styles.profileSectionTitle}>
+                    <span>📱</span> Mobile Number & Contact
+                  </h3>
+                  <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', margin: 0 }}>
+                    Enter your active mobile number so project managers and site coordinators can reach you directly.
+                  </p>
+
+                  <form onSubmit={handleUpdateMobile} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div className={styles.profileEditRow}>
+                      <input 
+                        type="tel"
+                        className={styles.profileInput}
+                        placeholder="e.g. +91 98765 43210"
+                        value={mobileNumberInput}
+                        onChange={(e) => setMobileNumberInput(e.target.value)}
+                        required
+                      />
+                      <button 
+                        type="submit" 
+                        className={styles.saveBtn}
+                        disabled={isSavingProfile}
+                      >
+                        {isSavingProfile ? 'Saving...' : 'Save'}
+                      </button>
+                    </div>
+                  </form>
+
+                  {user.mobileNumber && (
+                    <div style={{ fontSize: '0.85rem', color: '#059669', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span>✓</span> Saved: <strong>{user.mobileNumber}</strong>
+                    </div>
+                  )}
+                </div>
+
+                {/* Activity & Stats */}
+                <div className={styles.profileSection}>
+                  <h3 className={styles.profileSectionTitle}>
+                    <span>📈</span> Portal Activity
+                  </h3>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '12px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--accent-1)' }}>
+                        {allVisits.length}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '600' }}>
+                        SITE VISITS
+                      </div>
+                    </div>
+
+                    <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '12px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#059669' }}>
+                        {attendanceHistory.length}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '600' }}>
+                        ATTENDANCE DAYS
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: '0.5rem' }}>
+                    <button 
+                      onClick={handleLogout}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        borderRadius: '10px',
+                        border: '1px solid #fee2e2',
+                        background: '#fef2f2',
+                        color: '#ef4444',
+                        fontWeight: '600',
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <span>🚪</span> Sign Out of Account
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}

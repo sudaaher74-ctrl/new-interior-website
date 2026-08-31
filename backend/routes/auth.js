@@ -29,10 +29,14 @@ function formatUser(row) {
   return {
     id: row.id,
     role: row.role || 'Employee',
-    fullName: row.full_name || row.fullName,
+    fullName: row.full_name || row.fullName || 'Employee',
     email: row.email,
+    mobileNumber: row.mobile_number || row.mobileNumber || '',
+    googleId: row.google_id || row.googleId || '',
     profilePhoto: row.profile_photo || row.profilePhoto || '',
-    employeeId: row.employee_id || row.employeeId,
+    employeeId: row.employee_id || row.employeeId || '',
+    authProvider: row.auth_provider || 'local',
+    createdAt: row.created_at || '',
   };
 }
 
@@ -224,5 +228,47 @@ router.post('/google', loginLimiter, async (req, res) => {
 
 // GET /api/auth/me — lets the client confirm a stored token is still valid.
 router.get('/me', auth, (req, res) => res.json({ user: req.user }));
+
+// GET /api/auth/profile — fetch full employee profile
+router.get('/profile', auth, async (req, res) => {
+  try {
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', req.user.id)
+      .maybeSingle();
+
+    if (error || !user) {
+      return res.status(404).json({ msg: 'User profile not found' });
+    }
+
+    res.json({ user: formatUser(user) });
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
+// PUT /api/auth/profile — update mobile number or name
+router.put('/profile', auth, async (req, res) => {
+  try {
+    const { mobileNumber, fullName } = req.body;
+    const updates = {};
+    if (mobileNumber !== undefined) updates.mobile_number = mobileNumber;
+    if (fullName !== undefined) updates.full_name = fullName;
+
+    const { data: updated, error } = await supabase
+      .from('users')
+      .update(updates)
+      .eq('id', req.user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json({ msg: 'Profile updated successfully', user: formatUser(updated) });
+  } catch (err) {
+    console.error('Profile update error:', err);
+    res.status(500).json({ msg: 'Failed to update profile' });
+  }
+});
 
 module.exports = router;
