@@ -23,6 +23,13 @@ L.Marker.prototype.options.icon = DefaultIcon;
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [adminUser, setAdminUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user') || '{}');
+    } catch {
+      return {};
+    }
+  });
   
   // Data States
   const [stats, setStats] = useState({ totalProjects: '-', activeProjects: '-', totalEmployees: '-', siteVisitsToday: '-' });
@@ -1149,11 +1156,38 @@ const AdminDashboard = () => {
           </nav>
 
           <div className={styles.userProfile}>
-            <div className={styles.avatar}>A</div>
-            <div className={styles.userInfo}>
-              <span className={styles.userName}>Super Admin</span>
-              <span className={styles.userRole}>Management</span>
+            <div className={styles.avatar}>
+              {adminUser.profilePhoto ? (
+                <img src={adminUser.profilePhoto} alt={adminUser.fullName} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+              ) : (
+                adminUser.fullName?.charAt(0) || 'A'
+              )}
             </div>
+            <div className={styles.userInfo}>
+              <span className={styles.userName}>{adminUser.fullName || 'Super Admin'}</span>
+              <span className={styles.userRole}>{adminUser.role || 'Management'}</span>
+            </div>
+            <button 
+              onClick={() => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                toast.success('Logged out successfully');
+                navigate('/login');
+              }}
+              style={{
+                marginLeft: 'auto',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '1.1rem',
+                padding: '4px 8px',
+                borderRadius: '6px',
+                color: '#64748b'
+              }}
+              title="Sign Out"
+            >
+              🚪
+            </button>
           </div>
         </aside>
 
