@@ -5,16 +5,33 @@ const { auth, authorizeRoles, ADMIN_ROLES } = require('../middleware/auth');
 
 function formatAttendance(row) {
   if (!row) return null;
+  const userObj = row.users ? {
+    _id: row.users.id,
+    id: row.users.id,
+    fullName: row.users.full_name,
+    name: row.users.full_name,
+    email: row.users.email,
+  } : null;
+
+  let totalWorkingHours = 0;
+  if (row.check_in_time) {
+    const start = new Date(row.check_in_time).getTime();
+    const end = row.check_out_time ? new Date(row.check_out_time).getTime() : Date.now();
+    totalWorkingHours = Math.max(0, (end - start) / (1000 * 60 * 60));
+  }
+
   return {
     _id: row.id,
     id: row.id,
-    user: row.user_id,
+    user: userObj || { _id: row.user_id, fullName: 'Employee' },
+    userId: row.user_id,
     date: row.date,
     checkInTime: row.check_in_time,
     checkOutTime: row.check_out_time,
-    status: row.status,
+    status: row.status || 'Present',
     location: row.location,
     notes: row.notes,
+    totalWorkingHours,
     createdAt: row.created_at,
   };
 }
@@ -26,7 +43,7 @@ router.get('/today', auth, async (req, res) => {
 
     const { data: attendance, error } = await supabase
       .from('attendance')
-      .select('*')
+      .select('*, users(id, full_name, email, role)')
       .eq('user_id', req.user.id)
       .eq('date', today)
       .maybeSingle();
@@ -45,7 +62,7 @@ router.get('/history', auth, async (req, res) => {
     const { startDate, endDate } = req.query;
     let query = supabase
       .from('attendance')
-      .select('*')
+      .select('*, users(id, full_name, email, role)')
       .eq('user_id', req.user.id)
       .order('date', { ascending: false });
 
@@ -76,7 +93,7 @@ router.get('/admin/all', [auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'
 
     const { data: records, error } = await query;
     if (error) throw error;
-    res.json(records || []);
+    res.json((records || []).map(formatAttendance));
   } catch (err) {
     console.error('Admin attendance error:', err);
     res.status(500).send('Server error');

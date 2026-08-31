@@ -143,11 +143,13 @@ const AdminDashboard = () => {
         setStats(resStats.data);
       } catch(e) {}
 
-      // 2. Live Tracking (Site Visits)
+      // 2. Live Tracking (Site Visits) & Expenses
       try {
         const resVisits = await axios.get(`${API_URL}/v2/site-visits/all`, { headers });
-        console.log("Fetched visits length:", resVisits.data.length);
-        setSiteVisits(resVisits.data);
+        const visitList = Array.isArray(resVisits.data) ? resVisits.data : [];
+        setSiteVisits(visitList);
+        const expenses = visitList.filter(v => Number(v.expenseAmount) > 0);
+        setExpenseRecords(expenses);
       } catch(e) {
         console.error("Failed to fetch site visits:", e);
       }
@@ -170,17 +172,16 @@ const AdminDashboard = () => {
         setProjects(resProjects.data);
       } catch(e) {}
 
-      // 5. Employees
-
-      
-      // 6. Attendance
+      // 5. Attendance Logs
       try {
         let attUrl = `${API_URL}/attendance/admin/all`;
         const resAtt = await axios.get(attUrl, { headers });
-        setAttendanceRecords(resAtt.data);
-      } catch(e) {}
+        setAttendanceRecords(Array.isArray(resAtt.data) ? resAtt.data : []);
+      } catch(e) {
+        console.error("Failed to fetch attendance logs:", e);
+      }
       
-      // Skip original 5. Employees
+      // 6. Employees Directory
       try {
         const resEmployees = await axios.get(`${API_URL}/v2/admin/employees`, { headers });
         setEmployees(resEmployees.data);
@@ -613,27 +614,44 @@ const AdminDashboard = () => {
               <tr>
                 <th>Employee Name</th>
                 <th>Designation</th>
+                <th>Today's Visits</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {employees.map((emp) => (
-                <tr key={emp._id}>
-                  <td style={{fontWeight: '500'}}>{emp.fullName || emp.name}</td>
-                  <td>{emp.designation || emp.role}</td>
-                  <td>
-                    <button 
-                      onClick={() => setSelectedTrackingEmployee(emp)} 
-                      className={`${styles.btn} ${styles.btnPrimary}`} 
-                      style={{padding: '0.25rem 0.5rem', fontSize: '0.8rem', width: 'auto'}}
-                    >
-                      View Live Data
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {employees.map((emp) => {
+                const empId = emp._id || emp.id;
+                const empVisits = siteVisits.filter(v => {
+                  const vUserId = v.user?._id || v.user?.id || v.userId || (typeof v.user === 'string' ? v.user : '');
+                  return vUserId === empId;
+                });
+
+                return (
+                  <tr key={empId}>
+                    <td style={{fontWeight: '600', color: '#0f172a'}}>{emp.fullName || emp.name}</td>
+                    <td>{emp.designation || emp.role}</td>
+                    <td>
+                      <span className={styles.badge} style={{
+                        background: empVisits.length > 0 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(100, 116, 139, 0.1)',
+                        color: empVisits.length > 0 ? '#10b981' : '#64748b'
+                      }}>
+                        {empVisits.length} Logged {empVisits.length === 1 ? 'Visit' : 'Visits'}
+                      </span>
+                    </td>
+                    <td>
+                      <button 
+                        onClick={() => setSelectedTrackingEmployee(emp)} 
+                        className={`${styles.btn} ${styles.btnPrimary}`} 
+                        style={{padding: '0.35rem 0.75rem', fontSize: '0.85rem', width: 'auto'}}
+                      >
+                        📍 View Live GPS & Photos
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
               {employees.length === 0 && (
-                <tr><td colSpan="3" style={{textAlign: 'center', padding: '2rem'}}>No employees found.</td></tr>
+                <tr><td colSpan="4" style={{textAlign: 'center', padding: '2rem'}}>No employees found.</td></tr>
               )}
             </tbody>
           </table>
@@ -642,8 +660,9 @@ const AdminDashboard = () => {
     }
 
     const employeeVisits = siteVisits.filter(visit => {
-      const visitUserId = visit.user?._id || visit.user;
-      return visitUserId === selectedTrackingEmployee._id;
+      const visitUserId = visit.user?._id || visit.user?.id || visit.userId || (typeof visit.user === 'string' ? visit.user : '');
+      const selectedId = selectedTrackingEmployee._id || selectedTrackingEmployee.id;
+      return visitUserId === selectedId;
     });
 
     return (
@@ -1032,10 +1051,11 @@ const AdminDashboard = () => {
   };
 
   const renderAttendanceTab = () => {
-    const filteredAtt = attendanceRecords.filter(a => 
-      (a.user?.fullName && a.user.fullName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (a.project?.name && a.project.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
+    const filteredAtt = (attendanceRecords || []).filter(a => {
+      const empName = a?.user?.fullName || a?.user?.name || (typeof a?.user === 'string' ? a.user : '') || '';
+      const projName = a?.project?.name || a?.project?.title || a?.notes || '';
+      return empName.toLowerCase().includes(searchQuery.toLowerCase()) || projName.toLowerCase().includes(searchQuery.toLowerCase());
+    });
 
     return (
       <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
@@ -1059,17 +1079,18 @@ const AdminDashboard = () => {
             
             <input 
               type="text" 
-              placeholder="Search by name/project..." 
+              placeholder="Search by employee/project..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={filterInputStyle}
             />
             <button className={`${styles.btn} ${styles.btnSecondary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => handleExportCSV(filteredAtt.map(a => ({
-              Date: new Date(a.date).toLocaleDateString(),
-              Employee: a.user?.fullName,
-              Project: a.project?.name,
-              Status: a.status,
-              TotalHours: a.totalWorkingHours || 0
+              Date: a?.date ? new Date(a.date).toLocaleDateString() : 'Today',
+              Employee: a?.user?.fullName || a?.user?.name || 'Employee',
+              Project: a?.project?.name || a?.notes || 'On-Site Verified',
+              Status: a?.status || 'Present',
+              CheckIn: a?.checkInTime ? new Date(a.checkInTime).toLocaleTimeString() : '-',
+              TotalHours: a?.totalWorkingHours ? a.totalWorkingHours.toFixed(1) : '-'
             })), 'master-attendance')}>Export CSV</button>
           </div>
         </div>
@@ -1079,31 +1100,40 @@ const AdminDashboard = () => {
             <tr>
               <th>Date</th>
               <th>Employee</th>
-              <th>Project</th>
+              <th>Project / Verification</th>
+              <th>Check-In Time</th>
               <th>Status</th>
               <th>Hours</th>
             </tr>
           </thead>
           <tbody>
-            {filteredAtt.map((att) => (
-              <tr key={att._id}>
-                <td>{new Date(att.date).toLocaleDateString()}</td>
-                <td style={{fontWeight: '500'}}>{att.user?.fullName || 'Unknown'}</td>
-                <td>{att.project?.name || 'Unknown'}</td>
-                <td>
-                  <span style={{ 
-                    padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem',
-                    background: att.status === 'Present' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)',
-                    color: att.status === 'Present' ? '#10b981' : '#f59e0b'
-                  }}>
-                    {att.status}
-                  </span>
-                </td>
-                <td style={{fontWeight: 'bold'}}>{att.totalWorkingHours ? att.totalWorkingHours.toFixed(1) : '-'}</td>
-              </tr>
-            ))}
+            {filteredAtt.map((att, idx) => {
+              const empName = att?.user?.fullName || att?.user?.name || 'Employee';
+              const projTitle = att?.project?.name || att?.notes || 'On-Site Verified (GPS)';
+              const checkInStr = att?.checkInTime ? new Date(att.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+              const hoursStr = att?.totalWorkingHours > 0 ? att.totalWorkingHours.toFixed(1) + ' hrs' : (att?.checkInTime ? 'Active' : '-');
+
+              return (
+                <tr key={att?._id || idx}>
+                  <td>{att?.date ? new Date(att.date).toLocaleDateString() : 'Today'}</td>
+                  <td style={{fontWeight: '600', color: '#0f172a'}}>{empName}</td>
+                  <td>{projTitle}</td>
+                  <td style={{color: 'var(--text-secondary)'}}>🕒 {checkInStr}</td>
+                  <td>
+                    <span style={{ 
+                      padding: '3px 10px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '600',
+                      background: (att?.status || 'Present') === 'Present' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                      color: (att?.status || 'Present') === 'Present' ? '#10b981' : '#f59e0b'
+                    }}>
+                      {att?.status || 'Present'}
+                    </span>
+                  </td>
+                  <td style={{fontWeight: 'bold', color: '#0f172a'}}>{hoursStr}</td>
+                </tr>
+              );
+            })}
             {filteredAtt.length === 0 && (
-              <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>No attendance logs found.</td></tr>
+              <tr><td colSpan="6" style={{textAlign: 'center', padding: '2rem'}}>No attendance logs found.</td></tr>
             )}
           </tbody>
         </table>

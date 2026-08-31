@@ -20,6 +20,14 @@ function formatSiteVisit(row) {
     location: row.projects.location,
   } : null;
 
+  const userObj = row.users ? {
+    _id: row.users.id,
+    id: row.users.id,
+    fullName: row.users.full_name,
+    name: row.users.full_name,
+    email: row.users.email,
+  } : null;
+
   const lat = typeof row.lat === 'number' ? row.lat : (parseFloat(row.lat) || 0);
   const lng = typeof row.lng === 'number' ? row.lng : (parseFloat(row.lng) || 0);
   const accuracy = typeof row.accuracy === 'number' ? row.accuracy : (parseFloat(row.accuracy) || 0);
@@ -27,7 +35,8 @@ function formatSiteVisit(row) {
   return {
     _id: row.id,
     id: row.id,
-    user: row.user_id,
+    user: userObj || row.user_id,
+    userId: row.user_id,
     project: projectObj || (row.project_id ? { id: row.project_id, _id: row.project_id, name: 'Assigned Project' } : { name: 'General Site Visit' }),
     location: {
       lat,
@@ -78,14 +87,55 @@ router.post('/log', auth, async (req, res) => {
         expense_description: expenseDescription || null,
         expense_status: expenseAmount ? 'Pending' : 'Approved',
       })
-      .select('*, projects(id, title, location)')
+      .select('*, projects(id, title, location), users(id, full_name, email)')
       .single();
 
     if (error) throw error;
+
+    // Auto-sync attendance for today if not checked in yet
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const { data: existingAtt } = await supabase
+        .from('attendance')
+        .select('id')
+        .eq('user_id', req.user.id)
+        .eq('date', today)
+        .maybeSingle();
+
+      if (!existingAtt) {
+        await supabase.from('attendance').insert({
+          user_id: req.user.id,
+          date: today,
+          check_in_time: new Date().toISOString(),
+          status: 'Present',
+          location: { lat: Number(lat) || 0, lng: Number(lng) || 0, accuracy: Number(accuracy) || 0 },
+          notes: 'Verified via Site Visit Photo Report'
+        });
+      }
+    } catch (attErr) {
+      console.warn('Attendance auto-sync warning:', attErr.message);
+    }
+
     res.json(formatSiteVisit(visit));
   } catch (err) {
     console.error('Site visit log error:', err);
     res.status(500).json({ msg: err.message || 'Server error logging site visit' });
+  }
+});
+
+// Admin/PM: Get All Site Visits (Live Tracking & Photos & Expenses)
+router.get('/all', [auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager')], async (req, res) => {
+  try {
+    const { data: visits, error } = await supabase
+      .from('site_visits')
+      .select('*, projects(id, title, location), users(id, full_name, email)')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    res.json((visits || []).map(formatSiteVisit));
+  } catch (err) {
+    console.error('All visits error:', err);
+    res.status(500).send('Server error');
   }
 });
 
@@ -97,7 +147,7 @@ router.get('/my-today', auth, async (req, res) => {
 
     const { data: visits, error } = await supabase
       .from('site_visits')
-      .select('*, projects(id, title, location)')
+      .select('*, projects(id, title, location), users(id, full_name, email)')
       .eq('user_id', req.user.id)
       .gte('created_at', today.toISOString())
       .order('created_at', { ascending: false });
@@ -115,7 +165,7 @@ router.get('/my-visits', auth, async (req, res) => {
   try {
     const { data: visits, error } = await supabase
       .from('site_visits')
-      .select('*, projects(id, title, location)')
+      .select('*, projects(id, title, location), users(id, full_name, email)')
       .eq('user_id', req.user.id)
       .order('created_at', { ascending: false });
 
@@ -139,7 +189,7 @@ router.put('/expense/:id', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager
       .from('site_visits')
       .update({ expense_status: status })
       .eq('id', req.params.id)
-      .select('*, projects(id, title, location)')
+      .select('*, projects(id, title, location), users(id, full_name, email)')
       .single();
 
     if (error) throw error;
