@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const { OAuth2Client } = require('google-auth-library');
-const User = require('../models/User');
+const supabase = require('../config/supabase');
 const { auth, JWT_SECRET, JWT_ISSUER } = require('../middleware/auth');
 
 const TOKEN_TTL = '8h';
@@ -23,6 +23,19 @@ const loginLimiter = rateLimit({
   validate: { xForwardedForHeader: false },
 });
 
+// Helper to normalize user payload
+function formatUser(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    role: row.role || 'Employee',
+    fullName: row.full_name || row.fullName,
+    email: row.email,
+    profilePhoto: row.profile_photo || row.profilePhoto || '',
+    employeeId: row.employee_id || row.employeeId,
+  };
+}
+
 // POST /api/auth/login — exchange credentials for a JWT.
 router.post('/login', loginLimiter, async (req, res) => {
   try {
@@ -31,10 +44,18 @@ router.post('/login', loginLimiter, async (req, res) => {
       return res.status(400).json({ msg: 'Email and password are required' });
     }
 
-    const user = await User.findOne({ email: String(email).toLowerCase().trim() });
+    const cleanEmail = String(email).toLowerCase().trim();
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', cleanEmail)
+      .maybeSingle();
 
-    // Same response whether the address is unknown or the password is wrong,
-    // so the endpoint can't be used to enumerate accounts.
+    if (error) {
+      console.error('Supabase user fetch error:', error);
+      return res.status(500).json({ msg: 'Database query error: ' + error.message });
+    }
+
     const invalid = { msg: 'Invalid credentials' };
     if (!user) return res.status(401).json(invalid);
 
@@ -45,19 +66,13 @@ router.post('/login', loginLimiter, async (req, res) => {
     const matches = await bcrypt.compare(String(password), user.password);
     if (!matches) return res.status(401).json(invalid);
 
-    const payload = { 
-      user: { 
-        id: user.id, 
-        role: user.role, 
-        fullName: user.fullName,
-        email: user.email,
-        profilePhoto: user.profilePhoto 
-      } 
-    };
+    const userPayload = formatUser(user);
+    const payload = { user: userPayload };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_TTL, issuer: JWT_ISSUER });
 
-    res.json({ token, user: payload.user });
+    res.json({ token, user: userPayload });
   } catch (err) {
+    console.error('Login error:', err);
     res.status(500).json({ msg: 'Server error' });
   }
 });
@@ -120,60 +135,69 @@ router.post('/google', loginLimiter, async (req, res) => {
       }
     }
 
-    // Find existing user by email or googleId
-    let user = await User.findOne({ 
-      $or: [{ email }, { googleId }] 
-    });
+    // Find existing user by email or google_id
+    let { data: existingUser, error: findErr } = await supabase
+      .from('users')
+      .select('*')
+      .or(`email.eq.${email},google_id.eq.${googleId}`)
+      .maybeSingle();
 
-    if (user) {
-      // Link googleId and profilePhoto if missing
-      let modified = false;
-      if (!user.googleId) {
-        user.googleId = googleId;
-        modified = true;
-      }
-      if (!user.profilePhoto && profilePhoto) {
-        user.profilePhoto = profilePhoto;
-        modified = true;
-      }
-      if (modified) {
-        await user.save();
+    if (findErr) {
+      console.error('Supabase query error:', findErr);
+    }
+
+    let userRow;
+
+    if (existingUser) {
+      const updates = {};
+      if (!existingUser.google_id) updates.google_id = googleId;
+      if (!existingUser.profile_photo && profilePhoto) updates.profile_photo = profilePhoto;
+
+      if (Object.keys(updates).length > 0) {
+        const { data: updated, error: updateErr } = await supabase
+          .from('users')
+          .update(updates)
+          .eq('id', existingUser.id)
+          .select()
+          .single();
+        userRow = updated || existingUser;
+      } else {
+        userRow = existingUser;
       }
     } else {
       // Create new user with default 'Employee' role
-      const count = await User.countDocuments();
-      let employeeId = 'EMP' + (count + 1).toString().padStart(3, '0');
-      let existingEmp = await User.findOne({ employeeId });
-      if (existingEmp) {
-        employeeId = 'EMP' + Date.now().toString().slice(-4);
-      }
+      const { count } = await supabase.from('users').select('*', { count: 'exact', head: true });
+      const employeeId = 'EMP' + ((count || 0) + 1).toString().padStart(3, '0');
 
-      user = new User({
-        employeeId,
-        fullName,
+      const newUser = {
+        full_name: fullName,
         email,
-        googleId,
-        authProvider: 'google',
+        google_id: googleId,
+        auth_provider: 'google',
         role: 'Employee',
-        profilePhoto,
-        designation: 'Site Engineer'
-      });
+        profile_photo: profilePhoto,
+        employee_id: employeeId,
+        is_active: true,
+      };
 
-      await user.save();
+      const { data: created, error: insertErr } = await supabase
+        .from('users')
+        .insert(newUser)
+        .select()
+        .single();
+
+      if (insertErr) {
+        console.error('Supabase user creation error:', insertErr);
+        return res.status(500).json({ msg: insertErr.message || 'Failed to create user account in database' });
+      }
+      userRow = created;
     }
 
-    const payload = { 
-      user: { 
-        id: user.id, 
-        role: user.role, 
-        fullName: user.fullName,
-        email: user.email,
-        profilePhoto: user.profilePhoto 
-      } 
-    };
+    const userPayload = formatUser(userRow);
+    const payload = { user: userPayload };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_TTL, issuer: JWT_ISSUER });
 
-    res.json({ token, user: payload.user });
+    res.json({ token, user: userPayload });
   } catch (err) {
     console.error('Google auth server error:', err);
     res.status(500).json({ msg: err.message || 'Server error during Google authentication' });

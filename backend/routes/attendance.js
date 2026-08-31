@@ -1,25 +1,40 @@
 const express = require('express');
 const router = express.Router();
-const Attendance = require('../models/Attendance');
-const Project = require('../models/Project');
-const User = require('../models/User');
-const { auth, authorizeRoles } = require('../middleware/auth');
+const supabase = require('../config/supabase');
+const { auth, authorizeRoles, ADMIN_ROLES } = require('../middleware/auth');
 
-// Middleware to verify token
+function formatAttendance(row) {
+  if (!row) return null;
+  return {
+    _id: row.id,
+    id: row.id,
+    user: row.user_id,
+    date: row.date,
+    checkInTime: row.check_in_time,
+    checkOutTime: row.check_out_time,
+    status: row.status,
+    location: row.location,
+    notes: row.notes,
+    createdAt: row.created_at,
+  };
+}
 
 // Get Today's Status
 router.get('/today', auth, async (req, res) => {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = new Date().toISOString().split('T')[0];
 
-    const attendance = await Attendance.findOne({
-      user: req.user.id,
-      date: { $gte: today }
-    }).populate('project', 'name');
+    const { data: attendance, error } = await supabase
+      .from('attendance')
+      .select('*')
+      .eq('user_id', req.user.id)
+      .eq('date', today)
+      .maybeSingle();
 
-    res.json(attendance || { status: 'Not Checked In' });
+    if (error) throw error;
+    res.json(attendance ? formatAttendance(attendance) : { status: 'Not Checked In' });
   } catch (err) {
+    console.error('Attendance today error:', err);
     res.status(500).send('Server error');
   }
 });
@@ -28,168 +43,121 @@ router.get('/today', auth, async (req, res) => {
 router.get('/history', auth, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    let query = { user: req.user.id };
+    let query = supabase
+      .from('attendance')
+      .select('*')
+      .eq('user_id', req.user.id)
+      .order('date', { ascending: false });
 
-    if (startDate || endDate) {
-      query.date = {};
-      if (startDate) query.date.$gte = new Date(startDate);
-      if (endDate) {
-        const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
-        query.date.$lte = end;
-      }
-    }
+    if (startDate) query = query.gte('date', startDate);
+    if (endDate) query = query.lte('date', endDate);
 
-    const records = await Attendance.find(query)
-      .populate('project', 'name')
-      .sort({ date: -1 });
-
-    res.json(records);
+    const { data: records, error } = await query;
+    if (error) throw error;
+    res.json((records || []).map(formatAttendance));
   } catch (err) {
-    console.error(err);
+    console.error('Attendance history error:', err);
     res.status(500).send('Server error');
   }
 });
 
 // Admin/PM View All Attendance
-router.get('/admin/all', [auth, authorizeRoles('Admin', 'Project Manager')], async (req, res) => {
+router.get('/admin/all', [auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager')], async (req, res) => {
   try {
-    const { projectId, userId, startDate, endDate } = req.query;
-    let query = {};
+    const { userId, startDate, endDate } = req.query;
+    let query = supabase
+      .from('attendance')
+      .select('*, users(id, full_name, email, role)')
+      .order('date', { ascending: false });
 
-    if (projectId) query.project = projectId;
-    if (userId) query.user = userId;
-    
-    if (startDate || endDate) {
-      query.date = {};
-      if (startDate) query.date.$gte = new Date(startDate);
-      if (endDate) {
-        const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
-        query.date.$lte = end;
-      }
-    }
+    if (userId) query = query.eq('user_id', userId);
+    if (startDate) query = query.gte('date', startDate);
+    if (endDate) query = query.lte('date', endDate);
 
-    const records = await Attendance.find(query)
-      .populate('user', 'name email role')
-      .populate('project', 'name')
-      .sort({ date: -1 });
-
-    res.json(records);
+    const { data: records, error } = await query;
+    if (error) throw error;
+    res.json(records || []);
   } catch (err) {
-    console.error(err);
+    console.error('Admin attendance error:', err);
     res.status(500).send('Server error');
   }
 });
 
-// Haversine formula to calculate distance in meters
-function getDistanceInMeters(lat1, lon1, lat2, lon2) {
-  const R = 6371e3; // Earth radius in meters
-  const φ1 = lat1 * Math.PI/180;
-  const φ2 = lat2 * Math.PI/180;
-  const Δφ = (lat2-lat1) * Math.PI/180;
-  const Δλ = (lon2-lon1) * Math.PI/180;
-
-  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-            Math.cos(φ1) * Math.cos(φ2) *
-            Math.sin(Δλ/2) * Math.sin(Δλ/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-  return R * c;
-}
-
 // Check-In
 router.post('/check-in', auth, async (req, res) => {
-  const { projectId, lat, lng, accuracy, selfieUrl, deviceInfo } = req.body;
-
+  const { lat, lng, accuracy, notes } = req.body;
   try {
-    const project = await Project.findById(projectId);
-    if (!project) return res.status(404).json({ msg: 'Project not found' });
+    const today = new Date().toISOString().split('T')[0];
+    const now = new Date().toISOString();
 
-    // Validate Radius
-    if (project.coordinates && project.coordinates.lat && project.coordinates.lng) {
-      const distance = getDistanceInMeters(lat, lng, project.coordinates.lat, project.coordinates.lng);
-      const allowedRadius = project.geofenceRadius || 100;
-      if (distance > allowedRadius) {
-        return res.status(400).json({ msg: `You are not at the assigned site. Distance: ${Math.round(distance)}m. Allowed: ${allowedRadius}m` });
-      }
+    const { data: existing } = await supabase
+      .from('attendance')
+      .select('id')
+      .eq('user_id', req.user.id)
+      .eq('date', today)
+      .maybeSingle();
+
+    if (existing) {
+      return res.status(400).json({ msg: 'Already checked in today' });
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const { data: created, error } = await supabase
+      .from('attendance')
+      .insert({
+        user_id: req.user.id,
+        date: today,
+        check_in_time: now,
+        status: 'Present',
+        location: { lat, lng, accuracy },
+        notes: notes || null,
+      })
+      .select()
+      .single();
 
-    let attendance = await Attendance.findOne({ user: req.user.id, date: { $gte: today } });
-    if (attendance && attendance.checkIn && attendance.checkIn.time) {
-       return res.status(400).json({ msg: 'Already checked in today' });
-    }
-
-    if (!attendance) {
-        attendance = new Attendance({
-            user: req.user.id,
-            project: projectId,
-            date: new Date()
-        });
-    }
-    
-    attendance.checkIn = {
-      time: new Date(),
-      location: { lat, lng, accuracy },
-      selfieUrl,
-      deviceInfo
-    };
-    
-    // Auto-resolve Late Arrival
-    const checkInTime = new Date();
-    const cutOffTime = new Date();
-    cutOffTime.setHours(10, 0, 0, 0); // 10:00 AM local time
-    
-    if (checkInTime > cutOffTime) {
-      attendance.status = 'Late Arrival';
-    } else {
-      attendance.status = 'Present';
-    }
-
-    await attendance.save();
-    res.json(attendance);
-
+    if (error) throw error;
+    res.json(formatAttendance(created));
   } catch (err) {
-    console.error(err);
+    console.error('Check-in error:', err);
     res.status(500).send('Server error');
   }
 });
 
 // Check-Out
 router.post('/check-out', auth, async (req, res) => {
-  const { workSummary, progressPhotos } = req.body;
-
+  const { notes } = req.body;
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = new Date().toISOString().split('T')[0];
+    const now = new Date().toISOString();
 
-    let attendance = await Attendance.findOne({ user: req.user.id, date: { $gte: today } });
-    if (!attendance || !attendance.checkIn) {
-       return res.status(400).json({ msg: 'You must check in first' });
+    const { data: attendance } = await supabase
+      .from('attendance')
+      .select('*')
+      .eq('user_id', req.user.id)
+      .eq('date', today)
+      .maybeSingle();
+
+    if (!attendance || !attendance.check_in_time) {
+      return res.status(400).json({ msg: 'You must check in first' });
     }
 
-    if (attendance.checkOut && attendance.checkOut.time) {
-        return res.status(400).json({ msg: 'Already checked out today' });
+    if (attendance.check_out_time) {
+      return res.status(400).json({ msg: 'Already checked out today' });
     }
 
-    attendance.checkOut = {
-      time: new Date(),
-      workSummary,
-      progressPhotos
-    };
+    const { data: updated, error } = await supabase
+      .from('attendance')
+      .update({
+        check_out_time: now,
+        notes: notes ? (attendance.notes ? attendance.notes + ' | ' + notes : notes) : attendance.notes,
+      })
+      .eq('id', attendance.id)
+      .select()
+      .single();
 
-    // Calculate hours
-    const msDiff = attendance.checkOut.time - attendance.checkIn.time;
-    attendance.totalWorkingHours = (msDiff / (1000 * 60 * 60)).toFixed(2);
-
-    await attendance.save();
-    res.json(attendance);
-
+    if (error) throw error;
+    res.json(formatAttendance(updated));
   } catch (err) {
-    console.error(err);
+    console.error('Check-out error:', err);
     res.status(500).send('Server error');
   }
 });

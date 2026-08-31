@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/sudaaher74-ctrl/new-interior-website#readme",
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.4",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.10.0",
     "cors": "^2.8.6",

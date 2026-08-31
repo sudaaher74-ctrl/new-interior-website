@@ -1,11 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const supabase = require('../config/supabase');
 const cloudinary = require('cloudinary').v2;
-const PortfolioProject = require('../models/PortfolioProject');
 const { auth, authorizeRoles, ADMIN_ROLES } = require('../middleware/auth');
 
-// Optional: Cloudinary config, though it might be done in siteVisits or server.js globally
-// Better to configure it here just in case if not done globally
 if (process.env.CLOUDINARY_CLOUD_NAME) {
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -14,82 +12,57 @@ if (process.env.CLOUDINARY_CLOUD_NAME) {
   });
 }
 
-// Get all portfolio projects (Public)
-router.get('/', async (req, res) => {
-  try {
-    const projects = await PortfolioProject.find().sort({ createdAt: -1 });
-    res.json(projects);
-  } catch (err) {
-    res.status(500).send('Server error');
-  }
-});
-
-// Get a single portfolio project by slug (Public)
-router.get('/:slug', async (req, res) => {
-  try {
-    const project = await PortfolioProject.findOne({ slug: req.params.slug });
-    if (!project) return res.status(404).json({ msg: 'Project not found' });
-    res.json(project);
-  } catch (err) {
-    res.status(500).send('Server error');
-  }
-});
-
-// Helper function to upload base64 image to cloudinary
 const uploadBase64 = async (base64Str) => {
-  if (!base64Str.startsWith('data:image')) return base64Str; // Already a URL
+  if (!base64Str || !base64Str.startsWith('data:image')) return base64Str;
   const uploadRes = await cloudinary.uploader.upload(base64Str, { folder: 'os_interior_portfolio' });
   return uploadRes.secure_url;
 };
 
-// Create a new portfolio project (Admin only)
-router.post('/', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), async (req, res) => {
+// Get all portfolio projects (Public)
+router.get('/', async (req, res) => {
   try {
-    let projectData = { ...req.body };
-    
-    if (projectData.img && projectData.img.startsWith('data:image')) {
-      projectData.img = await uploadBase64(projectData.img);
-    }
-    
-    if (projectData.galleryWide && projectData.galleryWide.startsWith('data:image')) {
-      projectData.galleryWide = await uploadBase64(projectData.galleryWide);
-    }
-    
-    if (projectData.gallery && projectData.gallery.length > 0) {
-      projectData.gallery = await Promise.all(
-        projectData.gallery.map(img => uploadBase64(img))
-      );
-    }
+    const { data: projects, error } = await supabase
+      .from('portfolio_projects')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-    const project = new PortfolioProject(projectData);
-    await project.save();
-    res.json(project);
+    if (error) throw error;
+    res.json(projects || []);
   } catch (err) {
-    console.error(err);
+    console.error('Portfolio error:', err);
     res.status(500).send('Server error');
   }
 });
 
-// Update a portfolio project (Admin only)
-router.put('/:id', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), async (req, res) => {
+// Create a new portfolio project (Admin only)
+router.post('/', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), async (req, res) => {
   try {
-    let projectData = { ...req.body };
+    let { title, category, img, gallery, description, client, location, year } = req.body;
     
-    if (projectData.img && projectData.img.startsWith('data:image')) {
-      projectData.img = await uploadBase64(projectData.img);
+    if (img && img.startsWith('data:image')) {
+      img = await uploadBase64(img);
     }
     
-    if (projectData.galleryWide && projectData.galleryWide.startsWith('data:image')) {
-      projectData.galleryWide = await uploadBase64(projectData.galleryWide);
-    }
-    
-    if (projectData.gallery && projectData.gallery.length > 0) {
-      projectData.gallery = await Promise.all(
-        projectData.gallery.map(img => uploadBase64(img))
-      );
+    if (gallery && gallery.length > 0) {
+      gallery = await Promise.all(gallery.map(i => uploadBase64(i)));
     }
 
-    const project = await PortfolioProject.findByIdAndUpdate(req.params.id, projectData, { new: true });
+    const { data: project, error } = await supabase
+      .from('portfolio_projects')
+      .insert({
+        title,
+        category,
+        cover_image: img,
+        gallery_images: gallery || [],
+        description,
+        client,
+        location,
+        year,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
     res.json(project);
   } catch (err) {
     console.error(err);
@@ -100,7 +73,12 @@ router.put('/:id', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), asyn
 // Delete a portfolio project
 router.delete('/:id', auth, authorizeRoles(...ADMIN_ROLES), async (req, res) => {
   try {
-    await PortfolioProject.findByIdAndDelete(req.params.id);
+    const { error } = await supabase
+      .from('portfolio_projects')
+      .delete()
+      .eq('id', req.params.id);
+
+    if (error) throw error;
     res.json({ msg: 'Project removed' });
   } catch (err) {
     res.status(500).send('Server error');

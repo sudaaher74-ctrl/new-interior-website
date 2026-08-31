@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const SiteVisit = require('../models/SiteVisit');
+const supabase = require('../config/supabase');
 const cloudinary = require('cloudinary').v2;
 const { auth, authorizeRoles, ADMIN_ROLES } = require('../middleware/auth');
 
@@ -10,7 +10,23 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Middleware to verify token
+function formatSiteVisit(row) {
+  if (!row) return null;
+  return {
+    _id: row.id,
+    id: row.id,
+    user: row.user_id,
+    project: row.project_id,
+    lat: row.lat,
+    lng: row.lng,
+    accuracy: row.accuracy,
+    photoUrl: row.photo_url,
+    expenseAmount: row.expense_amount,
+    expenseDescription: row.expense_description,
+    expenseStatus: row.expense_status,
+    createdAt: row.created_at,
+  };
+}
 
 // Log a new Site Visit
 router.post('/log', auth, async (req, res) => {
@@ -19,7 +35,6 @@ router.post('/log', auth, async (req, res) => {
   try {
     let finalPhotoUrl = photoUrl;
 
-    // Upload to Cloudinary if base64 is provided
     if (photoBase64 && process.env.CLOUDINARY_CLOUD_NAME) {
       const uploadRes = await cloudinary.uploader.upload(photoBase64, { folder: 'os_interior_visits' });
       finalPhotoUrl = uploadRes.secure_url;
@@ -27,102 +42,68 @@ router.post('/log', auth, async (req, res) => {
       finalPhotoUrl = photoBase64;
     }
 
-    const visit = new SiteVisit({
-      user: req.user.id,
-      project: projectId,
-      location: { lat, lng, accuracy },
-      photoUrl: finalPhotoUrl,
-      expenseAmount: expenseAmount || 0,
-      expenseDescription: expenseDescription || ''
-    });
+    const { data: visit, error } = await supabase
+      .from('site_visits')
+      .insert({
+        user_id: req.user.id,
+        project_id: projectId || null,
+        lat,
+        lng,
+        accuracy,
+        photo_url: finalPhotoUrl,
+        expense_amount: expenseAmount ? Number(expenseAmount) : 0,
+        expense_description: expenseDescription || null,
+        expense_status: expenseAmount ? 'Pending' : 'Approved',
+      })
+      .select()
+      .single();
 
-    await visit.save();
-    res.json(visit);
+    if (error) throw error;
+    res.json(formatSiteVisit(visit));
   } catch (err) {
-    console.error(err.message);
+    console.error('Site visit log error:', err);
     res.status(500).send('Server error');
   }
 });
 
-// Get today's site visits for the logged-in employee
-router.get('/my-today', auth, async (req, res) => {
-  try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const visits = await SiteVisit.find({
-      user: req.user.id,
-      time: { $gte: today }
-    }).populate('project', 'name').sort({ time: -1 }).lean();
-
-    res.json(visits);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
-  }
-});
-
-// Get all site visits for the logged-in employee (historical)
+// Get User's Site Visits
 router.get('/my-visits', auth, async (req, res) => {
   try {
-    const visits = await SiteVisit.find({
-      user: req.user.id
-    }).populate('project', 'name').sort({ time: -1 }).lean();
+    const { data: visits, error } = await supabase
+      .from('site_visits')
+      .select('*, projects(id, title, location)')
+      .eq('user_id', req.user.id)
+      .order('created_at', { ascending: false });
 
-    res.json(visits);
+    if (error) throw error;
+    res.json(visits || []);
   } catch (err) {
-    console.error(err.message);
+    console.error('My visits error:', err);
     res.status(500).send('Server error');
   }
 });
-
-// Get all site visits for Admin Live Tracking
-router.get('/all', auth, async (req, res) => {
-  try {
-    const visits = await SiteVisit.find()
-      .populate('user', 'fullName role')
-      .populate('project', 'name title')
-      .sort({ time: -1 })
-      .lean();
-
-    res.json(visits);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
-  }
-});
-
 
 // Admin endpoint to update expense status
 router.put('/expense/:id', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), async (req, res) => {
   try {
-    const { status, comment } = req.body;
-    
-    // Validate status
+    const { status } = req.body;
     if (!['Pending', 'Approved', 'Rejected'].includes(status)) {
       return res.status(400).json({ msg: 'Invalid status' });
     }
 
-    const visit = await SiteVisit.findById(req.params.id);
-    if (!visit) {
-      return res.status(404).json({ msg: 'Site visit / expense not found' });
-    }
+    const { data: visit, error } = await supabase
+      .from('site_visits')
+      .update({ expense_status: status })
+      .eq('id', req.params.id)
+      .select()
+      .single();
 
-    visit.expenseStatus = status;
-    visit.expenseAdminComment = comment || '';
-    
-    await visit.save();
-
-    // Populate user and project for the response
-    await visit.populate('user', 'fullName');
-    await visit.populate('project', 'title name');
-
-    res.json({ msg: 'Expense updated successfully', visit });
+    if (error) throw error;
+    res.json({ msg: `Expense marked as ${status}`, visit: formatSiteVisit(visit) });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error('Expense update error:', err);
+    res.status(500).send('Server error');
   }
 });
 
 module.exports = router;
-

@@ -47,52 +47,6 @@ app.use('/api/', apiLimiter);
 // The login limiter now lives with the login route itself, in routes/auth.js.
 
 const PORT = process.env.PORT || 5001;
-const MONGODB_URI = process.env.MONGODB_URI;
-
-// ── DATABASE CONNECTION ─────────────────────────────────────
-let cachedDbPromise = null;
-const connectDb = async () => {
-  if (mongoose.connection.readyState >= 1) return;
-  const uri = process.env.MONGODB_URI;
-  if (!uri) {
-    console.error('MONGODB_URI is not set in environment variables');
-    return;
-  }
-  if (!cachedDbPromise) {
-    cachedDbPromise = mongoose.connect(uri, {
-      bufferCommands: false,
-    }).then((m) => {
-      console.log('Connected to MongoDB');
-      return m;
-    }).catch(err => {
-      cachedDbPromise = null;
-      console.error('MongoDB connection error:', err);
-      throw err;
-    });
-  }
-  return cachedDbPromise;
-};
-
-if (process.env.MONGODB_URI) {
-  connectDb();
-}
-
-app.use(async (req, res, next) => {
-  // Let health checks or OPTIONS pass without blocking
-  if (req.method === 'OPTIONS') return next();
-
-  if (!process.env.MONGODB_URI) {
-    return res.status(503).json({ msg: 'MONGODB_URI is missing in Vercel Environment Variables.' });
-  }
-  try {
-    await connectDb();
-    next();
-  } catch (err) {
-    console.error('DB connect middleware error:', err);
-    return res.status(503).json({ msg: 'Database connection failed. Please check MongoDB Atlas IP access whitelist.' });
-  }
-});
-// Models are loaded dynamically where needed via require('../models/...')
 
 // ── ROUTES ──────────────────────────────────────────────────
 
