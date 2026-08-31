@@ -22,6 +22,7 @@ const EmployeeDashboard = () => {
   // Camera State
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const fileInputRef = useRef(null);
   const [stream, setStream] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -208,59 +209,97 @@ const EmployeeDashboard = () => {
 
   const startCamera = async () => {
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
-      });
+      let mediaStream;
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: { ideal: 'environment' } } 
+        });
+      } catch {
+        mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      }
+
       setStream(mediaStream);
       setIsCameraOpen(true);
       setImageSrc(null);
       setActionMsg('');
       
-      // Attach stream to video tag after state updates
       setTimeout(() => {
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
+          videoRef.current.play().catch(e => console.warn("Video play exception:", e));
         }
-      }, 50);
+      }, 100);
     } catch (err) {
-      console.error("Camera access denied", err);
-      setActionMsg('Camera access is required. Please allow camera permissions.');
+      console.error("Camera access error:", err);
+      toast.error('Unable to open live video stream. You can also use the "Open Device Camera" button.');
+      setActionMsg('Camera stream not accessible. Click "Open Device Camera" to take a photo.');
     }
   };
 
   const capturePhoto = () => {
-    if (videoRef.current && canvasRef.current) {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      const context = canvas.getContext('2d');
-      
-      const MAX_WIDTH = 800;
-      let width = video.videoWidth;
-      let height = video.videoHeight;
-      
-      if (width > MAX_WIDTH) {
-        height = Math.round((height * MAX_WIDTH) / width);
-        width = MAX_WIDTH;
-      }
-
-      canvas.width = width;
-      canvas.height = height;
-      context.drawImage(video, 0, 0, width, height);
-      
-      // Compress heavily for offline queue safety
-      const base64Img = canvas.toDataURL('image/jpeg', 0.6);
-      setImageSrc(base64Img);
-      
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-      setIsCameraOpen(false);
+    if (!videoRef.current) {
+      toast.error('Camera preview not ready');
+      return;
     }
+    const video = videoRef.current;
+    const width = video.videoWidth || video.clientWidth || 640;
+    const height = video.videoHeight || video.clientHeight || 480;
+
+    const canvas = canvasRef.current || document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d');
+    context.drawImage(video, 0, 0, width, height);
+
+    const base64Img = canvas.toDataURL('image/jpeg', 0.8);
+    setImageSrc(base64Img);
+    toast.success('Site photo captured!');
+
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
+    setIsCameraOpen(false);
+  };
+
+  const handleNativeCameraCapture = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX_WIDTH = 1200;
+        let width = img.width;
+        let height = img.height;
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+
+        const canvas = canvasRef.current || document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressed = canvas.toDataURL('image/jpeg', 0.75);
+        setImageSrc(compressed);
+        toast.success('Site photo captured from camera!');
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
   };
 
   const retakePhoto = () => {
     setImageSrc(null);
-    startCamera();
+    if (stream) {
+      stream.getTracks().forEach(t => t.stop());
+      setStream(null);
+    }
+    setIsCameraOpen(false);
   };
 
   const handleCheckIn = () => {
@@ -521,25 +560,54 @@ const EmployeeDashboard = () => {
                   </div>
 
                   <div className={styles.cameraArea}>
+                    <canvas ref={canvasRef} style={{ display: 'none' }} />
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      capture="environment" 
+                      ref={fileInputRef} 
+                      style={{ display: 'none' }} 
+                      onChange={handleNativeCameraCapture} 
+                    />
+
                     {!isCameraOpen && !imageSrc && (
-                      <div style={{textAlign: 'center', padding: '3rem 1rem'}}>
-                        <div style={{fontSize: '3rem', marginBottom: '1rem'}}>📷</div>
-                        <p style={{color: 'var(--text-secondary)', marginBottom: '1.5rem'}}>Camera access required for live site photos.</p>
-                        <button onClick={startCamera} className={`${styles.btn} ${styles.btnPrimary}`}>📸 Open Camera</button>
+                      <div style={{textAlign: 'center', padding: '2.5rem 1rem'}}>
+                        <div style={{fontSize: '3rem', marginBottom: '0.75rem'}}>📷</div>
+                        <h4 style={{fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.5rem', color: '#0f172a'}}>Capture Live Site Photo</h4>
+                        <p style={{color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.9rem'}}>Live photo capture is required for on-site report verification.</p>
+                        
+                        <div style={{display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap'}}>
+                          <button type="button" onClick={startCamera} className={`${styles.btn} ${styles.btnPrimary}`}>
+                            📹 Open Live Camera
+                          </button>
+                          <button type="button" onClick={() => fileInputRef.current?.click()} className={`${styles.btn} ${styles.btnSecondary}`}>
+                            📸 Take Camera Snapshot
+                          </button>
+                        </div>
                       </div>
                     )}
                     {isCameraOpen && (
                       <div className={styles.videoContainer}>
                         <video ref={videoRef} className={styles.videoStream} autoPlay playsInline muted></video>
-                        <button onClick={capturePhoto} className={`${styles.btn} ${styles.btnPrimary}`} style={{ background: 'var(--gradient-success)' }}>
-                          ✅ Capture Photo
-                        </button>
+                        <div style={{display: 'flex', gap: '10px', marginTop: '1rem', width: '100%'}}>
+                          <button type="button" onClick={capturePhoto} className={`${styles.btn} ${styles.btnPrimary}`} style={{ background: 'var(--gradient-success)', flex: 2 }}>
+                            📸 Snap Photo Now
+                          </button>
+                          <button type="button" onClick={() => {
+                            if (stream) stream.getTracks().forEach(t => t.stop());
+                            setIsCameraOpen(false);
+                          }} className={`${styles.btn} ${styles.btnSecondary}`} style={{flex: 1}}>
+                            Cancel
+                          </button>
+                        </div>
                       </div>
                     )}
                     {imageSrc && (
                       <div className={styles.imagePreview}>
                         <img src={imageSrc} alt="Site" />
-                        <button onClick={retakePhoto} className={`${styles.btn} ${styles.btnSecondary}`}>🔄 Retake Photo</button>
+                        <div style={{marginTop: '0.75rem'}}>
+                          <button type="button" onClick={retakePhoto} className={`${styles.btn} ${styles.btnSecondary}`}>🔄 Retake Photo</button>
+                        </div>
                       </div>
                     )}
                   </div>
