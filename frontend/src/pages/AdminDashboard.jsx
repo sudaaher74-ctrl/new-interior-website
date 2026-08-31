@@ -8,7 +8,9 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import NotificationBell from '../components/NotificationBell';
 import styles from './AdminDashboard.module.css';
+
 
 // Fix Leaflet default icon issue
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -80,7 +82,10 @@ const AdminDashboard = () => {
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [attStartDate, setAttStartDate] = useState('');
   const [attEndDate, setAttEndDate] = useState('');
+  const [leaves, setLeaves] = useState([]);
+  const [leaveFilter, setLeaveFilter] = useState('All');
   const [reportMonth, setReportMonth] = useState(() => {
+
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
@@ -191,11 +196,36 @@ const AdminDashboard = () => {
         const resEmployees = await axios.get(`${API_URL}/v2/admin/employees`, { headers });
         setEmployees(resEmployees.data);
       } catch(e) {}
+
+      // 7. Leave Requests
+      try {
+        const resLeaves = await axios.get(`${API_URL}/v2/leaves/admin/all`, { headers });
+        setLeaves(Array.isArray(resLeaves.data) ? resLeaves.data : []);
+      } catch(e) {
+        console.error("Failed to fetch leaves:", e);
+      }
       
     } catch (error) {
       console.error("Fetch data error:", error);
     }
   };
+
+  const handleLeaveAction = async (id, status) => {
+    try {
+      const adminComment = prompt(status === 'Rejected' ? 'Reason for rejection (optional):' : 'Add an approval note (optional):');
+      if (adminComment === null && status === 'Rejected') return; // User pressed Cancel
+
+      toast.loading(`Setting leave to ${status}...`, { id: 'leave-action' });
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      const res = await axios.put(`${API_URL}/v2/leaves/admin/${id}`, { status, adminComment }, { headers });
+
+      setLeaves(prev => prev.map(l => l.id === id ? res.data : l));
+      toast.success(`Leave request ${status.toLowerCase()} successfully!`, { id: 'leave-action' });
+    } catch (err) {
+      toast.error('Failed to update leave request', { id: 'leave-action' });
+    }
+  };
+
 
 
   const handleExpenseAction = async (id, status) => {
@@ -1183,6 +1213,139 @@ const AdminDashboard = () => {
     );
   };
 
+  const renderLeavesTab = () => {
+
+    const filteredLeaves = (leaves || []).filter(l => {
+      const matchesStatus = leaveFilter === 'All' || (l.status || 'Pending') === leaveFilter;
+      const empName = l.user?.fullName || l.user?.name || '';
+      const reason = l.reason || '';
+      const matchesSearch = empName.toLowerCase().includes(searchQuery.toLowerCase()) || reason.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesStatus && matchesSearch;
+    });
+
+    const pendingCount = (leaves || []).filter(l => l.status === 'Pending').length;
+
+    return (
+      <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
+        <div className={styles.tableHeader} style={{ flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <h2 className={styles.pageTitle} style={{fontSize: '1.5rem', margin: 0}}>Employee Leave Requests</h2>
+            {pendingCount > 0 && (
+              <span style={{ fontSize: '0.85rem', color: '#f59e0b', fontWeight: '600', marginTop: '2px', display: 'inline-block' }}>
+                ⚠️ {pendingCount} pending request{pendingCount > 1 ? 's' : ''} awaiting action
+              </span>
+            )}
+          </div>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <select 
+              value={leaveFilter} 
+              onChange={e => setLeaveFilter(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value="All">All Requests</option>
+              <option value="Pending">Pending Only</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+            <input 
+              type="text" 
+              placeholder="Search by employee/reason..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={filterInputStyle}
+            />
+            <button className={`${styles.btn} ${styles.btnSecondary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => handleExportCSV(filteredLeaves.map(l => ({
+              Employee: l.user?.fullName || 'Employee',
+              Designation: l.user?.designation || l.user?.role || '-',
+              LeaveDate: l.leaveDate,
+              Reason: l.reason || 'Personal',
+              Status: l.status,
+              AdminNote: l.adminComment || '',
+              AppliedOn: l.createdAt ? new Date(l.createdAt).toLocaleDateString() : '-'
+            })), 'employee-leaves')}>Export CSV</button>
+          </div>
+        </div>
+        
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Leave Date</th>
+              <th>Reason</th>
+              <th>Applied On</th>
+              <th>Status</th>
+              <th>Admin Note</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredLeaves.map((l) => {
+              const status = l.status || 'Pending';
+              return (
+                <tr key={l.id}>
+                  <td>
+                    <div style={{ fontWeight: '600', color: '#0f172a' }}>{l.user?.fullName || 'Employee'}</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>{l.user?.designation || l.user?.role || 'Staff'}</div>
+                  </td>
+                  <td style={{ fontWeight: '700', color: '#0f172a', whiteSpace: 'nowrap' }}>
+                    📅 {new Date(l.leaveDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  </td>
+                  <td>{l.reason || 'Personal Work'}</td>
+                  <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                    {l.createdAt ? new Date(l.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : '-'}
+                  </td>
+                  <td>
+                    <span style={{ 
+                      padding: '3px 10px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '600',
+                      background: status === 'Approved' ? 'rgba(16, 185, 129, 0.15)' : status === 'Rejected' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                      color: status === 'Approved' ? '#10b981' : status === 'Rejected' ? '#ef4444' : '#f59e0b'
+                    }}>
+                      {status === 'Approved' ? '✅ Approved' : status === 'Rejected' ? '❌ Rejected' : '🟡 Pending'}
+                    </span>
+                  </td>
+                  <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    {l.adminComment || '-'}
+                  </td>
+                  <td>
+                    {status === 'Pending' ? (
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button 
+                          onClick={() => handleLeaveAction(l.id, 'Approved')} 
+                          style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981', color: '#10b981', padding: '0.3rem 0.6rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
+                        >
+                          ✅ Approve
+                        </button>
+                        <button 
+                          onClick={() => handleLeaveAction(l.id, 'Rejected')} 
+                          style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#ef4444', padding: '0.3rem 0.6rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
+                        >
+                          ❌ Reject
+                        </button>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', gap: '0.4rem' }}>
+                        <button 
+                          onClick={() => handleLeaveAction(l.id, status === 'Approved' ? 'Rejected' : 'Approved')} 
+                          style={{ background: 'none', border: '1px solid #cbd5e1', color: '#64748b', padding: '0.2rem 0.4rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}
+                        >
+                          Change
+                        </button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+            {filteredLeaves.length === 0 && (
+              <tr><td colSpan="7" style={{textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)'}}>No leave requests found.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+
   const renderAttendanceTab = () => {
     const filteredAtt = (attendanceRecords || []).filter(a => {
       const empName = a?.user?.fullName || a?.user?.name || (typeof a?.user === 'string' ? a.user : '') || '';
@@ -1403,7 +1566,38 @@ const AdminDashboard = () => {
             <button className={`${styles.navItem} ${activeTab === 'projects' ? styles.active : ''}`} onClick={() => setActiveTab('projects')}><span>🏗️</span> Projects</button>
             <button className={`${styles.navItem} ${activeTab === 'employees' ? styles.active : ''}`} onClick={() => setActiveTab('employees')}><span>👥</span> Employees</button>
             <button className={`${styles.navItem} ${activeTab === 'attendance' ? styles.active : ''}`} onClick={() => setActiveTab('attendance')}><span>⏰</span> Attendance Logs</button>
-            <button className={`${styles.navItem} ${activeTab === 'expenses' ? styles.active : ''}`} onClick={() => setActiveTab('expenses')}><span>💰</span> Expenses</button>
+            <button className={`${styles.navItem} ${activeTab === 'leaves' ? styles.active : ''}`} onClick={() => setActiveTab('leaves')}>
+              <span>🏖️</span> Leaves
+              {(leaves || []).filter(l => l.status === 'Pending').length > 0 && (
+                <span style={{
+                  marginLeft: 'auto',
+                  backgroundColor: '#f59e0b',
+                  color: 'white',
+                  borderRadius: '10px',
+                  padding: '1px 6px',
+                  fontSize: '0.72rem',
+                  fontWeight: 'bold'
+                }}>
+                  {(leaves || []).filter(l => l.status === 'Pending').length}
+                </span>
+              )}
+            </button>
+            <button className={`${styles.navItem} ${activeTab === 'expenses' ? styles.active : ''}`} onClick={() => setActiveTab('expenses')}>
+              <span>💰</span> Expenses
+              {(expenseRecords || []).filter(e => (e.expenseStatus || 'Pending') === 'Pending').length > 0 && (
+                <span style={{
+                  marginLeft: 'auto',
+                  backgroundColor: '#f59e0b',
+                  color: 'white',
+                  borderRadius: '10px',
+                  padding: '1px 6px',
+                  fontSize: '0.72rem',
+                  fontWeight: 'bold'
+                }}>
+                  {(expenseRecords || []).filter(e => (e.expenseStatus || 'Pending') === 'Pending').length}
+                </span>
+              )}
+            </button>
             <button className={`${styles.navItem} ${activeTab === 'portfolio' ? styles.active : ''}`} onClick={() => setActiveTab('portfolio')}><span>🖼️</span> Portfolio Projects</button>
             <button className={`${styles.navItem} ${activeTab === 'blog' ? styles.active : ''}`} onClick={() => setActiveTab('blog')}><span>✍️</span> Blog Content</button>
           </nav>
@@ -1448,7 +1642,10 @@ const AdminDashboard = () => {
         <main className={styles.mainContent}>
           <header className={styles.header}>
             <h1 className={styles.pageTitle} style={{textTransform: 'capitalize'}}>{activeTab.replace('-', ' ')}</h1>
-            <div className={styles.dateDisplay}>{currentDate}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              <div className={styles.dateDisplay}>{currentDate}</div>
+              <NotificationBell />
+            </div>
           </header>
 
           {activeTab === 'dashboard' && renderDashboardTab()}
@@ -1457,12 +1654,14 @@ const AdminDashboard = () => {
           {activeTab === 'projects' && renderProjectsTab()}
           {activeTab === 'employees' && renderEmployeesTab()}
           {activeTab === 'attendance' && renderAttendanceTab()}
+          {activeTab === 'leaves' && renderLeavesTab()}
           {activeTab === 'expenses' && renderExpensesTab()}
           {activeTab === 'portfolio' && renderPortfolioTab()}
           {activeTab === 'blog' && renderBlogTab()}
           
         </main>
       </div>
+
 
       {/* Photo Preview Modal */}
       {selectedPhoto && (

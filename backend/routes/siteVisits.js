@@ -3,6 +3,7 @@ const router = express.Router();
 const supabase = require('../config/supabase');
 const cloudinary = require('cloudinary').v2;
 const { auth, authorizeRoles, ADMIN_ROLES } = require('../middleware/auth');
+const { sendNotification, notifyAdmins } = require('./notifications');
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -49,11 +50,13 @@ function formatSiteVisit(row) {
     photoUrl: row.photo_url,
     expenseAmount: Number(row.expense_amount) || 0,
     expenseDescription: row.expense_description || '',
-    expenseStatus: row.expense_status || 'Approved',
+    expenseStatus: row.expense_status || (Number(row.expense_amount) > 0 ? 'Pending' : 'Approved'),
+    expenseAdminComment: row.expense_admin_comment || '',
     time: row.created_at,
     createdAt: row.created_at,
   };
 }
+
 
 // Log a new Site Visit
 router.post('/log', auth, async (req, res) => {
@@ -127,6 +130,20 @@ router.post('/log', auth, async (req, res) => {
       console.warn('Attendance auto-sync warning:', attErr.message);
     }
 
+    // Notify admins about new site visit
+    try {
+      const empName = req.user.fullName || req.user.name || 'Employee';
+      const projTitle = visit?.projects?.title || visit?.projects?.name || '';
+      notifyAdmins({
+        senderName: empName,
+        type: 'site_visit',
+        message: `${empName} logged site visit${projTitle ? ` at ${projTitle}` : ''}${expenseAmount ? ` (Expense: ₹${expenseAmount})` : ''}`,
+        link: '/admin'
+      });
+    } catch (notifErr) {
+      console.warn('Admin notification error on site visit:', notifErr.message);
+    }
+
     res.json(formatSiteVisit(visit));
   } catch (err) {
     console.error('Site visit log error:', err);
@@ -191,19 +208,35 @@ router.get('/my-visits', auth, async (req, res) => {
 // Admin endpoint to update expense status
 router.put('/expense/:id', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, comment } = req.body;
     if (!['Pending', 'Approved', 'Rejected'].includes(status)) {
       return res.status(400).json({ msg: 'Invalid status' });
     }
 
     const { data: visit, error } = await supabase
       .from('site_visits')
-      .update({ expense_status: status })
+      .update({
+        expense_status: status,
+        expense_admin_comment: comment || ''
+      })
       .eq('id', req.params.id)
       .select('*, projects(id, title, location), users(id, full_name, email)')
       .single();
 
     if (error) throw error;
+
+    // Send notification to employee
+    if (visit && visit.user_id) {
+      const statusIcon = status === 'Approved' ? '✅' : status === 'Rejected' ? '❌' : 'ℹ️';
+      await sendNotification({
+        recipientId: visit.user_id,
+        senderName: req.user.fullName || 'Admin',
+        type: `expense_${status.toLowerCase()}`,
+        message: `Your travel expense of ₹${visit.expense_amount || 0} has been marked as ${status} ${statusIcon}.${comment ? ` Note: "${comment}"` : ''}`,
+        link: '/employee'
+      });
+    }
+
     res.json({ msg: `Expense marked as ${status}`, visit: formatSiteVisit(visit) });
   } catch (err) {
     console.error('Expense update error:', err);

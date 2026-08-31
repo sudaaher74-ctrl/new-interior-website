@@ -67,6 +67,10 @@ app.use('/api/v2/admin', require('./routes/admin'));
 app.use('/v2/admin', require('./routes/admin'));
 app.use('/api/v2/site-visits', require('./routes/siteVisits'));
 app.use('/v2/site-visits', require('./routes/siteVisits'));
+app.use('/api/v2/leaves', require('./routes/leaves'));
+app.use('/v2/leaves', require('./routes/leaves'));
+app.use('/api/v2/notifications', require('./routes/notifications'));
+app.use('/v2/notifications', require('./routes/notifications'));
 
 // 2. Main Site APIs
 app.use('/api/leads', require('./routes/leads'));

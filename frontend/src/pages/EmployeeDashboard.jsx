@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import NotificationBell from '../components/NotificationBell';
 import styles from './EmployeeDashboard.module.css';
 
 const EmployeeDashboard = () => {
@@ -31,9 +32,16 @@ const EmployeeDashboard = () => {
   const [attendanceHistory, setAttendanceHistory] = useState([]);
   const [workSummary, setWorkSummary] = useState('');
 
+  // Leaves State
+  const [leaves, setLeaves] = useState([]);
+  const [leaveDate, setLeaveDate] = useState('');
+  const [leaveReason, setLeaveReason] = useState('');
+  const [isSubmittingLeave, setIsSubmittingLeave] = useState(false);
+
   // Profile Edit State
   const [mobileNumberInput, setMobileNumberInput] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+
   
   // Offline Sync State
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -151,6 +159,13 @@ const EmployeeDashboard = () => {
       } catch (err) {
         console.error("Failed to fetch attendance history", err);
       }
+
+      try {
+        const leavesRes = await axios.get(`${API_URL}/v2/leaves/my`, { headers });
+        setLeaves(leavesRes.data || []);
+      } catch (err) {
+        console.error("Failed to fetch leaves", err);
+      }
       
       try {
         const profileRes = await axios.get(`${API_URL}/auth/profile`, { headers });
@@ -175,6 +190,33 @@ const EmployeeDashboard = () => {
       console.error(error);
     }
   };
+
+  const handleSubmitLeave = async (e) => {
+    e.preventDefault();
+    if (!leaveDate) {
+      toast.error('Please select a leave date');
+      return;
+    }
+    setIsSubmittingLeave(true);
+    const toastId = toast.loading('Submitting leave request...');
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      const res = await axios.post(`${API_URL}/v2/leaves`, {
+        leaveDate,
+        reason: leaveReason
+      }, { headers });
+
+      setLeaves(prev => [res.data, ...prev]);
+      setLeaveDate('');
+      setLeaveReason('');
+      toast.success('Leave request submitted! Admins have been notified.', { id: toastId });
+    } catch (err) {
+      toast.error(err.response?.data?.msg || 'Failed to submit leave request', { id: toastId });
+    } finally {
+      setIsSubmittingLeave(false);
+    }
+  };
+
 
   const handleUpdateMobile = async (e) => {
     e.preventDefault();
@@ -487,6 +529,7 @@ const EmployeeDashboard = () => {
             <button className={`${styles.navItem} ${activeTab === 'reports' ? styles.active : ''}`} onClick={() => setActiveTab('reports')}><span>📝</span> Daily Reports</button>
             <button className={`${styles.navItem} ${activeTab === 'expenses' ? styles.active : ''}`} onClick={() => setActiveTab('expenses')}><span>💰</span> Expenses</button>
             <button className={`${styles.navItem} ${activeTab === 'attendance' ? styles.active : ''}`} onClick={() => setActiveTab('attendance')}><span>⏰</span> Attendance</button>
+            <button className={`${styles.navItem} ${activeTab === 'leaves' ? styles.active : ''}`} onClick={() => setActiveTab('leaves')}><span>🏖️</span> Leave Requests</button>
             <button className={`${styles.navItem} ${activeTab === 'profile' ? styles.active : ''}`} onClick={() => setActiveTab('profile')}><span>👤</span> My Profile</button>
           </nav>
 
@@ -532,10 +575,15 @@ const EmployeeDashboard = () => {
               {activeTab === 'reports' && 'Daily Reports'}
               {activeTab === 'expenses' && 'My Expenses'}
               {activeTab === 'attendance' && 'Attendance & Time Tracking'}
+              {activeTab === 'leaves' && 'My Leave Requests'}
               {activeTab === 'profile' && 'My Profile & Account Details'}
             </h1>
-            <div className={styles.dateDisplay}>{currentDate}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              <div className={styles.dateDisplay}>{currentDate}</div>
+              <NotificationBell />
+            </div>
           </header>
+
 
                    {activeTab === 'dashboard' && (
             <div className={styles.dashboardGrid}>
@@ -1011,37 +1059,164 @@ const EmployeeDashboard = () => {
           
           {activeTab === 'expenses' && (
             <div className={`${styles.glassCard} ${styles.fadeInUp}`}>
-              <h2 className={styles.cardTitle}>My Expenses</h2>
+              <h2 className={styles.cardTitle}>My Travel Expenses</h2>
               <div style={{ marginTop: '1rem' }}>
-                {allVisits.filter(v => v.expenseAmount > 0).length === 0 ? (
-                  <p style={{color: 'var(--text-secondary)'}}>No expenses logged yet.</p>
+                {allVisits.filter(v => (Number(v.expenseAmount) || 0) > 0).length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
+                    <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>💰</div>
+                    <div style={{ fontWeight: '600' }}>No expenses logged yet.</div>
+                    <div style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Add travel expense when logging site visits from the Dashboard.</div>
+                  </div>
                 ) : (
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '2px solid var(--border-color)' }}>
-                        <th style={{ padding: '8px' }}>Date</th>
-                        <th style={{ padding: '8px' }}>Project</th>
-                        <th style={{ padding: '8px' }}>Description</th>
-                        <th style={{ padding: '8px' }}>Status</th>
-                        <th style={{ padding: '8px' }}>Notes</th>
-                        <th style={{ padding: '8px' }}>Amount (₹)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {allVisits.filter(v => v.expenseAmount > 0).map((v, idx) => (
-                        <tr key={idx} style={{ borderBottom: '1px solid var(--border-hairline)' }}>
-                          <td style={{ padding: '8px' }}>{new Date(v.time).toLocaleDateString()}</td>
-                          <td style={{ padding: '8px' }}>{v.project?.name || 'Unknown'}</td>
-                          <td style={{ padding: '8px' }}>{v.expenseDescription || 'N/A'}</td>
-                          <td style={{ padding: '8px', fontWeight: 'bold' }}>₹{v.expenseAmount}</td>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '2px solid var(--border-color)' }}>
+                          <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Date</th>
+                          <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Project / Site</th>
+                          <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Description</th>
+                          <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Amount</th>
+                          <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Approval Status</th>
+                          <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Admin Note</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {allVisits.filter(v => (Number(v.expenseAmount) || 0) > 0).map((v, idx) => {
+                          const status = v.expenseStatus || 'Pending';
+                          return (
+                            <tr key={idx} style={{ borderBottom: '1px solid var(--border-hairline)' }}>
+                              <td style={{ padding: '12px 12px', fontWeight: '500', color: '#0f172a', whiteSpace: 'nowrap' }}>
+                                {new Date(v.time || v.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                              </td>
+                              <td style={{ padding: '12px 12px', color: 'var(--text-secondary)' }}>{v.project?.name || v.project?.title || 'Site Visit'}</td>
+                              <td style={{ padding: '12px 12px' }}>{v.expenseDescription || 'Travel Expense'}</td>
+                              <td style={{ padding: '12px 12px', fontWeight: '700', color: 'var(--accent-1)' }}>₹{v.expenseAmount}</td>
+                              <td style={{ padding: '12px 12px' }}>
+                                <span style={{
+                                  padding: '3px 10px', borderRadius: '12px', fontSize: '0.78rem', fontWeight: '600',
+                                  background: status === 'Approved' ? 'rgba(16, 185, 129, 0.15)' : status === 'Rejected' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                                  color: status === 'Approved' ? '#10b981' : status === 'Rejected' ? '#ef4444' : '#f59e0b'
+                                }}>
+                                  {status === 'Approved' ? '✅ Approved' : status === 'Rejected' ? '❌ Rejected' : '🟡 Pending'}
+                                </span>
+                              </td>
+                              <td style={{ padding: '12px 12px', color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
+                                {v.expenseAdminComment || '-'}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </div>
             </div>
           )}
+
+          {activeTab === 'leaves' && (
+            <div className={`${styles.fadeInUp}`} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+              {/* Apply for Leave Form Card */}
+              <div className={styles.glassCard}>
+                <h2 className={styles.cardTitle}><span>🏖️</span> Request Leave</h2>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
+                  Submit a leave request in advance. Your management team will be notified immediately to review and approve.
+                </p>
+
+                <form onSubmit={handleSubmitLeave} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+                  <div className={styles.inputGroup}>
+                    <label className={styles.label}>Leave Date *</label>
+                    <input
+                      type="date"
+                      className={styles.input}
+                      value={leaveDate}
+                      min={new Date().toISOString().split('T')[0]}
+                      onChange={e => setLeaveDate(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className={styles.inputGroup} style={{ gridColumn: '1 / -1' }}>
+                    <label className={styles.label}>Reason for Leave (Optional)</label>
+                    <textarea
+                      className={styles.input}
+                      placeholder="e.g., Family event, Medical appointment, Personal work..."
+                      value={leaveReason}
+                      onChange={e => setLeaveReason(e.target.value)}
+                      style={{ height: '70px', resize: 'vertical' }}
+                    />
+                  </div>
+
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <button
+                      type="submit"
+                      disabled={isSubmittingLeave}
+                      className={`${styles.btn} ${styles.btnPrimary}`}
+                      style={{ width: 'auto', padding: '0.65rem 1.75rem', fontWeight: '700' }}
+                    >
+                      {isSubmittingLeave ? 'Submitting...' : '🚀 Submit Leave Request'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Leave Requests History Card */}
+              <div className={styles.glassCard}>
+                <h2 className={styles.cardTitle}><span>📋</span> My Leave History</h2>
+                <div style={{ marginTop: '1rem' }}>
+                  {leaves.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-secondary)' }}>
+                      <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🏖️</div>
+                      <div style={{ fontWeight: '600' }}>No leave requests submitted yet.</div>
+                    </div>
+                  ) : (
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+                        <thead>
+                          <tr style={{ borderBottom: '2px solid var(--border-color)' }}>
+                            <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Leave Date</th>
+                            <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Reason</th>
+                            <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Status</th>
+                            <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Admin Note</th>
+                            <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Applied On</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {leaves.map((leave, idx) => {
+                            const status = leave.status || 'Pending';
+                            return (
+                              <tr key={leave.id || idx} style={{ borderBottom: '1px solid var(--border-hairline)' }}>
+                                <td style={{ padding: '12px 12px', fontWeight: '700', color: '#0f172a', whiteSpace: 'nowrap' }}>
+                                  📅 {new Date(leave.leaveDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                </td>
+                                <td style={{ padding: '12px 12px', color: 'var(--text-secondary)' }}>{leave.reason || 'Personal'}</td>
+                                <td style={{ padding: '12px 12px' }}>
+                                  <span style={{
+                                    padding: '3px 10px', borderRadius: '12px', fontSize: '0.78rem', fontWeight: '600',
+                                    background: status === 'Approved' ? 'rgba(16, 185, 129, 0.15)' : status === 'Rejected' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                                    color: status === 'Approved' ? '#10b981' : status === 'Rejected' ? '#ef4444' : '#f59e0b'
+                                  }}>
+                                    {status === 'Approved' ? '✅ Approved' : status === 'Rejected' ? '❌ Rejected' : '🟡 Pending'}
+                                  </span>
+                                </td>
+                                <td style={{ padding: '12px 12px', color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
+                                  {leave.adminComment || '-'}
+                                </td>
+                                <td style={{ padding: '12px 12px', color: 'var(--text-secondary)', fontSize: '0.82rem', whiteSpace: 'nowrap' }}>
+                                  {leave.createdAt ? new Date(leave.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : '-'}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
 
           {activeTab === 'profile' && (
             <div className={`${styles.profileContainer} ${styles.fadeInUp}`}>
