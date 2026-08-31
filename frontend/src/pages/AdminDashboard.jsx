@@ -20,6 +20,38 @@ let DefaultIcon = L.icon({
     popupAnchor: [1, -34],
 });
 L.Marker.prototype.options.icon = DefaultIcon;
+
+const modalInputStyle = {
+  width: '100%',
+  padding: '0.75rem 1rem',
+  borderRadius: '10px',
+  border: '1.5px solid #cbd5e1',
+  background: '#f8fafc',
+  color: '#0f172a',
+  fontSize: '0.95rem',
+  fontWeight: '500',
+  boxSizing: 'border-box',
+  outline: 'none',
+};
+
+const modalLabelStyle = {
+  display: 'block',
+  marginBottom: '0.4rem',
+  fontSize: '0.85rem',
+  fontWeight: '600',
+  color: '#334155',
+};
+
+const filterInputStyle = {
+  padding: '0.45rem 0.85rem',
+  borderRadius: '8px',
+  border: '1.5px solid #cbd5e1',
+  background: '#ffffff',
+  color: '#0f172a',
+  fontSize: '0.9rem',
+  outline: 'none',
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -784,7 +816,7 @@ const AdminDashboard = () => {
 
     return (
       <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`} style={{ background: 'transparent', boxShadow: 'none' }}>
-        <div className={styles.tableHeader} style={{ flexWrap: 'wrap', gap: '1rem', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '12px', marginBottom: '1rem' }}>
+        <div className={styles.tableHeader} style={{ flexWrap: 'wrap', gap: '1rem', background: '#f8fafc', padding: '1rem', borderRadius: '12px', marginBottom: '1rem', border: '1px solid #e2e8f0' }}>
           <h2 className={styles.pageTitle} style={{fontSize: '1.5rem', margin: 0}}>Leads CRM Board</h2>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
             <input 
@@ -792,7 +824,7 @@ const AdminDashboard = () => {
               placeholder="Search leads..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ padding: '0.4rem 0.8rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.2)', color: 'white' }}
+              style={filterInputStyle}
             />
             <button className={`${styles.btn} ${styles.btnSecondary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => handleExportCSV(filteredLeads, 'leads')}>Export CSV</button>
           </div>
@@ -802,18 +834,18 @@ const AdminDashboard = () => {
           {columns.map(col => {
             const columnLeads = filteredLeads.filter(l => col.statusMatches.includes(l.status || 'New'));
             return (
-              <div key={col.id} style={{ flex: '1', minWidth: '300px', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <h3 style={{ fontSize: '1.1rem', margin: 0, paddingBottom: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between' }}>
-                  {col.title} <span style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.9rem' }}>{columnLeads.length}</span>
+              <div key={col.id} style={{ flex: '1', minWidth: '300px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <h3 style={{ fontSize: '1.1rem', margin: 0, paddingBottom: '0.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', color: '#0f172a' }}>
+                  {col.title} <span style={{ background: '#e2e8f0', color: '#0f172a', padding: '2px 8px', borderRadius: '12px', fontSize: '0.9rem' }}>{columnLeads.length}</span>
                 </h3>
                 
                 {columnLeads.length === 0 ? (
                   <p style={{ color: 'var(--text-secondary)', textAlign: 'center', fontSize: '0.9rem', marginTop: '1rem' }}>No leads here</p>
                 ) : (
                   columnLeads.map(lead => (
-                    <div key={lead._id} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '1rem' }} className="hover-float">
+                    <div key={lead._id} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }} className="hover-float">
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                        <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '500' }}>{lead.name}</h4>
+                        <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: '#0f172a' }}>{lead.name}</h4>
                         <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{new Date(lead.createdAt).toLocaleDateString()}</span>
                       </div>
                       
@@ -824,8 +856,8 @@ const AdminDashboard = () => {
                       </div>
 
                       {lead.message && (
-                        <div style={{ fontSize: '0.85rem', background: 'rgba(0,0,0,0.2)', padding: '0.5rem', borderRadius: '4px', marginBottom: '1rem', fontStyle: 'italic', borderLeft: '2px solid var(--accent-1)' }}>
-                          "${lead.message}"
+                        <div style={{ fontSize: '0.85rem', background: '#f1f5f9', color: '#334155', padding: '0.5rem', borderRadius: '6px', marginBottom: '1rem', fontStyle: 'italic', borderLeft: '3px solid var(--accent-1)' }}>
+                          "{lead.message}"
                         </div>
                       )}
 
@@ -833,12 +865,12 @@ const AdminDashboard = () => {
                         <select 
                           value={lead.status || 'New'}
                           onChange={(e) => handleUpdateLeadStatus(lead._id, e.target.value)}
-                          style={{ flex: 1, padding: '0.3rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', background: 'transparent', color: 'white', cursor: 'pointer', fontSize: '0.85rem' }}
+                          style={{ flex: 1, padding: '0.35rem 0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', cursor: 'pointer', fontSize: '0.85rem' }}
                         >
-                          <option value="New" style={{color: 'black'}}>New</option>
-                          <option value="Contacted" style={{color: 'black'}}>Contacted</option>
-                          <option value="Converted" style={{color: 'black'}}>Converted</option>
-                          <option value="Closed" style={{color: 'black'}}>Closed</option>
+                          <option value="New">New</option>
+                          <option value="Contacted">Contacted</option>
+                          <option value="Converted">Converted</option>
+                          <option value="Closed">Closed</option>
                         </select>
                         <button className={`${styles.btnSecondary}`} onClick={() => setEditingLead(lead)} style={{padding: '0.3rem 0.6rem', fontSize: '0.85rem'}}>
                           Edit
@@ -872,7 +904,7 @@ const AdminDashboard = () => {
             placeholder="Search projects..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ padding: '0.4rem 0.8rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.2)', color: 'white' }}
+            style={filterInputStyle}
           />
           <button className={`${styles.btn} ${styles.btnSecondary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => handleExportCSV(filteredProjects, 'projects')}>Export CSV</button>
           <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => setShowAddProjectModal(true)}>+ Add Project</button>
@@ -928,7 +960,7 @@ const AdminDashboard = () => {
             <select 
               value={expenseFilter} 
               onChange={e => setExpenseFilter(e.target.value)}
-              style={{ padding: '0.4rem 0.8rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.2)', color: 'white' }}
+              style={filterInputStyle}
             >
               <option value="All">All Statuses</option>
               <option value="Pending">Pending</option>
@@ -940,7 +972,7 @@ const AdminDashboard = () => {
               placeholder="Search by name/project..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ padding: '0.4rem 0.8rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.2)', color: 'white' }}
+              style={filterInputStyle}
             />
           </div>
         </div>
@@ -1014,14 +1046,14 @@ const AdminDashboard = () => {
               type="date" 
               value={attStartDate}
               onChange={e => setAttStartDate(e.target.value)}
-              style={{ padding: '0.4rem 0.8rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.2)', color: 'white' }}
+              style={filterInputStyle}
             />
-            <span style={{ color: 'white' }}>to</span>
+            <span style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>to</span>
             <input 
               type="date" 
               value={attEndDate}
               onChange={e => setAttEndDate(e.target.value)}
-              style={{ padding: '0.4rem 0.8rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.2)', color: 'white' }}
+              style={filterInputStyle}
             />
             <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={handleFetchAttendance}>Fetch</button>
             
@@ -1030,7 +1062,7 @@ const AdminDashboard = () => {
               placeholder="Search by name/project..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ padding: '0.4rem 0.8rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.2)', color: 'white' }}
+              style={filterInputStyle}
             />
             <button className={`${styles.btn} ${styles.btnSecondary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => handleExportCSV(filteredAtt.map(a => ({
               Date: new Date(a.date).toLocaleDateString(),
@@ -1097,7 +1129,7 @@ const AdminDashboard = () => {
             placeholder="Search employees..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ padding: '0.4rem 0.8rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.2)', color: 'white' }}
+            style={filterInputStyle}
           />
           <button className={`${styles.btn} ${styles.btnSecondary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => handleExportCSV(filteredEmployees, 'employees')}>Export CSV</button>
           <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => setShowAddEmployeeModal(true)}>+ Add Employee</button>
@@ -1224,32 +1256,32 @@ const AdminDashboard = () => {
 
       {/* Add Employee Modal */}
       {showAddEmployeeModal && (
-        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', zIndex: 9999, backdropFilter: 'blur(10px)'}}>
-          <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative'}}>
-            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: 'var(--text-primary)'}} onClick={() => setShowAddEmployeeModal(false)}>&times;</span>
-            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem'}}>Add New Employee</h3>
+        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.6)', zIndex: 9999, backdropFilter: 'blur(8px)'}}>
+          <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative', background: '#ffffff', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'}}>
+            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: '#64748b'}} onClick={() => setShowAddEmployeeModal(false)}>&times;</span>
+            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem', color: '#0f172a'}}>Add New Employee</h3>
             <form onSubmit={handleAddEmployee} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Full Name</label>
-                <input type="text" required value={newEmployee.fullName} onChange={e => setNewEmployee({...newEmployee, fullName: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Full Name</label>
+                <input type="text" required value={newEmployee.fullName} onChange={e => setNewEmployee({...newEmployee, fullName: e.target.value})} style={modalInputStyle} placeholder="e.g. Rahul Sharma" />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Email</label>
-                <input type="email" required value={newEmployee.email} onChange={e => setNewEmployee({...newEmployee, email: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Email</label>
+                <input type="email" required value={newEmployee.email} onChange={e => setNewEmployee({...newEmployee, email: e.target.value})} style={modalInputStyle} placeholder="rahul@osinterior.in" />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Password</label>
-                <input type="password" required value={newEmployee.password} onChange={e => setNewEmployee({...newEmployee, password: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Password</label>
+                <input type="password" required value={newEmployee.password} onChange={e => setNewEmployee({...newEmployee, password: e.target.value})} style={modalInputStyle} placeholder="••••••••" />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Mobile Number</label>
-                <input type="tel" required value={newEmployee.mobileNumber} onChange={e => setNewEmployee({...newEmployee, mobileNumber: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Mobile Number</label>
+                <input type="tel" required value={newEmployee.mobileNumber} onChange={e => setNewEmployee({...newEmployee, mobileNumber: e.target.value})} style={modalInputStyle} placeholder="+91 98765 43210" />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Designation</label>
-                <input type="text" value={newEmployee.designation} onChange={e => setNewEmployee({...newEmployee, designation: e.target.value})} placeholder="e.g. Site Engineer" style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Designation</label>
+                <input type="text" value={newEmployee.designation} onChange={e => setNewEmployee({...newEmployee, designation: e.target.value})} placeholder="e.g. Site Engineer" style={modalInputStyle} />
               </div>
-              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '1rem'}}>Save Employee</button>
+              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '0.5rem', width: '100%'}}>Save Employee</button>
             </form>
           </div>
         </div>
@@ -1257,26 +1289,26 @@ const AdminDashboard = () => {
 
       {/* Add Project Modal */}
       {showAddProjectModal && (
-        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', zIndex: 9999, backdropFilter: 'blur(10px)'}}>
-          <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative'}}>
-            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: 'var(--text-primary)'}} onClick={() => setShowAddProjectModal(false)}>&times;</span>
-            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem'}}>Add New Project</h3>
+        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.6)', zIndex: 9999, backdropFilter: 'blur(8px)'}}>
+          <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative', background: '#ffffff', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'}}>
+            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: '#64748b'}} onClick={() => setShowAddProjectModal(false)}>&times;</span>
+            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem', color: '#0f172a'}}>Add New Project</h3>
             <form onSubmit={handleAddProject} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Project Name</label>
-                <input type="text" required value={newProject.name} onChange={e => setNewProject({...newProject, name: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Project Name</label>
+                <input type="text" required value={newProject.name} onChange={e => setNewProject({...newProject, name: e.target.value})} style={modalInputStyle} placeholder="e.g. Luxury Apartment 402" />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Client Name</label>
-                <input type="text" value={newProject.clientName} onChange={e => setNewProject({...newProject, clientName: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Client Name</label>
+                <input type="text" value={newProject.clientName} onChange={e => setNewProject({...newProject, clientName: e.target.value})} style={modalInputStyle} placeholder="e.g. Mr. Sharma" />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Site Address</label>
-                <input type="text" value={newProject.siteAddress} onChange={e => setNewProject({...newProject, siteAddress: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Site Address / Location</label>
+                <input type="text" value={newProject.siteAddress} onChange={e => setNewProject({...newProject, siteAddress: e.target.value})} style={modalInputStyle} placeholder="e.g. Bandra West, Mumbai" />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Status</label>
-                <select value={newProject.status} onChange={e => setNewProject({...newProject, status: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}}>
+                <label style={modalLabelStyle}>Status</label>
+                <select value={newProject.status} onChange={e => setNewProject({...newProject, status: e.target.value})} style={modalInputStyle}>
                   <option value="Planning">Planning</option>
                   <option value="Ongoing">Ongoing</option>
                   <option value="On Hold">On Hold</option>
@@ -1284,7 +1316,7 @@ const AdminDashboard = () => {
                   <option value="Upcoming">Upcoming</option>
                 </select>
               </div>
-              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '1rem'}}>Save Project</button>
+              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '0.5rem', width: '100%'}}>Save Project</button>
             </form>
           </div>
         </div>
@@ -1292,26 +1324,26 @@ const AdminDashboard = () => {
 
       {/* Edit Project Modal */}
       {editingProject && (
-        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', zIndex: 9999, backdropFilter: 'blur(10px)'}}>
-          <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative'}}>
-            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: 'var(--text-primary)'}} onClick={() => setEditingProject(null)}>&times;</span>
-            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem'}}>Edit Project</h3>
+        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.6)', zIndex: 9999, backdropFilter: 'blur(8px)'}}>
+          <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative', background: '#ffffff', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'}}>
+            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: '#64748b'}} onClick={() => setEditingProject(null)}>&times;</span>
+            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem', color: '#0f172a'}}>Edit Project</h3>
             <form onSubmit={handleEditProject} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Project Name</label>
-                <input type="text" required value={editingProject.title || editingProject.name} onChange={e => setEditingProject({...editingProject, name: e.target.value, title: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Project Name</label>
+                <input type="text" required value={editingProject.title || editingProject.name} onChange={e => setEditingProject({...editingProject, name: e.target.value, title: e.target.value})} style={modalInputStyle} />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Client Name</label>
-                <input type="text" value={editingProject.clientName || ''} onChange={e => setEditingProject({...editingProject, clientName: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Client Name</label>
+                <input type="text" value={editingProject.clientName || ''} onChange={e => setEditingProject({...editingProject, clientName: e.target.value})} style={modalInputStyle} />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Site Address</label>
-                <input type="text" value={editingProject.siteAddress || editingProject.location || ''} onChange={e => setEditingProject({...editingProject, siteAddress: e.target.value, location: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Site Address</label>
+                <input type="text" value={editingProject.siteAddress || editingProject.location || ''} onChange={e => setEditingProject({...editingProject, siteAddress: e.target.value, location: e.target.value})} style={modalInputStyle} />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Status</label>
-                <select value={editingProject.status || 'Planning'} onChange={e => setEditingProject({...editingProject, status: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}}>
+                <label style={modalLabelStyle}>Status</label>
+                <select value={editingProject.status || 'Planning'} onChange={e => setEditingProject({...editingProject, status: e.target.value})} style={modalInputStyle}>
                   <option value="Planning">Planning</option>
                   <option value="Ongoing">Ongoing</option>
                   <option value="On Hold">On Hold</option>
@@ -1319,7 +1351,7 @@ const AdminDashboard = () => {
                   <option value="Upcoming">Upcoming</option>
                 </select>
               </div>
-              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '1rem'}}>Update Project</button>
+              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '0.5rem', width: '100%'}}>Update Project</button>
             </form>
           </div>
         </div>
@@ -1327,32 +1359,32 @@ const AdminDashboard = () => {
 
       {/* Edit Employee Modal */}
       {editingEmployee && (
-        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', zIndex: 9999, backdropFilter: 'blur(10px)'}}>
-          <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative'}}>
-            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: 'var(--text-primary)'}} onClick={() => setEditingEmployee(null)}>&times;</span>
-            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem'}}>Edit Employee</h3>
+        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.6)', zIndex: 9999, backdropFilter: 'blur(8px)'}}>
+          <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative', background: '#ffffff', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'}}>
+            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: '#64748b'}} onClick={() => setEditingEmployee(null)}>&times;</span>
+            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem', color: '#0f172a'}}>Edit Employee</h3>
             <form onSubmit={handleEditEmployee} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Full Name</label>
-                <input type="text" required value={editingEmployee.fullName || editingEmployee.name || ''} onChange={e => setEditingEmployee({...editingEmployee, fullName: e.target.value, name: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Full Name</label>
+                <input type="text" required value={editingEmployee.fullName || editingEmployee.name || ''} onChange={e => setEditingEmployee({...editingEmployee, fullName: e.target.value, name: e.target.value})} style={modalInputStyle} />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Email</label>
-                <input type="email" required value={editingEmployee.email || ''} onChange={e => setEditingEmployee({...editingEmployee, email: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Email</label>
+                <input type="email" required value={editingEmployee.email || ''} onChange={e => setEditingEmployee({...editingEmployee, email: e.target.value})} style={modalInputStyle} />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>New Password (leave blank to keep current)</label>
-                <input type="password" value={editingEmployee.password || ''} onChange={e => setEditingEmployee({...editingEmployee, password: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>New Password (leave blank to keep current)</label>
+                <input type="password" value={editingEmployee.password || ''} onChange={e => setEditingEmployee({...editingEmployee, password: e.target.value})} style={modalInputStyle} placeholder="Leave blank to keep current" />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Mobile Number</label>
-                <input type="tel" required value={editingEmployee.mobileNumber || ''} onChange={e => setEditingEmployee({...editingEmployee, mobileNumber: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Mobile Number</label>
+                <input type="tel" required value={editingEmployee.mobileNumber || ''} onChange={e => setEditingEmployee({...editingEmployee, mobileNumber: e.target.value})} style={modalInputStyle} />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Designation</label>
-                <input type="text" value={editingEmployee.designation || ''} onChange={e => setEditingEmployee({...editingEmployee, designation: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Designation</label>
+                <input type="text" value={editingEmployee.designation || ''} onChange={e => setEditingEmployee({...editingEmployee, designation: e.target.value})} style={modalInputStyle} />
               </div>
-              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '1rem'}}>Update Employee</button>
+              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '0.5rem', width: '100%'}}>Update Employee</button>
             </form>
           </div>
         </div>
@@ -1360,38 +1392,38 @@ const AdminDashboard = () => {
 
       {/* Photo Viewer Modal */}
       {selectedPhoto && (
-        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.8)', zIndex: 9999, backdropFilter: 'blur(10px)'}}>
+        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.85)', zIndex: 9999, backdropFilter: 'blur(8px)'}}>
           <div style={{position: 'relative', maxWidth: '90%', maxHeight: '90%'}}>
             <span style={{position: 'absolute', top: '-40px', right: '0px', fontSize: '2rem', cursor: 'pointer', color: 'white'}} onClick={() => setSelectedPhoto(null)}>&times;</span>
-            <img src={selectedPhoto} alt="Site Visit" style={{maxWidth: '100%', maxHeight: '80vh', borderRadius: '8px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)'}} />
+            <img src={selectedPhoto} alt="Site Visit" style={{maxWidth: '100%', maxHeight: '80vh', borderRadius: '12px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.5)'}} />
           </div>
         </div>
       )}
 
       {/* Edit Lead Modal */}
       {editingLead && (
-        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', zIndex: 9999, backdropFilter: 'blur(10px)'}}>
-          <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative'}}>
-            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: 'var(--text-primary)'}} onClick={() => setEditingLead(null)}>&times;</span>
-            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem'}}>Edit Lead</h3>
+        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.6)', zIndex: 9999, backdropFilter: 'blur(8px)'}}>
+          <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative', background: '#ffffff', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'}}>
+            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: '#64748b'}} onClick={() => setEditingLead(null)}>&times;</span>
+            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem', color: '#0f172a'}}>Edit Lead</h3>
             <form onSubmit={handleEditLead} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Name</label>
-                <input type="text" value={editingLead.name || ''} onChange={e => setEditingLead({...editingLead, name: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Name</label>
+                <input type="text" value={editingLead.name || ''} onChange={e => setEditingLead({...editingLead, name: e.target.value})} style={modalInputStyle} />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Email</label>
-                <input type="email" value={editingLead.email || ''} onChange={e => setEditingLead({...editingLead, email: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Email</label>
+                <input type="email" value={editingLead.email || ''} onChange={e => setEditingLead({...editingLead, email: e.target.value})} style={modalInputStyle} />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Phone</label>
-                <input type="text" value={editingLead.phone || ''} onChange={e => setEditingLead({...editingLead, phone: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} />
+                <label style={modalLabelStyle}>Phone</label>
+                <input type="text" value={editingLead.phone || ''} onChange={e => setEditingLead({...editingLead, phone: e.target.value})} style={modalInputStyle} />
               </div>
               <div>
-                <label style={{display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)'}}>Admin Notes</label>
-                <textarea rows="3" value={editingLead.adminNotes || ''} onChange={e => setEditingLead({...editingLead, adminNotes: e.target.value})} style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white'}} placeholder="Add internal notes about this lead..."></textarea>
+                <label style={modalLabelStyle}>Admin Notes</label>
+                <textarea rows="3" value={editingLead.adminNotes || ''} onChange={e => setEditingLead({...editingLead, adminNotes: e.target.value})} style={{...modalInputStyle, resize: 'vertical'}} placeholder="Add internal notes about this lead..."></textarea>
               </div>
-              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '1rem'}}>Save Changes</button>
+              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '0.5rem', width: '100%'}}>Save Changes</button>
             </form>
           </div>
         </div>
