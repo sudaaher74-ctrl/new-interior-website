@@ -50,7 +50,7 @@ export async function loginWithGoogle(payload) {
   });
 
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.msg || 'Could not sign in with Google.');
+  if (!res.ok) throw new Error(data.msg || data.error || (res.status === 404 ? 'API route not found on server' : `Sign in failed (HTTP ${res.status})`));
 
   localStorage.setItem(TOKEN_KEY, data.token);
   localStorage.setItem(USER_KEY, JSON.stringify(data.user));

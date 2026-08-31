@@ -45,10 +45,37 @@ const PORT = process.env.PORT || 5001;
 const MONGODB_URI = process.env.MONGODB_URI;
 
 // ── DATABASE CONNECTION ─────────────────────────────────────
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+let cachedDbPromise = null;
+const connectDb = async () => {
+  if (mongoose.connection.readyState >= 1) return;
+  if (!MONGODB_URI) {
+    console.error('MONGODB_URI is not set in environment variables');
+    return;
+  }
+  if (!cachedDbPromise) {
+    cachedDbPromise = mongoose.connect(MONGODB_URI).then((m) => {
+      console.log('Connected to MongoDB');
+      return m;
+    }).catch(err => {
+      cachedDbPromise = null;
+      console.error('MongoDB connection error:', err);
+    });
+  }
+  return cachedDbPromise;
+};
 
+if (MONGODB_URI) {
+  connectDb();
+}
+
+app.use(async (req, res, next) => {
+  try {
+    await connectDb();
+  } catch (err) {
+    console.error('DB connect middleware error:', err);
+  }
+  next();
+});
 // Models are loaded dynamically where needed via require('../models/...')
 
 // ── ROUTES ──────────────────────────────────────────────────
