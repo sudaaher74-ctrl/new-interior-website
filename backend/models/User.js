@@ -4,8 +4,14 @@ const UserSchema = new mongoose.Schema({
   employeeId: { type: String, required: true, unique: true },
   fullName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  mobileNumber: { type: String, required: true },
+  password: { 
+    type: String, 
+    required: function() { return this.authProvider !== 'google' && !this.googleId; } 
+  },
+  mobileNumber: { 
+    type: String, 
+    required: false 
+  },
   designation: { type: String },
   department: { type: String },
   role: { 
@@ -13,6 +19,8 @@ const UserSchema = new mongoose.Schema({
     enum: ['Super Admin', 'Owner', 'Project Manager', 'Site Supervisor', 'Employee'], 
     default: 'Employee' 
   },
+  googleId: { type: String, sparse: true },
+  authProvider: { type: String, enum: ['local', 'google'], default: 'local' },
   assignedSites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ErpProject' }],
   profilePhoto: { type: String },
   createdAt: { type: Date, default: Date.now }

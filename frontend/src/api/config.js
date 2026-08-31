@@ -2,6 +2,8 @@ export const API_BASE_URL = window.location.hostname === 'localhost' || window.l
     ? 'http://localhost:5005/api'
     : '/api';
 
+export const API_URL = API_BASE_URL;
+
 export const API_ENDPOINTS = {
     LOGIN: `${API_BASE_URL}/auth/login`,
     LEADS: `${API_BASE_URL}/leads`,

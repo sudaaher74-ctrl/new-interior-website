@@ -16,12 +16,12 @@ const BlogPostDetail = () => {
   
   // Dynamic SEO
   useDocumentTitle(
-    post ? \`\${post.title} | OS Interiors Blog\` : 'Loading Post...',
+    post ? `${post.title} | OS Interiors Blog` : 'Loading Post...',
     post ? post.content.substring(0, 150) + '...' : ''
   );
 
   useEffect(() => {
-    axios.get(\`\${API_URL}/v2/blog/\${slug}\`)
+    axios.get(`${API_URL}/v2/blog/${slug}`)
       .then(res => {
         setPost(res.data);
         setLoading(false);
