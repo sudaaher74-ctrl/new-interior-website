@@ -63,6 +63,11 @@ router.post('/login', loginLimiter, async (req, res) => {
     const invalid = { msg: 'Invalid credentials' };
     if (!user) return res.status(401).json(invalid);
 
+    // Block deactivated accounts
+    if (user.is_active === false) {
+      return res.status(403).json({ msg: 'Your account has been deactivated. Please contact your admin.' });
+    }
+
     if (!user.password) {
       return res.status(401).json({ msg: 'This account uses Google Sign-In. Please sign in with Google.' });
     }
@@ -162,6 +167,11 @@ router.post('/google', loginLimiter, async (req, res) => {
     let userRow;
 
     if (existingUser) {
+      // Check if account is active
+      if (existingUser.is_active === false) {
+        return res.status(403).json({ msg: 'Your account has been deactivated. Please contact your admin.' });
+      }
+
       const updates = {};
       if (!existingUser.google_id && googleId) updates.google_id = googleId;
       if (!existingUser.profile_photo && profilePhoto) updates.profile_photo = profilePhoto;
@@ -178,42 +188,14 @@ router.post('/google', loginLimiter, async (req, res) => {
         userRow = existingUser;
       }
     } else {
-      // Create new user with default 'Employee' role
-      const employeeId = 'EMP' + Date.now().toString().slice(-6);
-
-      const newUser = {
-        full_name: fullName || email.split('@')[0],
-        email,
-        google_id: googleId || null,
-        auth_provider: 'google',
-        role: 'Employee',
-        profile_photo: profilePhoto || null,
-        employee_id: employeeId,
-        is_active: true,
-      };
-
-      const { data: created, error: insertErr } = await supabase
-        .from('users')
-        .insert(newUser)
-        .select()
-        .single();
-
-      if (insertErr) {
-        console.error('Supabase user creation error:', insertErr);
-        const { data: fallbackUser } = await supabase
-          .from('users')
-          .select('*')
-          .eq('email', email)
-          .maybeSingle();
-        if (fallbackUser) {
-          userRow = fallbackUser;
-        } else {
-          return res.status(500).json({ msg: insertErr.message || 'Failed to create user account' });
-        }
-      } else {
-        userRow = created;
-      }
+      // ✋ SECURITY: Do NOT auto-create accounts.
+      // Only employees pre-registered by the admin can log in.
+      console.warn(`Blocked unknown Google login attempt: ${email}`);
+      return res.status(403).json({
+        msg: 'Access denied. Your Google account is not registered as an OS Interiors employee. Please contact your admin.',
+      });
     }
+
 
     const userPayload = formatUser(userRow);
     const payload = { user: userPayload };
