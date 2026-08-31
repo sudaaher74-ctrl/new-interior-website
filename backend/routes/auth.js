@@ -135,26 +135,35 @@ router.post('/google', loginLimiter, async (req, res) => {
       }
     }
 
-    // Find existing user by email or google_id
-    let { data: existingUser, error: findErr } = await supabase
-      .from('users')
-      .select('*')
-      .or(`email.eq.${email},google_id.eq.${googleId}`)
-      .maybeSingle();
+    // Find existing user by google_id or email
+    let existingUser = null;
+    if (googleId) {
+      const { data: byGoogle } = await supabase
+        .from('users')
+        .select('*')
+        .eq('google_id', googleId)
+        .maybeSingle();
+      if (byGoogle) existingUser = byGoogle;
+    }
 
-    if (findErr) {
-      console.error('Supabase query error:', findErr);
+    if (!existingUser && email) {
+      const { data: byEmail } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .maybeSingle();
+      if (byEmail) existingUser = byEmail;
     }
 
     let userRow;
 
     if (existingUser) {
       const updates = {};
-      if (!existingUser.google_id) updates.google_id = googleId;
+      if (!existingUser.google_id && googleId) updates.google_id = googleId;
       if (!existingUser.profile_photo && profilePhoto) updates.profile_photo = profilePhoto;
 
       if (Object.keys(updates).length > 0) {
-        const { data: updated, error: updateErr } = await supabase
+        const { data: updated } = await supabase
           .from('users')
           .update(updates)
           .eq('id', existingUser.id)
@@ -166,16 +175,15 @@ router.post('/google', loginLimiter, async (req, res) => {
       }
     } else {
       // Create new user with default 'Employee' role
-      const { count } = await supabase.from('users').select('*', { count: 'exact', head: true });
-      const employeeId = 'EMP' + ((count || 0) + 1).toString().padStart(3, '0');
+      const employeeId = 'EMP' + Date.now().toString().slice(-6);
 
       const newUser = {
-        full_name: fullName,
+        full_name: fullName || email.split('@')[0],
         email,
-        google_id: googleId,
+        google_id: googleId || null,
         auth_provider: 'google',
         role: 'Employee',
-        profile_photo: profilePhoto,
+        profile_photo: profilePhoto || null,
         employee_id: employeeId,
         is_active: true,
       };
@@ -188,9 +196,19 @@ router.post('/google', loginLimiter, async (req, res) => {
 
       if (insertErr) {
         console.error('Supabase user creation error:', insertErr);
-        return res.status(500).json({ msg: insertErr.message || 'Failed to create user account in database' });
+        const { data: fallbackUser } = await supabase
+          .from('users')
+          .select('*')
+          .eq('email', email)
+          .maybeSingle();
+        if (fallbackUser) {
+          userRow = fallbackUser;
+        } else {
+          return res.status(500).json({ msg: insertErr.message || 'Failed to create user account' });
+        }
+      } else {
+        userRow = created;
       }
-      userRow = created;
     }
 
     const userPayload = formatUser(userRow);
