@@ -124,8 +124,8 @@ app.use((err, req, res, next) => {
 });
 
 // ── START SERVER ────────────────────────────────────────────
-// Only start the server if we're running locally (not as a Vercel function)
-if (process.env.NODE_ENV !== 'production') {
+// Only start the server if we're running locally (not as a Vercel serverless function)
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 
