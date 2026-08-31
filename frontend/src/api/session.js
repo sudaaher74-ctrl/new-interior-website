@@ -15,7 +15,7 @@ export const getUser = () => {
 };
 
 export const isAdmin = (user = getUser()) =>
-  Boolean(user) && ['Super Admin', 'Owner'].includes(user.role);
+  Boolean(user) && ['Super Admin', 'Owner', 'Admin'].includes(user.role);
 
 /** Authorization header for API calls; empty when signed out. */
 export const authHeaders = () => {
