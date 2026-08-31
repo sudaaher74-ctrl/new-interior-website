@@ -16,10 +16,11 @@ const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 // Brute-force guard on endpoints that accept credentials.
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: 20,
   message: { msg: 'Too many login attempts, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
 });
 
 // POST /api/auth/login — exchange credentials for a JWT.
