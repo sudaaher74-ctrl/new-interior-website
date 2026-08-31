@@ -821,77 +821,193 @@ const EmployeeDashboard = () => {
               </div>
             </div>
           )}
-          {activeTab === 'attendance' && (
-            <div className={`${styles.glassCard} ${styles.fadeInUp}`}>
-              <h2 className={styles.cardTitle}>Daily Attendance</h2>
-              <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-                <div style={{ flex: 1, padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-                  <h3 style={{ marginBottom: '1rem', fontSize: '1rem' }}>Clock In</h3>
-                  <select 
-                    className={styles.select} 
-                    value={selectedProject} 
-                    onChange={e => setSelectedProject(e.target.value)}
-                    style={{ marginBottom: '1rem' }}
-                  >
-                    <option value="">Select current site...</option>
-                    {projects.map(p => <option key={p._id} value={p._id}>{p.title || p.name}</option>)}
-                  </select>
-                  <button onClick={handleCheckIn} className={`${styles.btn} ${styles.btnPrimary}`} style={{ width: '100%', background: 'var(--gradient-success)' }}>
-                    ✅ Check In
-                  </button>
-                </div>
-                <div style={{ flex: 1, padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-                  <h3 style={{ marginBottom: '1rem', fontSize: '1rem' }}>Clock Out</h3>
-                  <textarea 
-                    className={styles.input} 
-                    placeholder="Brief work summary for today..." 
-                    value={workSummary}
-                    onChange={e => setWorkSummary(e.target.value)}
-                    style={{ marginBottom: '1rem', height: '60px', resize: 'none' }}
-                  />
-                  <button onClick={handleCheckOut} className={`${styles.btn} ${styles.btnPrimary}`} style={{ width: '100%', background: 'var(--accent-1)' }}>
-                    🛑 Check Out
-                  </button>
-                </div>
-              </div>
+          {activeTab === 'attendance' && (() => {
+            // Build daily attendance from allVisits (always has data)
+            const visitsByDay = {};
+            for (const v of allVisits) {
+              const date = (v.time || v.createdAt || '').split('T')[0];
+              if (!date) continue;
+              if (!visitsByDay[date]) visitsByDay[date] = [];
+              visitsByDay[date].push(v);
+            }
+
+            // Merge with attendanceHistory from attendance table (has check-out times)
+            const attByDay = {};
+            for (const a of attendanceHistory) {
+              const date = (a.date || '').split('T')[0];
+              if (date) attByDay[date] = a;
+            }
+
+            // Build per-day records
+            const dayRecords = Object.keys(visitsByDay).sort((a, b) => b.localeCompare(a)).map(date => {
+              const dayVisits = visitsByDay[date] || [];
+              const attRecord = attByDay[date];
+              const sortedVisits = [...dayVisits].sort((a, b) => new Date(a.time || a.createdAt) - new Date(b.time || b.createdAt));
+              const firstVisit = sortedVisits[0];
+              const lastVisit = sortedVisits[sortedVisits.length - 1];
+
+              const checkIn = attRecord?.checkInTime || firstVisit?.time || firstVisit?.createdAt;
+              const checkOut = attRecord?.checkOutTime || (sortedVisits.length > 1 ? lastVisit?.time || lastVisit?.createdAt : null);
               
-              <h2 className={styles.cardTitle}>My Attendance History</h2>
-              <div style={{ marginTop: '1rem' }}>
-                {attendanceHistory.length === 0 ? (
-                  <p style={{color: 'var(--text-secondary)'}}>No attendance records found.</p>
-                ) : (
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '2px solid var(--border-color)' }}>
-                        <th style={{ padding: '8px' }}>Date</th>
-                        <th style={{ padding: '8px' }}>Project</th>
-                        <th style={{ padding: '8px' }}>Status</th>
-                        <th style={{ padding: '8px' }}>Hours Logged</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {attendanceHistory.map((rec, idx) => (
-                        <tr key={idx} style={{ borderBottom: '1px solid var(--border-hairline)' }}>
-                          <td style={{ padding: '8px' }}>{new Date(rec.date).toLocaleDateString()}</td>
-                          <td style={{ padding: '8px' }}>{rec.project?.name || 'Unknown'}</td>
-                          <td style={{ padding: '8px' }}>
-                            <span style={{ 
-                              padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem',
-                              background: rec.status === 'Present' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)',
-                              color: rec.status === 'Present' ? '#10b981' : '#f59e0b'
-                            }}>
-                              {rec.status}
-                            </span>
-                          </td>
-                          <td style={{ padding: '8px' }}>{rec.totalWorkingHours ? rec.totalWorkingHours.toFixed(1) + ' hrs' : '-'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
+              let hours = attRecord?.totalWorkingHours || 0;
+              if (!hours && checkIn && checkOut) {
+                hours = Math.max(0, (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60));
+              }
+
+              const dayExpense = dayVisits.reduce((sum, v) => sum + (Number(v.expenseAmount) || 0), 0);
+              const projectName = dayVisits[0]?.project?.name || dayVisits[0]?.project?.title || 'On-Site Visit';
+
+              return { date, checkIn, checkOut, hours, dayExpense, projectName, photoCount: dayVisits.length };
+            });
+
+            // Monthly summary for current month
+            const now = new Date();
+            const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            const thisMonthRecords = dayRecords.filter(r => r.date.startsWith(currentMonthKey));
+            const totalDays = thisMonthRecords.length;
+            const totalHours = thisMonthRecords.reduce((s, r) => s + r.hours, 0);
+            const totalExpense = thisMonthRecords.reduce((s, r) => s + r.dayExpense, 0);
+
+            return (
+              <div className={`${styles.fadeInUp}`}>
+                {/* Monthly Summary Cards */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+                  {[
+                    { icon: '📅', label: 'Days Present', value: totalDays, sub: 'This month', color: '#3b82f6' },
+                    { icon: '⏱', label: 'Total Hours', value: totalHours.toFixed(1) + ' hrs', sub: 'This month', color: '#10b981' },
+                    { icon: '💰', label: 'Travel Expense', value: '₹' + totalExpense.toLocaleString('en-IN'), sub: 'This month', color: '#f59e0b' },
+                    { icon: '📸', label: 'Photos Logged', value: thisMonthRecords.reduce((s, r) => s + r.photoCount, 0), sub: 'This month', color: '#8b5cf6' },
+                  ].map((card, i) => (
+                    <div key={i} style={{
+                      background: 'var(--glass-bg)', border: '1px solid var(--border-color)',
+                      borderRadius: '14px', padding: '1.25rem', textAlign: 'center',
+                      borderTop: `3px solid ${card.color}`
+                    }}>
+                      <div style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>{card.icon}</div>
+                      <div style={{ fontSize: '1.3rem', fontWeight: '800', color: card.color }}>{card.value}</div>
+                      <div style={{ fontSize: '0.8rem', fontWeight: '600', color: '#0f172a', marginTop: '2px' }}>{card.label}</div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>{card.sub}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Today's Status Banner */}
+                {(() => {
+                  const todayKey = new Date().toISOString().split('T')[0];
+                  const todayRec = dayRecords.find(r => r.date === todayKey);
+                  if (!todayRec) return (
+                    <div style={{
+                      background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245,158,11,0.3)',
+                      borderRadius: '12px', padding: '1rem 1.25rem', marginBottom: '1.5rem',
+                      display: 'flex', alignItems: 'center', gap: '0.75rem'
+                    }}>
+                      <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+                      <div>
+                        <div style={{ fontWeight: '700', color: '#92400e' }}>Not checked in today</div>
+                        <div style={{ fontSize: '0.85rem', color: '#b45309' }}>Go to Dashboard → submit a site photo to mark your attendance.</div>
+                      </div>
+                    </div>
+                  );
+                  return (
+                    <div style={{
+                      background: 'linear-gradient(135deg, #064e3b, #065f46)',
+                      borderRadius: '12px', padding: '1rem 1.25rem', marginBottom: '1.5rem',
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <span style={{ fontSize: '1.5rem' }}>✅</span>
+                        <div>
+                          <div style={{ fontWeight: '700', color: 'white', fontSize: '0.95rem' }}>Today's Attendance Active</div>
+                          <div style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.7)' }}>{todayRec.photoCount} photo{todayRec.photoCount > 1 ? 's' : ''} logged</div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '1.5rem' }}>
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)' }}>🟢 CHECK-IN</div>
+                          <div style={{ fontWeight: '700', color: 'white', fontSize: '1rem' }}>
+                            {todayRec.checkIn ? new Date(todayRec.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}
+                          </div>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)' }}>🔴 CHECK-OUT</div>
+                          <div style={{ fontWeight: '700', color: 'white', fontSize: '1rem' }}>
+                            {todayRec.checkOut ? new Date(todayRec.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '🟡 Active'}
+                          </div>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)' }}>⏱ HOURS</div>
+                          <div style={{ fontWeight: '700', color: 'white', fontSize: '1rem' }}>
+                            {todayRec.hours > 0 ? todayRec.hours.toFixed(1) + 'h' : 'Active'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Full History Table */}
+                <div className={styles.glassCard}>
+                  <h2 className={styles.cardTitle}>📋 My Attendance History</h2>
+                  {dayRecords.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
+                      <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📷</div>
+                      <div style={{ fontWeight: '600' }}>No attendance records yet</div>
+                      <div style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Submit site photos from the Dashboard to build your attendance history.</div>
+                    </div>
+                  ) : (
+                    <div style={{ overflowX: 'auto', marginTop: '1rem' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+                        <thead>
+                          <tr style={{ borderBottom: '2px solid var(--border-color)' }}>
+                            <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Date</th>
+                            <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Site / Project</th>
+                            <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Check-In 🟢</th>
+                            <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Check-Out 🔴</th>
+                            <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Hours</th>
+                            <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Travel ₹</th>
+                            <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Photos</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {dayRecords.map((rec, idx) => {
+                            const isToday = rec.date === new Date().toISOString().split('T')[0];
+                            const checkInStr = rec.checkIn ? new Date(rec.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+                            const checkOutStr = rec.checkOut ? new Date(rec.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—';
+                            const hoursStr = rec.hours > 0 ? rec.hours.toFixed(1) + ' hrs' : (rec.checkIn && !rec.checkOut ? '🟡 Active' : '-');
+
+                            return (
+                              <tr key={idx} style={{
+                                borderBottom: '1px solid var(--border-hairline)',
+                                background: isToday ? 'rgba(16, 185, 129, 0.04)' : 'transparent',
+                              }}>
+                                <td style={{ padding: '12px 12px', fontWeight: isToday ? '700' : '500', color: '#0f172a', whiteSpace: 'nowrap' }}>
+                                  {isToday && <span style={{ fontSize: '0.72rem', background: '#10b981', color: 'white', borderRadius: '4px', padding: '1px 5px', marginRight: '5px' }}>Today</span>}
+                                  {new Date(rec.date + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                </td>
+                                <td style={{ padding: '12px 12px', color: 'var(--text-secondary)', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{rec.projectName}</td>
+                                <td style={{ padding: '12px 12px', color: '#10b981', fontWeight: '600' }}>🟢 {checkInStr}</td>
+                                <td style={{ padding: '12px 12px', color: rec.checkOut ? '#ef4444' : '#94a3b8', fontWeight: '600' }}>
+                                  {rec.checkOut ? `🔴 ${checkOutStr}` : '—'}
+                                </td>
+                                <td style={{ padding: '12px 12px', fontWeight: '700', color: rec.hours > 0 ? '#0f172a' : '#94a3b8' }}>{hoursStr}</td>
+                                <td style={{ padding: '12px 12px', color: rec.dayExpense > 0 ? '#f59e0b' : 'var(--text-secondary)', fontWeight: rec.dayExpense > 0 ? '600' : '400' }}>
+                                  {rec.dayExpense > 0 ? `₹${rec.dayExpense.toLocaleString('en-IN')}` : '—'}
+                                </td>
+                                <td style={{ padding: '12px 12px', color: 'var(--text-secondary)' }}>
+                                  📸 {rec.photoCount}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
+
           
           {activeTab === 'expenses' && (
             <div className={`${styles.glassCard} ${styles.fadeInUp}`}>
