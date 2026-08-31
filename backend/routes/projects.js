@@ -9,9 +9,11 @@ function formatProject(row) {
     _id: row.id,
     id: row.id,
     title: row.title,
+    name: row.title,
     clientName: row.client_name,
     clientPhone: row.client_phone,
     location: row.location,
+    siteAddress: row.location,
     status: row.status,
     budget: row.budget,
     startDate: row.start_date,
@@ -25,29 +27,56 @@ function formatProject(row) {
 // Create a project
 router.post('/', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), async (req, res) => {
   try {
-    const { title, clientName, clientPhone, location, status, budget, startDate, endDate, team, updates } = req.body;
+    const {
+      title,
+      name,
+      clientName,
+      client_name,
+      clientPhone,
+      client_phone,
+      location,
+      siteAddress,
+      status,
+      budget,
+      startDate,
+      start_date,
+      endDate,
+      end_date,
+      team,
+      updates
+    } = req.body;
+
+    const projectTitle = title || name || 'Untitled Project';
+    const projectLocation = location || siteAddress || '';
+    const projectClientName = clientName || client_name || '';
+    const projectClientPhone = clientPhone || client_phone || null;
+    const projectBudget = typeof budget === 'number' ? budget : (parseFloat(budget) || 0);
+
     const { data, error } = await supabase
       .from('projects')
       .insert({
-        title,
-        client_name: clientName,
-        client_phone: clientPhone,
-        location,
+        title: projectTitle,
+        client_name: projectClientName,
+        client_phone: projectClientPhone,
+        location: projectLocation,
         status: status || 'Planning',
-        budget: budget || 0,
-        start_date: startDate || null,
-        end_date: endDate || null,
+        budget: projectBudget,
+        start_date: startDate || start_date || null,
+        end_date: endDate || end_date || null,
         team: team || [],
         updates: updates || [],
       })
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase project create error details:', error);
+      throw error;
+    }
     res.json(formatProject(data));
   } catch (err) {
     console.error('Project create error:', err);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: err.message || 'Server error creating project' });
   }
 });
 
@@ -72,14 +101,14 @@ router.put('/:id', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), asyn
   try {
     const body = req.body;
     const updates = {};
-    if (body.title !== undefined) updates.title = body.title;
-    if (body.clientName !== undefined) updates.client_name = body.clientName;
-    if (body.clientPhone !== undefined) updates.client_phone = body.clientPhone;
-    if (body.location !== undefined) updates.location = body.location;
+    if (body.title !== undefined || body.name !== undefined) updates.title = body.title || body.name;
+    if (body.clientName !== undefined || body.client_name !== undefined) updates.client_name = body.clientName || body.client_name;
+    if (body.clientPhone !== undefined || body.client_phone !== undefined) updates.client_phone = body.clientPhone || body.client_phone;
+    if (body.location !== undefined || body.siteAddress !== undefined) updates.location = body.location || body.siteAddress;
     if (body.status !== undefined) updates.status = body.status;
-    if (body.budget !== undefined) updates.budget = body.budget;
-    if (body.startDate !== undefined) updates.start_date = body.startDate;
-    if (body.endDate !== undefined) updates.end_date = body.endDate;
+    if (body.budget !== undefined) updates.budget = typeof body.budget === 'number' ? body.budget : (parseFloat(body.budget) || 0);
+    if (body.startDate !== undefined || body.start_date !== undefined) updates.start_date = body.startDate || body.start_date || null;
+    if (body.endDate !== undefined || body.end_date !== undefined) updates.end_date = body.endDate || body.end_date || null;
     if (body.team !== undefined) updates.team = body.team;
     if (body.updates !== undefined) updates.updates = body.updates;
 
@@ -94,7 +123,7 @@ router.put('/:id', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), asyn
     res.json(formatProject(data));
   } catch (err) {
     console.error('Project update error:', err);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: err.message || 'Server error updating project' });
   }
 });
 
