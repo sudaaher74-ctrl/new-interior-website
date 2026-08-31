@@ -38,11 +38,15 @@ export async function login(email, password) {
   return data.user;
 }
 
-export async function loginWithGoogle(credential) {
+export async function loginWithGoogle(payload) {
+  const body = typeof payload === 'string'
+    ? { credential: payload }
+    : (payload.credential ? { credential: payload.credential } : { access_token: payload.access_token });
+
   const res = await fetch(`${API_BASE_URL}/auth/google`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ credential }),
+    body: JSON.stringify(body),
   });
 
   const data = await res.json().catch(() => ({}));

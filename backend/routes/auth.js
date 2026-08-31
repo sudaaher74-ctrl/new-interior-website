@@ -61,12 +61,12 @@ router.post('/login', loginLimiter, async (req, res) => {
   }
 });
 
-// POST /api/auth/google — exchange verified Google ID token for an app JWT.
+// POST /api/auth/google — exchange verified Google ID token or access token for an app JWT.
 router.post('/google', loginLimiter, async (req, res) => {
   try {
-    const { credential } = req.body;
-    if (!credential) {
-      return res.status(400).json({ msg: 'Google credential is required' });
+    const { credential, access_token } = req.body;
+    if (!credential && !access_token) {
+      return res.status(400).json({ msg: 'Google token is required' });
     }
 
     const clientId = GOOGLE_CLIENT_ID;
@@ -75,27 +75,49 @@ router.post('/google', loginLimiter, async (req, res) => {
       return res.status(500).json({ msg: 'Google Authentication is not configured on the server.' });
     }
 
-    // Verify token using google-auth-library
-    let payload;
-    try {
-      const ticket = await googleClient.verifyIdToken({
-        idToken: credential,
-        audience: clientId,
-      });
-      payload = ticket.getPayload();
-    } catch (verifyErr) {
-      console.error('Google token verification failed:', verifyErr.message);
-      return res.status(401).json({ msg: 'Invalid or expired Google token' });
-    }
+    let email, googleId, fullName, profilePhoto;
 
-    if (!payload || !payload.email) {
-      return res.status(401).json({ msg: 'Could not obtain email from Google account' });
+    if (credential) {
+      // Verify ID token using google-auth-library
+      try {
+        const ticket = await googleClient.verifyIdToken({
+          idToken: credential,
+          audience: clientId,
+        });
+        const payload = ticket.getPayload();
+        if (!payload || !payload.email) {
+          return res.status(401).json({ msg: 'Could not obtain email from Google account' });
+        }
+        email = payload.email.toLowerCase().trim();
+        googleId = payload.sub;
+        fullName = payload.name || email.split('@')[0];
+        profilePhoto = payload.picture || '';
+      } catch (verifyErr) {
+        console.error('Google ID token verification failed:', verifyErr.message);
+        return res.status(401).json({ msg: 'Invalid or expired Google token' });
+      }
+    } else if (access_token) {
+      // Fetch user profile from Google userinfo API
+      try {
+        const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${access_token}` },
+        });
+        if (!userInfoRes.ok) {
+          return res.status(401).json({ msg: 'Failed to verify Google access token' });
+        }
+        const data = await userInfoRes.json();
+        if (!data.email) {
+          return res.status(401).json({ msg: 'Could not obtain email from Google account' });
+        }
+        email = data.email.toLowerCase().trim();
+        googleId = data.sub;
+        fullName = data.name || email.split('@')[0];
+        profilePhoto = data.picture || '';
+      } catch (tokenErr) {
+        console.error('Google userinfo fetch failed:', tokenErr.message);
+        return res.status(401).json({ msg: 'Error verifying Google session' });
+      }
     }
-
-    const email = payload.email.toLowerCase().trim();
-    const googleId = payload.sub;
-    const fullName = payload.name || email.split('@')[0];
-    const profilePhoto = payload.picture || '';
 
     // Find existing user by email or googleId
     let user = await User.findOne({ 
