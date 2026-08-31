@@ -82,21 +82,27 @@ app.use(async (req, res, next) => {
 
 // 0. Authentication — the only route that issues tokens.
 app.use('/api/auth', require('./routes/auth'));
+app.use('/auth', require('./routes/auth'));
 
 // 1. New Moduler ERP APIs (v2)
 app.use('/api/v2/projects', require('./routes/projects'));
+app.use('/v2/projects', require('./routes/projects'));
 app.use('/api/v2/leads', require('./routes/leads'));
+app.use('/v2/leads', require('./routes/leads'));
 app.use('/api/v2/attendance', require('./routes/attendance'));
+app.use('/v2/attendance', require('./routes/attendance'));
 app.use('/api/v2/reports', require('./routes/reports'));
+app.use('/v2/reports', require('./routes/reports'));
 app.use('/api/v2/admin', require('./routes/admin'));
+app.use('/v2/admin', require('./routes/admin'));
 app.use('/api/v2/site-visits', require('./routes/siteVisits'));
-// Use the v2 projects router for /api/projects as well.
-app.use('/api/projects', require('./routes/projects'));
+app.use('/v2/site-visits', require('./routes/siteVisits'));
 
 // 2. Main Site APIs
 app.use('/api/leads', require('./routes/leads'));
-// Use the v2 projects router for /api/projects as well.
+app.use('/leads', require('./routes/leads'));
 app.use('/api/projects', require('./routes/projects'));
+app.use('/projects', require('./routes/projects'));
 
 
 
