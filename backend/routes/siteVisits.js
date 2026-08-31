@@ -92,25 +92,36 @@ router.post('/log', auth, async (req, res) => {
 
     if (error) throw error;
 
-    // Auto-sync attendance for today if not checked in yet
+    // Auto-sync attendance: first photo = check-in, every subsequent photo updates check-out
     try {
       const today = new Date().toISOString().split('T')[0];
+      const now = new Date().toISOString();
+
       const { data: existingAtt } = await supabase
         .from('attendance')
-        .select('id')
+        .select('id, check_in_time')
         .eq('user_id', req.user.id)
         .eq('date', today)
         .maybeSingle();
 
       if (!existingAtt) {
+        // First photo of the day → Check-In
         await supabase.from('attendance').insert({
           user_id: req.user.id,
           date: today,
-          check_in_time: new Date().toISOString(),
+          check_in_time: now,
           status: 'Present',
           location: { lat: Number(lat) || 0, lng: Number(lng) || 0, accuracy: Number(accuracy) || 0 },
-          notes: 'Verified via Site Visit Photo Report'
+          notes: 'Auto check-in via site photo report'
         });
+      } else {
+        // Subsequent photos → always update check-out to latest timestamp
+        await supabase.from('attendance')
+          .update({
+            check_out_time: now,
+            notes: 'Auto check-out updated via site photo report'
+          })
+          .eq('id', existingAtt.id);
       }
     } catch (attErr) {
       console.warn('Attendance auto-sync warning:', attErr.message);

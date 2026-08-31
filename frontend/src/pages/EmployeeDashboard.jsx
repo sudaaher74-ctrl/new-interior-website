@@ -645,8 +645,64 @@ const EmployeeDashboard = () => {
 
               {/* Right Column */}
               <div className={styles.rightCol}>
+                {/* Attendance Status Card */}
+                {visits.length > 0 && (() => {
+                  const sortedVisits = [...visits].sort((a, b) => new Date(a.time || a.createdAt) - new Date(b.time || b.createdAt));
+                  const firstVisit = sortedVisits[0];
+                  const lastVisit = sortedVisits[sortedVisits.length - 1];
+                  const checkInTime = new Date(firstVisit.time || firstVisit.createdAt);
+                  const checkOutTime = new Date(lastVisit.time || lastVisit.createdAt);
+                  const isMultiple = sortedVisits.length > 1;
+                  const elapsedMs = Date.now() - checkInTime.getTime();
+                  const elapsedHrs = Math.floor(elapsedMs / (1000 * 60 * 60));
+                  const elapsedMins = Math.floor((elapsedMs % (1000 * 60 * 60)) / (1000 * 60));
+
+                  return (
+                    <div style={{
+                      background: 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)',
+                      borderRadius: '14px', padding: '1.25rem 1.5rem',
+                      marginBottom: '1.5rem', color: 'white',
+                      boxShadow: '0 6px 20px rgba(6, 78, 59, 0.35)'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '700', color: 'rgba(255,255,255,0.9)' }}>
+                          ✅ Today's Attendance
+                        </h3>
+                        <span style={{
+                          background: 'rgba(255,255,255,0.15)', borderRadius: '20px',
+                          padding: '3px 10px', fontSize: '0.78rem', fontWeight: '600'
+                        }}>
+                          {visits.length} Photo{visits.length > 1 ? 's' : ''} Logged
+                        </span>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                        <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: '10px', padding: '0.75rem' }}>
+                          <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.6)', marginBottom: '4px' }}>🟢 CHECK-IN</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: '700' }}>
+                            {checkInTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)', marginTop: '2px' }}>First photo submitted</div>
+                        </div>
+                        <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: '10px', padding: '0.75rem' }}>
+                          <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.6)', marginBottom: '4px' }}>🔴 CHECK-OUT</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: '700' }}>
+                            {isMultiple ? checkOutTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)', marginTop: '2px' }}>
+                            {isMultiple ? 'Last photo submitted' : 'Submit more photos to update'}
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ marginTop: '0.75rem', background: 'rgba(255,255,255,0.08)', borderRadius: '8px', padding: '0.6rem 0.9rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.7)' }}>⏱ Active for</span>
+                        <span style={{ fontWeight: '700', fontSize: '0.95rem' }}>{elapsedHrs}h {elapsedMins}m</span>
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 <div className={`${styles.glassCard} ${styles.delay3}`} style={{marginBottom: '2rem'}}>
-                  <h3 className={styles.cardTitle}><span>🕒</span> Today's Visits</h3>
+                  <h3 className={styles.cardTitle}><span>🕒</span> Today's Photo Logs</h3>
                   <div className={styles.visitsList}>
                     {visits.map((v, idx) => {
                       const projName = v?.project?.name || v?.project?.title || 'Assigned Project';
@@ -656,18 +712,24 @@ const EmployeeDashboard = () => {
                       const accVal = typeof v?.location?.accuracy === 'number' ? Math.round(v.location.accuracy) : (typeof v?.accuracy === 'number' ? Math.round(v.accuracy) : 0);
                       const expAmt = v?.expenseAmount || 0;
                       const expDesc = v?.expenseDescription || '';
+                      const isFirst = idx === 0;
+                      const isLast = idx === visits.length - 1 && visits.length > 1;
 
                       return (
-                        <div key={v?._id || idx} className={styles.visitItem}>
+                        <div key={v?._id || idx} className={styles.visitItem} style={{
+                          borderLeft: isFirst ? '3px solid #10b981' : isLast ? '3px solid #ef4444' : '3px solid #94a3b8',
+                          paddingLeft: '0.75rem'
+                        }}>
                           <div className={styles.visitHeader}>
-                            <span className={styles.visitProject}>{projName}</span>
+                            <span className={styles.visitProject}>
+                              {isFirst ? '🟢 ' : isLast ? '🔴 ' : '📍 '}{projName}
+                            </span>
                             <span className={styles.visitTime}>{vTime}</span>
                           </div>
                           <div className={styles.visitDetails}>
-                            <div>📍 Location: {latVal.toFixed(4)}, {lngVal.toFixed(4)}</div>
-                            <div>📏 Accuracy: {accVal} meters</div>
+                            <div>📍 {latVal.toFixed(4)}, {lngVal.toFixed(4)} | 📏 ±{accVal}m</div>
                             {expAmt > 0 && (
-                              <div style={{color: 'var(--accent-1)', marginTop: '0.25rem'}}>💰 Exp: ₹{expAmt} {expDesc ? `(${expDesc})` : ''}</div>
+                              <div style={{color: 'var(--accent-1)', marginTop: '0.25rem'}}>💰 ₹{expAmt} {expDesc ? `(${expDesc})` : ''}</div>
                             )}
                           </div>
                         </div>
@@ -675,7 +737,8 @@ const EmployeeDashboard = () => {
                     })}
                     {visits.length === 0 && (
                       <div style={{textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)'}}>
-                        No visits logged today.
+                        <div style={{fontSize: '2rem', marginBottom: '0.5rem'}}>📷</div>
+                        Submit your first site photo to start your attendance for today.
                       </div>
                     )}
                   </div>

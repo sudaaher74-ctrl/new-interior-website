@@ -155,6 +155,133 @@ router.get('/admin/all', [auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'
   }
 });
 
+// Admin: Monthly Attendance Report (for PDF download)
+router.get('/admin/monthly-report', [auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager')], async (req, res) => {
+  try {
+    const { month } = req.query; // format: "2026-08"
+    if (!month || !/^\d{4}-\d{2}$/.test(month)) {
+      return res.status(400).json({ msg: 'Provide month in YYYY-MM format' });
+    }
+
+    const [year, mon] = month.split('-').map(Number);
+    const startDate = `${month}-01`;
+    const lastDay = new Date(year, mon, 0).getDate();
+    const endDate = `${month}-${String(lastDay).padStart(2, '0')}`;
+
+    // 1. Get all attendance records for the month
+    const { data: attRecords } = await supabase
+      .from('attendance')
+      .select('*, users(id, full_name, email)')
+      .gte('date', startDate)
+      .lte('date', endDate)
+      .order('date', { ascending: true });
+
+    // 2. Get all site visits for the month (for expenses + gap filling)
+    const { data: visitRecords } = await supabase
+      .from('site_visits')
+      .select('*, users(id, full_name, email), projects(id, title)')
+      .gte('created_at', `${startDate}T00:00:00`)
+      .lte('created_at', `${endDate}T23:59:59`)
+      .order('created_at', { ascending: true });
+
+    // 3. Get all users (employees)
+    const { data: allUsers } = await supabase
+      .from('users')
+      .select('id, full_name, email, role, designation')
+      .eq('role', 'Employee');
+
+    // 4. Build expense map: { userId_date: totalExpense }
+    const expenseMap = {};
+    for (const v of (visitRecords || [])) {
+      const date = (v.created_at || '').split('T')[0];
+      const key = `${v.user_id}_${date}`;
+      expenseMap[key] = (expenseMap[key] || 0) + (Number(v.expense_amount) || 0);
+    }
+
+    // 5. Build site_visit first/last time map per day per user
+    const visitTimeMap = {}; // key: userId_date => { firstTime, lastTime }
+    for (const v of (visitRecords || [])) {
+      const date = (v.created_at || '').split('T')[0];
+      const key = `${v.user_id}_${date}`;
+      if (!visitTimeMap[key]) {
+        visitTimeMap[key] = { firstTime: v.created_at, lastTime: v.created_at };
+      } else {
+        if (v.created_at < visitTimeMap[key].firstTime) visitTimeMap[key].firstTime = v.created_at;
+        if (v.created_at > visitTimeMap[key].lastTime) visitTimeMap[key].lastTime = v.created_at;
+      }
+    }
+
+    // 6. Build attendance map: { userId_date: attendanceRow }
+    const attMap = {};
+    for (const a of (attRecords || [])) {
+      attMap[`${a.user_id}_${a.date}`] = a;
+    }
+
+    // 7. Build report per employee
+    const report = [];
+
+    for (const emp of (allUsers || [])) {
+      // Collect all unique dates this employee has presence (from attendance OR site_visits)
+      const dateSet = new Set();
+      for (const a of (attRecords || [])) {
+        if (a.user_id === emp.id) dateSet.add(a.date);
+      }
+      for (const v of (visitRecords || [])) {
+        if (v.user_id === emp.id) dateSet.add((v.created_at || '').split('T')[0]);
+      }
+
+      if (dateSet.size === 0) continue; // employee had no activity this month
+
+      const dailyLog = [];
+      let totalHours = 0;
+      let totalExpense = 0;
+
+      for (const date of [...dateSet].sort()) {
+        const key = `${emp.id}_${date}`;
+        const att = attMap[key];
+        const vtimes = visitTimeMap[key];
+        const expense = expenseMap[key] || 0;
+
+        // Prefer real attendance check-in/out; fall back to site_visit times
+        const checkIn = att?.check_in_time || vtimes?.firstTime || null;
+        const checkOut = att?.check_out_time || vtimes?.lastTime || null;
+
+        let hours = 0;
+        if (checkIn && checkOut && checkIn !== checkOut) {
+          hours = Math.max(0, (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60));
+        }
+
+        totalHours += hours;
+        totalExpense += expense;
+
+        dailyLog.push({
+          date,
+          checkIn: checkIn ? new Date(checkIn).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : 'On-Site',
+          checkOut: checkOut && checkOut !== checkIn ? new Date(checkOut).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : '-',
+          hoursWorked: hours > 0 ? parseFloat(hours.toFixed(2)) : 0,
+          travelExpense: expense,
+        });
+      }
+
+      report.push({
+        employeeId: emp.id,
+        employeeName: emp.full_name,
+        email: emp.email,
+        designation: emp.designation || 'Employee',
+        totalDaysPresent: dailyLog.length,
+        totalHoursWorked: parseFloat(totalHours.toFixed(2)),
+        totalTravelExpense: totalExpense,
+        dailyLog,
+      });
+    }
+
+    res.json({ month, report });
+  } catch (err) {
+    console.error('Monthly report error:', err);
+    res.status(500).send('Server error');
+  }
+});
+
 // Check-In
 router.post('/check-in', auth, async (req, res) => {
   const { lat, lng, accuracy, notes } = req.body;

@@ -80,7 +80,12 @@ const AdminDashboard = () => {
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [attStartDate, setAttStartDate] = useState('');
   const [attEndDate, setAttEndDate] = useState('');
-  
+  const [reportMonth, setReportMonth] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  });
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+
   const [currentDate, setCurrentDate] = useState('');
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
@@ -223,6 +228,134 @@ const AdminDashboard = () => {
       toast.success('Attendance records fetched');
     } catch(err) {
       toast.error('Failed to fetch attendance records');
+    }
+  };
+
+  const handleDownloadMonthlyPdf = async () => {
+    setIsDownloadingPdf(true);
+    const toastId = toast.loading(`Generating PDF for ${reportMonth}...`);
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      const res = await axios.get(`${API_URL}/attendance/admin/monthly-report?month=${reportMonth}`, { headers });
+      const { month, report } = res.data;
+
+      if (!report || report.length === 0) {
+        toast.error('No attendance data found for this month.', { id: toastId });
+        setIsDownloadingPdf(false);
+        return;
+      }
+
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const monthLabel = new Date(month + '-01').toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+      const pageWidth = doc.internal.pageSize.getWidth();
+
+      // --- Header ---
+      doc.setFillColor(15, 23, 42);
+      doc.rect(0, 0, pageWidth, 28, 'F');
+      doc.setFontSize(18);
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.text('OS Interiors', 14, 12);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Monthly Attendance & Expense Report', 14, 20);
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text(monthLabel, pageWidth - 14, 12, { align: 'right' });
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}`, pageWidth - 14, 20, { align: 'right' });
+
+      let yPos = 36;
+
+      // --- Summary Table (all employees) ---
+      doc.setFontSize(12);
+      doc.setTextColor(15, 23, 42);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Employee Summary', 14, yPos);
+      yPos += 4;
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Employee', 'Designation', 'Days Present', 'Total Hours', 'Total Travel Expense (₹)']],
+        body: report.map(emp => [
+          emp.employeeName,
+          emp.designation,
+          emp.totalDaysPresent,
+          emp.totalHoursWorked.toFixed(1) + ' hrs',
+          '₹ ' + emp.totalTravelExpense.toLocaleString('en-IN'),
+        ]),
+        headStyles: { fillColor: [15, 23, 42], textColor: 255, fontStyle: 'bold', fontSize: 9 },
+        bodyStyles: { fontSize: 9 },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+        styles: { cellPadding: 3 },
+        margin: { left: 14, right: 14 },
+      });
+
+      yPos = doc.lastAutoTable.finalY + 12;
+
+      // --- Per Employee Daily Log ---
+      for (const emp of report) {
+        // Start new page if less than 60mm left
+        if (yPos > 240) {
+          doc.addPage();
+          yPos = 16;
+        }
+
+        // Employee header bar
+        doc.setFillColor(248, 250, 252);
+        doc.rect(14, yPos, pageWidth - 28, 10, 'F');
+        doc.setDrawColor(203, 213, 225);
+        doc.rect(14, yPos, pageWidth - 28, 10, 'S');
+        doc.setFontSize(11);
+        doc.setTextColor(15, 23, 42);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${emp.employeeName}  —  ${emp.designation}`, 17, yPos + 7);
+        yPos += 14;
+
+        autoTable(doc, {
+          startY: yPos,
+          head: [['Date', 'Check-In', 'Check-Out', 'Hours Worked', 'Travel Expense (₹)']],
+          body: emp.dailyLog.map(d => [
+            new Date(d.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+            d.checkIn,
+            d.checkOut,
+            d.hoursWorked > 0 ? d.hoursWorked.toFixed(1) + ' hrs' : '-',
+            d.travelExpense > 0 ? '₹ ' + d.travelExpense.toLocaleString('en-IN') : '-',
+          ]),
+          foot: [[
+            { content: 'TOTAL', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [15, 23, 42], textColor: 255 } },
+            { content: emp.totalDaysPresent + ' days', styles: { fontStyle: 'bold', fillColor: [15, 23, 42], textColor: 255 } },
+            { content: emp.totalHoursWorked.toFixed(1) + ' hrs', styles: { fontStyle: 'bold', fillColor: [15, 23, 42], textColor: 255 } },
+            { content: '₹ ' + emp.totalTravelExpense.toLocaleString('en-IN'), styles: { fontStyle: 'bold', fillColor: [15, 23, 42], textColor: 255 } },
+          ]],
+          headStyles: { fillColor: [71, 85, 105], textColor: 255, fontStyle: 'bold', fontSize: 8 },
+          bodyStyles: { fontSize: 8 },
+          footStyles: { fontSize: 8 },
+          alternateRowStyles: { fillColor: [248, 250, 252] },
+          styles: { cellPadding: 2.5 },
+          margin: { left: 14, right: 14 },
+        });
+
+        yPos = doc.lastAutoTable.finalY + 10;
+      }
+
+      // Footer on every page
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(148, 163, 184);
+        doc.text(`OS Interiors — Confidential  |  Page ${i} of ${pageCount}`, pageWidth / 2, 290, { align: 'center' });
+      }
+
+      doc.save(`OS-Attendance-${month}.pdf`);
+      toast.success(`PDF downloaded: OS-Attendance-${month}.pdf`, { id: toastId });
+    } catch(err) {
+      console.error('PDF error:', err);
+      toast.error('Failed to generate PDF: ' + (err.response?.data?.msg || err.message), { id: toastId });
+    } finally {
+      setIsDownloadingPdf(false);
     }
   };
 
@@ -1058,88 +1191,146 @@ const AdminDashboard = () => {
     });
 
     return (
-      <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
-        <div className={styles.tableHeader} style={{ flexWrap: 'wrap', gap: '1rem' }}>
-          <h2 className={styles.pageTitle} style={{fontSize: '1.5rem', margin: 0}}>Master Attendance Logs</h2>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <input 
-              type="date" 
-              value={attStartDate}
-              onChange={e => setAttStartDate(e.target.value)}
-              style={filterInputStyle}
+      <div className={`${styles.fadeInUp} ${styles.delay1}`} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+        {/* PDF Download Card */}
+        <div style={{
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)',
+          borderRadius: '16px', padding: '1.5rem 2rem',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem',
+          boxShadow: '0 8px 24px rgba(15,23,42,0.25)'
+        }}>
+          <div>
+            <h3 style={{ color: 'white', margin: 0, fontSize: '1.1rem', fontWeight: '700' }}>📥 Download Monthly Attendance PDF</h3>
+            <p style={{ color: 'rgba(255,255,255,0.65)', margin: '4px 0 0', fontSize: '0.85rem' }}>
+              Includes check-in & check-out times, total hours, and travel expenses per employee
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <input
+              type="month"
+              value={reportMonth}
+              onChange={e => setReportMonth(e.target.value)}
+              style={{
+                padding: '0.5rem 0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.2)',
+                background: 'rgba(255,255,255,0.1)', color: 'white', fontSize: '0.9rem',
+                outline: 'none', cursor: 'pointer'
+              }}
             />
-            <span style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>to</span>
-            <input 
-              type="date" 
-              value={attEndDate}
-              onChange={e => setAttEndDate(e.target.value)}
-              style={filterInputStyle}
-            />
-            <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={handleFetchAttendance}>Fetch</button>
-            
-            <input 
-              type="text" 
-              placeholder="Search by employee/project..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={filterInputStyle}
-            />
-            <button className={`${styles.btn} ${styles.btnSecondary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => handleExportCSV(filteredAtt.map(a => ({
-              Date: a?.date ? new Date(a.date).toLocaleDateString() : 'Today',
-              Employee: a?.user?.fullName || a?.user?.name || 'Employee',
-              Project: a?.project?.name || a?.notes || 'On-Site Verified',
-              Status: a?.status || 'Present',
-              CheckIn: a?.checkInTime ? new Date(a.checkInTime).toLocaleTimeString() : '-',
-              TotalHours: a?.totalWorkingHours ? a.totalWorkingHours.toFixed(1) : '-'
-            })), 'master-attendance')}>Export CSV</button>
+            <button
+              onClick={handleDownloadMonthlyPdf}
+              disabled={isDownloadingPdf}
+              style={{
+                padding: '0.55rem 1.2rem', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                background: isDownloadingPdf ? 'rgba(255,255,255,0.2)' : '#10b981',
+                color: 'white', fontWeight: '700', fontSize: '0.9rem',
+                display: 'flex', alignItems: 'center', gap: '0.5rem',
+                transition: 'all 0.2s ease',
+                opacity: isDownloadingPdf ? 0.7 : 1,
+              }}
+            >
+              {isDownloadingPdf ? '⏳ Generating...' : '📄 Download PDF'}
+            </button>
           </div>
         </div>
-        
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Employee</th>
-              <th>Project / Verification</th>
-              <th>Check-In Time</th>
-              <th>Status</th>
-              <th>Hours</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredAtt.map((att, idx) => {
-              const empName = att?.user?.fullName || att?.user?.name || 'Employee';
-              const projTitle = att?.project?.name || att?.notes || 'On-Site Verified (GPS)';
-              const checkInStr = att?.checkInTime ? new Date(att.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
-              const hoursStr = att?.totalWorkingHours > 0 ? att.totalWorkingHours.toFixed(1) + ' hrs' : (att?.checkInTime ? 'Active' : '-');
 
-              return (
-                <tr key={att?._id || idx}>
-                  <td>{att?.date ? new Date(att.date).toLocaleDateString() : 'Today'}</td>
-                  <td style={{fontWeight: '600', color: '#0f172a'}}>{empName}</td>
-                  <td>{projTitle}</td>
-                  <td style={{color: 'var(--text-secondary)'}}>🕒 {checkInStr}</td>
-                  <td>
-                    <span style={{ 
-                      padding: '3px 10px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '600',
-                      background: (att?.status || 'Present') === 'Present' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
-                      color: (att?.status || 'Present') === 'Present' ? '#10b981' : '#f59e0b'
-                    }}>
-                      {att?.status || 'Present'}
-                    </span>
-                  </td>
-                  <td style={{fontWeight: 'bold', color: '#0f172a'}}>{hoursStr}</td>
-                </tr>
-              );
-            })}
-            {filteredAtt.length === 0 && (
-              <tr><td colSpan="6" style={{textAlign: 'center', padding: '2rem'}}>No attendance logs found.</td></tr>
-            )}
-          </tbody>
-        </table>
+        {/* Attendance Logs Table */}
+        <div className={styles.tableContainer}>
+          <div className={styles.tableHeader} style={{ flexWrap: 'wrap', gap: '1rem' }}>
+            <h2 className={styles.pageTitle} style={{fontSize: '1.5rem', margin: 0}}>Master Attendance Logs</h2>
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+              <input 
+                type="date" 
+                value={attStartDate}
+                onChange={e => setAttStartDate(e.target.value)}
+                style={filterInputStyle}
+              />
+              <span style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>to</span>
+              <input 
+                type="date" 
+                value={attEndDate}
+                onChange={e => setAttEndDate(e.target.value)}
+                style={filterInputStyle}
+              />
+              <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={handleFetchAttendance}>Fetch</button>
+              <input 
+                type="text" 
+                placeholder="Search by employee..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={filterInputStyle}
+              />
+              <button className={`${styles.btn} ${styles.btnSecondary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => handleExportCSV(filteredAtt.map(a => ({
+                Date: a?.date ? new Date(a.date).toLocaleDateString() : 'Today',
+                Employee: a?.user?.fullName || a?.user?.name || 'Employee',
+                Project: a?.project?.name || a?.notes || 'On-Site Verified',
+                CheckIn: a?.checkInTime ? new Date(a.checkInTime).toLocaleTimeString() : '-',
+                CheckOut: a?.checkOutTime ? new Date(a.checkOutTime).toLocaleTimeString() : '-',
+                TotalHours: a?.totalWorkingHours > 0 ? a.totalWorkingHours.toFixed(1) : '0',
+                Status: a?.status || 'Present',
+              })), 'master-attendance')}>⬇ CSV</button>
+            </div>
+          </div>
+          
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Employee</th>
+                <th>Project / Site</th>
+                <th>Check-In 🟢</th>
+                <th>Check-Out 🔴</th>
+                <th>Total Hours</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredAtt.map((att, idx) => {
+                const empName = att?.user?.fullName || att?.user?.name || 'Employee';
+                const projTitle = att?.project?.name || att?.notes || 'On-Site (GPS Verified)';
+                const checkIn = att?.checkInTime;
+                const checkOut = att?.checkOutTime;
+                const checkInStr = checkIn ? new Date(checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+                const checkOutStr = checkOut ? new Date(checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—';
+                
+                let hours = att?.totalWorkingHours || 0;
+                if (!hours && checkIn && checkOut) {
+                  hours = Math.max(0, (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60));
+                }
+                const hoursStr = hours > 0 ? hours.toFixed(1) + ' hrs' : (checkIn && !checkOut ? '🟡 Active' : '-');
+
+                return (
+                  <tr key={att?._id || idx}>
+                    <td style={{whiteSpace: 'nowrap'}}>{att?.date ? new Date(att.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Today'}</td>
+                    <td style={{fontWeight: '700', color: '#0f172a'}}>{empName}</td>
+                    <td style={{color: 'var(--text-secondary)', fontSize: '0.85rem'}}>{projTitle}</td>
+                    <td style={{color: '#10b981', fontWeight: '600'}}>🟢 {checkInStr}</td>
+                    <td style={{color: checkOut ? '#ef4444' : '#94a3b8', fontWeight: '600'}}>
+                      {checkOut ? `🔴 ${checkOutStr}` : '—'}
+                    </td>
+                    <td style={{fontWeight: 'bold', color: hours > 0 ? '#0f172a' : '#94a3b8'}}>{hoursStr}</td>
+                    <td>
+                      <span style={{ 
+                        padding: '3px 10px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '600',
+                        background: (att?.status || 'Present') === 'Present' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                        color: (att?.status || 'Present') === 'Present' ? '#10b981' : '#f59e0b'
+                      }}>
+                        {att?.status || 'Present'}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+              {filteredAtt.length === 0 && (
+                <tr><td colSpan="7" style={{textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)'}}>No attendance logs found. Employees need to submit at least one site photo today.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   };
+
 
   const renderEmployeesTab = () => {
     const filteredEmployees = employees.filter(e => 
