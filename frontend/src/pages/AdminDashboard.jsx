@@ -179,7 +179,7 @@ const AdminDashboard = () => {
 
       // 5. Attendance Logs
       try {
-        let attUrl = `${API_URL}/attendance/admin/all`;
+        let attUrl = `${API_URL}/v2/attendance/admin/all`;
         const resAtt = await axios.get(attUrl, { headers });
         setAttendanceRecords(Array.isArray(resAtt.data) ? resAtt.data : []);
       } catch(e) {
@@ -223,7 +223,7 @@ const AdminDashboard = () => {
       if (attStartDate) query.push(`startDate=${attStartDate}`);
       if (attEndDate) query.push(`endDate=${attEndDate}`);
       
-      const resAtt = await axios.get(`${API_URL}/attendance/admin/all?${query.join('&')}`, { headers });
+      const resAtt = await axios.get(`${API_URL}/v2/attendance/admin/all?${query.join('&')}`, { headers });
       setAttendanceRecords(resAtt.data);
       toast.success('Attendance records fetched');
     } catch(err) {
@@ -236,7 +236,7 @@ const AdminDashboard = () => {
     const toastId = toast.loading(`Generating PDF for ${reportMonth}...`);
     try {
       const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
-      const res = await axios.get(`${API_URL}/attendance/admin/monthly-report?month=${reportMonth}`, { headers });
+      const res = await axios.get(`${API_URL}/v2/attendance/admin/monthly-report?month=${reportMonth}`, { headers });
       const { month, report } = res.data;
 
       if (!report || report.length === 0) {

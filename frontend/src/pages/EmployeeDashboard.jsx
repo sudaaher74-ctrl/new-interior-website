@@ -146,7 +146,7 @@ const EmployeeDashboard = () => {
       }
       
       try {
-        const attRes = await axios.get(`${API_URL}/attendance/history`, { headers });
+        const attRes = await axios.get(`${API_URL}/v2/attendance/history`, { headers });
         setAttendanceHistory(attRes.data);
       } catch (err) {
         console.error("Failed to fetch attendance history", err);
@@ -310,7 +310,7 @@ const EmployeeDashboard = () => {
     navigator.geolocation.getCurrentPosition(async (pos) => {
       try {
         const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
-        await axios.post(`${API_URL}/attendance/check-in`, {
+        await axios.post(`${API_URL}/v2/attendance/check-in`, {
           projectId: selectedProject,
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
@@ -331,7 +331,7 @@ const EmployeeDashboard = () => {
     try {
       toast.loading('Processing Check-Out...', { id: 'checkout' });
       const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
-      await axios.post(`${API_URL}/attendance/check-out`, { workSummary }, { headers });
+      await axios.post(`${API_URL}/v2/attendance/check-out`, { workSummary }, { headers });
       toast.success('Successfully Checked Out!', { id: 'checkout' });
       setWorkSummary('');
       fetchData();
