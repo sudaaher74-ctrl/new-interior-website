@@ -185,9 +185,9 @@ router.get('/admin/monthly-report', [auth, authorizeRoles(...ADMIN_ROLES, 'Proje
       .order('created_at', { ascending: true });
 
     // 3. Get all users (employees)
-    const { data: allUsers } = await supabase
+    let { data: allUsers, error: userErr } = await supabase
       .from('users')
-      .select('id, full_name, email, role, designation')
+      .select('id, full_name, email, role')
       .eq('role', 'Employee');
 
     // 4. Build expense map: { userId_date: totalExpense }
