@@ -4,9 +4,20 @@ const supabase = require('../config/supabase');
 const { auth, authorizeRoles, ADMIN_ROLES } = require('../middleware/auth');
 const { sendNotification, notifyAdmins } = require('./notifications');
 
-// Format leave row
+// Format leave row with date range support
 function formatLeave(row) {
   if (!row) return null;
+  const startDate = row.leave_date || row.start_date;
+  const endDate = row.end_date || startDate;
+  
+  let days = row.total_days;
+  if (!days && startDate && endDate) {
+    const s = new Date(startDate);
+    const e = new Date(endDate);
+    days = Math.max(1, Math.round((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+  }
+  days = days || 1;
+
   return {
     id: row.id,
     _id: row.id,
@@ -18,9 +29,12 @@ function formatLeave(row) {
       name: row.users.full_name,
       email: row.users.email,
       role: row.users.role,
-      designation: row.users.designation
+      designation: row.users.designation || ''
     } : null,
-    leaveDate: row.leave_date,
+    leaveDate: startDate,
+    startDate: startDate,
+    endDate: endDate,
+    totalDays: days,
     reason: row.reason || '',
     status: row.status || 'Pending',
     adminComment: row.admin_comment || '',
@@ -28,26 +42,65 @@ function formatLeave(row) {
   };
 }
 
-// POST /api/v2/leaves — Employee submits leave request
+// POST /api/v2/leaves — Employee submits leave request (supports single date or date-to-date range)
 router.post('/', auth, async (req, res) => {
   try {
-    const { leaveDate, reason } = req.body;
-    if (!leaveDate) {
-      return res.status(400).json({ msg: 'Leave date is required' });
+    const { startDate, endDate, leaveDate, reason } = req.body;
+    const fromDate = startDate || leaveDate;
+    const toDate = endDate || fromDate;
+
+    if (!fromDate) {
+      return res.status(400).json({ msg: 'Leave start date is required' });
     }
 
-    const { data: created, error } = await supabase
+    const s = new Date(fromDate);
+    const e = new Date(toDate);
+    if (e < s) {
+      return res.status(400).json({ msg: 'End date cannot be earlier than start date' });
+    }
+
+    const totalDays = Math.max(1, Math.round((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+
+    // Try inserting with end_date & total_days, with fallback if columns not yet added to Supabase
+    let insertPayload = {
+      user_id: req.user.id,
+      leave_date: fromDate,
+      end_date: toDate,
+      total_days: totalDays,
+      reason: reason || '',
+      status: 'Pending'
+    };
+
+    let { data: created, error } = await supabase
       .from('leaves')
-      .insert({
-        user_id: req.user.id,
-        leave_date: leaveDate,
-        reason: reason || '',
-        status: 'Pending'
-      })
+      .insert(insertPayload)
       .select('*, users(id, full_name, email, role)')
       .single();
 
-    if (error) throw error;
+    if (error && (error.code === '42703' || (error.message && error.message.includes('end_date')))) {
+      // Fallback for when end_date column is not yet migrated
+      const fallbackPayload = {
+        user_id: req.user.id,
+        leave_date: fromDate,
+        reason: totalDays > 1 ? `${reason ? reason + ' ' : ''}[${fromDate} to ${toDate} (${totalDays} days)]` : (reason || ''),
+        status: 'Pending'
+      };
+      const fallbackRes = await supabase
+        .from('leaves')
+        .insert(fallbackPayload)
+        .select('*, users(id, full_name, email, role)')
+        .single();
+
+      if (fallbackRes.error) throw fallbackRes.error;
+      created = { ...fallbackRes.data, end_date: toDate, total_days: totalDays };
+    } else if (error) {
+      throw error;
+    }
+
+    // Format readable date string for notification
+    const dateText = (fromDate === toDate)
+      ? `${new Date(fromDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} (1 day)`
+      : `${new Date(fromDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} to ${new Date(toDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} (${totalDays} days)`;
 
     // Notify admins
     const empName = req.user.fullName || req.user.name || 'Employee';
@@ -55,7 +108,7 @@ router.post('/', auth, async (req, res) => {
       await notifyAdmins({
         senderName: empName,
         type: 'leave_request',
-        message: `${empName} requested leave for ${new Date(leaveDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}: "${reason || 'No reason provided'}"`,
+        message: `${empName} requested ${totalDays} day${totalDays > 1 ? 's' : ''} leave (${dateText}): "${reason || 'No reason provided'}"`,
         link: '/admin'
       });
     } catch (notifErr) {
@@ -132,13 +185,19 @@ router.put('/admin/:id', [auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'
     // Send notification to employee
     if (updated && updated.user_id) {
       try {
-        const formattedDate = new Date(updated.leave_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        const sDate = updated.leave_date;
+        const eDate = updated.end_date || sDate;
+        const totalDays = updated.total_days || 1;
+        const dateText = (sDate === eDate)
+          ? `${new Date(sDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} (1 day)`
+          : `${new Date(sDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} to ${new Date(eDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} (${totalDays} days)`;
+
         const statusIcon = status === 'Approved' ? '✅' : status === 'Rejected' ? '❌' : 'ℹ️';
         await sendNotification({
           recipientId: updated.user_id,
           senderName: req.user.fullName || 'Admin',
           type: `leave_${status.toLowerCase()}`,
-          message: `Your leave request for ${formattedDate} has been ${status} ${statusIcon}.${adminComment ? ` Note: "${adminComment}"` : ''}`,
+          message: `Your leave request for ${dateText} has been ${status} ${statusIcon}.${adminComment ? ` Note: "${adminComment}"` : ''}`,
           link: '/employee'
         });
       } catch (notifErr) {

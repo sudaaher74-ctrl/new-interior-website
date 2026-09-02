@@ -34,7 +34,8 @@ const EmployeeDashboard = () => {
 
   // Leaves State
   const [leaves, setLeaves] = useState([]);
-  const [leaveDate, setLeaveDate] = useState('');
+  const [leaveStartDate, setLeaveStartDate] = useState('');
+  const [leaveEndDate, setLeaveEndDate] = useState('');
   const [leaveReason, setLeaveReason] = useState('');
   const [isSubmittingLeave, setIsSubmittingLeave] = useState(false);
 
@@ -191,25 +192,54 @@ const EmployeeDashboard = () => {
     }
   };
 
+  const calculateLeaveDays = (start, end) => {
+    if (!start) return 0;
+    if (!end) return 1;
+    const s = new Date(start);
+    const e = new Date(end);
+    const diff = Math.round((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    return diff > 0 ? diff : 1;
+  };
+
+  const handleQuickDuration = (days) => {
+    const baseDate = leaveStartDate || new Date().toISOString().split('T')[0];
+    if (!leaveStartDate) setLeaveStartDate(baseDate);
+
+    const s = new Date(baseDate);
+    s.setDate(s.getDate() + (days - 1));
+    setLeaveEndDate(s.toISOString().split('T')[0]);
+  };
+
   const handleSubmitLeave = async (e) => {
     e.preventDefault();
-    if (!leaveDate) {
-      toast.error('Please select a leave date');
+    if (!leaveStartDate) {
+      toast.error('Please select a start date');
       return;
     }
+    const toDate = leaveEndDate || leaveStartDate;
+    if (toDate < leaveStartDate) {
+      toast.error('End date cannot be earlier than start date');
+      return;
+    }
+    const totalDays = calculateLeaveDays(leaveStartDate, toDate);
+
     setIsSubmittingLeave(true);
     const toastId = toast.loading('Submitting leave request...');
     try {
       const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
       const res = await axios.post(`${API_URL}/v2/leaves`, {
-        leaveDate,
+        startDate: leaveStartDate,
+        endDate: toDate,
+        leaveDate: leaveStartDate,
+        totalDays,
         reason: leaveReason
       }, { headers });
 
       setLeaves(prev => [res.data, ...prev]);
-      setLeaveDate('');
+      setLeaveStartDate('');
+      setLeaveEndDate('');
       setLeaveReason('');
-      toast.success('Leave request submitted! Admins have been notified.', { id: toastId });
+      toast.success(`Leave request (${totalDays} day${totalDays > 1 ? 's' : ''}) submitted! Admins have been notified.`, { id: toastId });
     } catch (err) {
       toast.error(err.response?.data?.msg || 'Failed to submit leave request', { id: toastId });
     } finally {
@@ -1118,20 +1148,94 @@ const EmployeeDashboard = () => {
             <div className={`${styles.fadeInUp}`} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               {/* Apply for Leave Form Card */}
               <div className={styles.glassCard}>
-                <h2 className={styles.cardTitle}><span>🏖️</span> Request Leave</h2>
-                <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
-                  Submit a leave request in advance. Your management team will be notified immediately to review and approve.
-                </p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
+                  <div>
+                    <h2 className={styles.cardTitle} style={{ margin: 0 }}><span>🏖️</span> Request Leave</h2>
+                    <p style={{ color: 'var(--text-secondary)', marginTop: '4px', marginBottom: 0, fontSize: '0.95rem' }}>
+                      Submit single or multi-day leave requests. Management will review and notify you.
+                    </p>
+                  </div>
+                  {leaveStartDate && (
+                    <div style={{
+                      backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                      border: '1px solid rgba(59, 130, 246, 0.25)',
+                      padding: '6px 14px',
+                      borderRadius: '20px',
+                      color: '#2563eb',
+                      fontWeight: '700',
+                      fontSize: '0.88rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}>
+                      <span>✨</span>
+                      <span>
+                        {calculateLeaveDays(leaveStartDate, leaveEndDate || leaveStartDate)} Day{calculateLeaveDays(leaveStartDate, leaveEndDate || leaveStartDate) > 1 ? 's' : ''} Leave
+                      </span>
+                    </div>
+                  )}
+                </div>
 
-                <form onSubmit={handleSubmitLeave} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+                {/* Quick select pills */}
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', alignSelf: 'center', fontWeight: '600' }}>Quick Select:</span>
+                  {[
+                    { label: '1 Day', days: 1 },
+                    { label: '2 Days', days: 2 },
+                    { label: '3 Days', days: 3 },
+                    { label: '5 Days', days: 5 },
+                    { label: '1 Week (7 Days)', days: 7 },
+                  ].map(item => (
+                    <button
+                      key={item.days}
+                      type="button"
+                      onClick={() => handleQuickDuration(item.days)}
+                      style={{
+                        background: 'rgba(241, 245, 249, 0.8)',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '16px',
+                        padding: '4px 12px',
+                        fontSize: '0.78rem',
+                        fontWeight: '600',
+                        color: '#334155',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#3b82f6'; e.currentTarget.style.color = '#2563eb'; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.color = '#334155'; }}
+                    >
+                      +{item.label}
+                    </button>
+                  ))}
+                </div>
+
+                <form onSubmit={handleSubmitLeave} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem' }}>
                   <div className={styles.inputGroup}>
-                    <label className={styles.label}>Leave Date *</label>
+                    <label className={styles.label}>From Date (Start) *</label>
                     <input
                       type="date"
                       className={styles.input}
-                      value={leaveDate}
+                      value={leaveStartDate}
                       min={new Date().toISOString().split('T')[0]}
-                      onChange={e => setLeaveDate(e.target.value)}
+                      onChange={e => {
+                        const newStart = e.target.value;
+                        setLeaveStartDate(newStart);
+                        if (!leaveEndDate || leaveEndDate < newStart) {
+                          setLeaveEndDate(newStart);
+                        }
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <div className={styles.inputGroup}>
+                    <label className={styles.label}>To Date (End) *</label>
+                    <input
+                      type="date"
+                      className={styles.input}
+                      value={leaveEndDate || leaveStartDate}
+                      min={leaveStartDate || new Date().toISOString().split('T')[0]}
+                      onChange={e => setLeaveEndDate(e.target.value)}
                       required
                     />
                   </div>
@@ -1140,7 +1244,7 @@ const EmployeeDashboard = () => {
                     <label className={styles.label}>Reason for Leave (Optional)</label>
                     <textarea
                       className={styles.input}
-                      placeholder="e.g., Family event, Medical appointment, Personal work..."
+                      placeholder="e.g., Family event, Medical checkup, Personal work, Out of town..."
                       value={leaveReason}
                       onChange={e => setLeaveReason(e.target.value)}
                       style={{ height: '70px', resize: 'vertical' }}
@@ -1154,7 +1258,7 @@ const EmployeeDashboard = () => {
                       className={`${styles.btn} ${styles.btnPrimary}`}
                       style={{ width: 'auto', padding: '0.65rem 1.75rem', fontWeight: '700' }}
                     >
-                      {isSubmittingLeave ? 'Submitting...' : '🚀 Submit Leave Request'}
+                      {isSubmittingLeave ? 'Submitting...' : `🚀 Submit Leave Request (${calculateLeaveDays(leaveStartDate, leaveEndDate || leaveStartDate)} Day${calculateLeaveDays(leaveStartDate, leaveEndDate || leaveStartDate) > 1 ? 's' : ''})`}
                     </button>
                   </div>
                 </form>
@@ -1174,7 +1278,8 @@ const EmployeeDashboard = () => {
                       <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
                         <thead>
                           <tr style={{ borderBottom: '2px solid var(--border-color)' }}>
-                            <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Leave Date</th>
+                            <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Leave Dates</th>
+                            <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Duration</th>
                             <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Reason</th>
                             <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Status</th>
                             <th style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Admin Note</th>
@@ -1184,10 +1289,31 @@ const EmployeeDashboard = () => {
                         <tbody>
                           {leaves.map((leave, idx) => {
                             const status = leave.status || 'Pending';
+                            const sDate = leave.startDate || leave.leaveDate;
+                            const eDate = leave.endDate || sDate;
+                            const days = leave.totalDays || calculateLeaveDays(sDate, eDate);
+                            const isSingleDay = !eDate || sDate === eDate;
+
                             return (
                               <tr key={leave.id || idx} style={{ borderBottom: '1px solid var(--border-hairline)' }}>
                                 <td style={{ padding: '12px 12px', fontWeight: '700', color: '#0f172a', whiteSpace: 'nowrap' }}>
-                                  📅 {new Date(leave.leaveDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                  {isSingleDay ? (
+                                    <span>📅 {new Date(sDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                                  ) : (
+                                    <span>📅 {new Date(sDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} – {new Date(eDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                                  )}
+                                </td>
+                                <td style={{ padding: '12px 12px', whiteSpace: 'nowrap' }}>
+                                  <span style={{
+                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                    color: '#2563eb',
+                                    fontWeight: '700',
+                                    fontSize: '0.78rem',
+                                    padding: '3px 8px',
+                                    borderRadius: '6px'
+                                  }}>
+                                    {days} Day{days > 1 ? 's' : ''}
+                                  </span>
                                 </td>
                                 <td style={{ padding: '12px 12px', color: 'var(--text-secondary)' }}>{leave.reason || 'Personal'}</td>
                                 <td style={{ padding: '12px 12px' }}>

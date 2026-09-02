@@ -1257,7 +1257,9 @@ const AdminDashboard = () => {
             <button className={`${styles.btn} ${styles.btnSecondary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => handleExportCSV(filteredLeaves.map(l => ({
               Employee: l.user?.fullName || 'Employee',
               Designation: l.user?.designation || l.user?.role || '-',
-              LeaveDate: l.leaveDate,
+              FromDate: l.startDate || l.leaveDate,
+              ToDate: l.endDate || l.startDate || l.leaveDate,
+              TotalDays: l.totalDays || 1,
               Reason: l.reason || 'Personal',
               Status: l.status,
               AdminNote: l.adminComment || '',
@@ -1270,7 +1272,8 @@ const AdminDashboard = () => {
           <thead>
             <tr>
               <th>Employee</th>
-              <th>Leave Date</th>
+              <th>Leave Dates</th>
+              <th>Duration</th>
               <th>Reason</th>
               <th>Applied On</th>
               <th>Status</th>
@@ -1281,6 +1284,11 @@ const AdminDashboard = () => {
           <tbody>
             {filteredLeaves.map((l) => {
               const status = l.status || 'Pending';
+              const sDate = l.startDate || l.leaveDate;
+              const eDate = l.endDate || sDate;
+              const days = l.totalDays || 1;
+              const isSingleDay = !eDate || sDate === eDate;
+
               return (
                 <tr key={l.id}>
                   <td>
@@ -1288,7 +1296,23 @@ const AdminDashboard = () => {
                     <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>{l.user?.designation || l.user?.role || 'Staff'}</div>
                   </td>
                   <td style={{ fontWeight: '700', color: '#0f172a', whiteSpace: 'nowrap' }}>
-                    📅 {new Date(l.leaveDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    {isSingleDay ? (
+                      <span>📅 {new Date(sDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                    ) : (
+                      <span>📅 {new Date(sDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} – {new Date(eDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                    )}
+                  </td>
+                  <td style={{ whiteSpace: 'nowrap' }}>
+                    <span style={{
+                      backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                      color: '#2563eb',
+                      fontWeight: '700',
+                      fontSize: '0.78rem',
+                      padding: '3px 8px',
+                      borderRadius: '6px'
+                    }}>
+                      {days} Day{days > 1 ? 's' : ''}
+                    </span>
                   </td>
                   <td>{l.reason || 'Personal Work'}</td>
                   <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
@@ -1337,7 +1361,7 @@ const AdminDashboard = () => {
               );
             })}
             {filteredLeaves.length === 0 && (
-              <tr><td colSpan="7" style={{textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)'}}>No leave requests found.</td></tr>
+              <tr><td colSpan="8" style={{textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)'}}>No leave requests found.</td></tr>
             )}
           </tbody>
         </table>
