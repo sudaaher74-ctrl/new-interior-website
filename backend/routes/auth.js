@@ -164,6 +164,8 @@ router.post('/google', loginLimiter, async (req, res) => {
       if (byEmail) existingUser = byEmail;
     }
 
+    const ADMIN_GOOGLE_EMAIL = 'team.osinteriors@gmail.com';
+
     let userRow;
 
     if (existingUser) {
@@ -172,9 +174,21 @@ router.post('/google', loginLimiter, async (req, res) => {
         return res.status(403).json({ msg: 'Your account has been deactivated. Please contact your admin.' });
       }
 
+      // ✋ Strict Access Control: ONLY team.osinteriors@gmail.com can hold Admin/Super Admin privileges via Google
+      let finalRole = existingUser.role;
+      if (email === ADMIN_GOOGLE_EMAIL) {
+        finalRole = 'Super Admin';
+      } else if (['Super Admin', 'Owner', 'Admin'].includes(finalRole)) {
+        console.warn(`Blocked non-authorized Google admin access attempt from ${email}`);
+        return res.status(403).json({
+          msg: 'Admin portal access via Google is exclusively restricted to team.osinteriors@gmail.com.',
+        });
+      }
+
       const updates = {};
       if (!existingUser.google_id && googleId) updates.google_id = googleId;
       if (!existingUser.profile_photo && profilePhoto) updates.profile_photo = profilePhoto;
+      if (existingUser.role !== finalRole) updates.role = finalRole;
 
       if (Object.keys(updates).length > 0) {
         const { data: updated } = await supabase
@@ -188,12 +202,33 @@ router.post('/google', loginLimiter, async (req, res) => {
         userRow = existingUser;
       }
     } else {
-      // ✋ SECURITY: Do NOT auto-create accounts.
-      // Only employees pre-registered by the admin can log in.
-      console.warn(`Blocked unknown Google login attempt: ${email}`);
-      return res.status(403).json({
-        msg: 'Access denied. Your Google account is not registered as an OS Interiors employee. Please contact your admin.',
-      });
+      // Auto-provision team.osinteriors@gmail.com as Super Admin if not already present
+      if (email === ADMIN_GOOGLE_EMAIL) {
+        const { data: newAdmin, error: createErr } = await supabase
+          .from('users')
+          .insert({
+            email: ADMIN_GOOGLE_EMAIL,
+            full_name: fullName || 'OS Interiors Admin',
+            role: 'Super Admin',
+            google_id: googleId,
+            profile_photo: profilePhoto,
+            auth_provider: 'google',
+            employee_id: 'ADM-001',
+            is_active: true
+          })
+          .select()
+          .single();
+
+        if (createErr) throw createErr;
+        userRow = newAdmin;
+      } else {
+        // ✋ SECURITY: Do NOT auto-create accounts.
+        // Only employees pre-registered by the admin can log in.
+        console.warn(`Blocked unknown Google login attempt: ${email}`);
+        return res.status(403).json({
+          msg: 'Access denied. Your Google account is not registered as an OS Interiors employee. Please contact your admin.',
+        });
+      }
     }
 
 

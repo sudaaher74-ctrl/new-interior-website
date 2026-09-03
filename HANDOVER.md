@@ -101,9 +101,10 @@ The platform uses a role-based access matrix:
 3. **Employee / Site Engineer**: Field check-in, GPS photo logging, personal attendance logs, leave submissions, and expense claims.
 
 ### Managing Staff & Passwords:
-- To add a new employee: Navigate to **Admin Dashboard → Employees → "+ Add Employee"**.
-- To reset an employee's password: Click **Reset Password** next to any employee in the directory (resets to default: `osinterior123`).
-- **Google SSO**: Pre-register the employee's Gmail address under the Employee Directory. When they click "Continue with Google", they will be authenticated and mapped to their assigned role.
+- **Client Super Admin Google Account**: `team.osinteriors@gmail.com` is configured as the exclusive Google account with automatic `Super Admin` privileges for the `/admin` portal.
+- **Google SSO for Staff**: Pre-register any employee's Gmail under the Employee Directory. When they click "Continue with Google", they are routed to the mobile-friendly Site Employee Portal (`/employee`). Non-authorized Google accounts are strictly denied admin portal access.
+- **Adding New Staff**: Navigate to **Admin Dashboard → Employees → "+ Add Employee"**.
+- **Resetting Passwords**: Click **Reset Password** next to any employee in the directory (resets to default: `osinterior123`).
 
 ---
 
