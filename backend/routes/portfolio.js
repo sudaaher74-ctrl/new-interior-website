@@ -14,8 +14,14 @@ if (process.env.CLOUDINARY_CLOUD_NAME) {
 
 const uploadBase64 = async (base64Str) => {
   if (!base64Str || !base64Str.startsWith('data:image')) return base64Str;
-  const uploadRes = await cloudinary.uploader.upload(base64Str, { folder: 'os_interior_portfolio' });
-  return uploadRes.secure_url;
+  if (!process.env.CLOUDINARY_CLOUD_NAME) return base64Str;
+  try {
+    const uploadRes = await cloudinary.uploader.upload(base64Str, { folder: 'os_interior_portfolio' });
+    return uploadRes.secure_url;
+  } catch (err) {
+    console.warn('Cloudinary portfolio upload warning, storing image directly:', err.message);
+    return base64Str;
+  }
 };
 
 // Get all portfolio projects (Public)

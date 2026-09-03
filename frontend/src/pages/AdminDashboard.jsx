@@ -74,7 +74,7 @@ const AdminDashboard = () => {
   const [showBlogModal, setShowBlogModal] = useState(false);
   const [newBlogPost, setNewBlogPost] = useState({ slug: '', title: '', author: 'OS Interiors', content: '', coverImage: '', tags: '', isPublished: false });
   const [showPortfolioModal, setShowPortfolioModal] = useState(false);
-  const [newPortfolioProject, setNewPortfolioProject] = useState({ slug: '', title: '', category: 'Restaurants', img: '', altText: '' });
+  const [newPortfolioProject, setNewPortfolioProject] = useState({ title: '', category: 'Residential', img: '', description: '', location: '', client: '', year: '' });
   const [projects, setProjects] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [expenseRecords, setExpenseRecords] = useState([]);
@@ -203,6 +203,22 @@ const AdminDashboard = () => {
         setLeaves(Array.isArray(resLeaves.data) ? resLeaves.data : []);
       } catch(e) {
         console.error("Failed to fetch leaves:", e);
+      }
+
+      // 8. Portfolio Projects
+      try {
+        const resPortfolio = await axios.get(`${API_URL}/v2/portfolio`, { headers });
+        setPortfolioProjects(Array.isArray(resPortfolio.data) ? resPortfolio.data : []);
+      } catch(e) {
+        console.error("Failed to fetch portfolio projects:", e);
+      }
+
+      // 9. Blog Posts
+      try {
+        const resBlog = await axios.get(`${API_URL}/v2/blog`, { headers });
+        setBlogPosts(Array.isArray(resBlog.data) ? resBlog.data : []);
+      } catch(e) {
+        console.error("Failed to fetch blog posts:", e);
       }
       
     } catch (error) {
@@ -447,17 +463,47 @@ const AdminDashboard = () => {
 
   const handleSavePortfolio = async (e) => {
     e.preventDefault();
+    if (!newPortfolioProject.title) {
+      toast.error('Project title is required');
+      return;
+    }
     try {
       const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
       toast.loading('Saving project (might take a moment to upload image)...', { id: 'save-portfolio' });
       await axios.post(`${API_URL}/v2/portfolio`, newPortfolioProject, { headers });
       toast.success('Portfolio project created!', { id: 'save-portfolio' });
       setShowPortfolioModal(false);
-      setNewPortfolioProject({ slug: '', title: '', category: 'Restaurants', img: '', altText: '' });
+      setNewPortfolioProject({ title: '', category: 'Residential', img: '', description: '', location: '', client: '', year: '' });
       fetchAllData();
     } catch (err) {
       console.error(err);
-      toast.error('Failed to save project', { id: 'save-portfolio' });
+      toast.error('Failed to save project: ' + (err.response?.data?.msg || err.response?.data || err.message), { id: 'save-portfolio' });
+    }
+  };
+
+  const handleDeletePortfolio = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this portfolio project?")) return;
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      await axios.delete(`${API_URL}/v2/portfolio/${id}`, { headers });
+      toast.success('Portfolio project deleted!');
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to delete portfolio project: ' + (err.response?.data?.msg || err.message));
+    }
+  };
+
+  const handleDeleteBlog = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this blog post?")) return;
+    try {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      await axios.delete(`${API_URL}/v2/blog/${id}`, { headers });
+      toast.success('Blog post deleted!');
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to delete blog post: ' + (err.response?.data?.msg || err.message));
     }
   };
 
@@ -950,14 +996,14 @@ const AdminDashboard = () => {
                   {post.isPublished ? 'Published' : 'Draft'}
                 </span>
               </td>
-              <td>{new Date(post.createdAt).toLocaleDateString()}</td>
+              <td>{new Date(post.published_at || post.createdAt || Date.now()).toLocaleDateString()}</td>
               <td>
-                <button className={styles.btnSecondary} onClick={() => toast('Edit coming soon!')} style={{padding: '0.2rem 0.5rem', fontSize: '0.8rem'}}>Edit</button>
+                <button onClick={() => handleDeleteBlog(post.id || post._id)} style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#ef4444', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>🗑️ Delete</button>
               </td>
             </tr>
           ))}
           {blogPosts.length === 0 && (
-            <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>No blog posts found.</td></tr>
+            <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem', color: '#64748b'}}>No blog posts found. Click '+ Write Post' to publish your first post.</td></tr>
           )}
         </tbody>
       </table>
@@ -968,17 +1014,47 @@ const AdminDashboard = () => {
     <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
       <div className={styles.tableHeader}>
         <h2 className={styles.pageTitle} style={{fontSize: '1.5rem', margin: 0}}>Portfolio Projects</h2>
-        <button className={styles.btn} onClick={() => setShowPortfolioModal(true)}>+ Add Project</button>
+        <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => setShowPortfolioModal(true)}>+ Add Project</button>
       </div>
-      <div className="grid-3" style={{ padding: '1rem', gap: '1rem' }}>
-        {portfolioProjects.map(p => (
-          <div key={p._id} style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '1rem' }}>
-            <img src={p.img} alt={p.title} style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '4px', marginBottom: '0.5rem' }} />
-            <h4 style={{ margin: '0 0 0.5rem 0' }}>{p.title}</h4>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{p.category} | {p.location}</div>
-          </div>
-        ))}
-      </div>
+      {portfolioProjects.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#64748b' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🖼️</div>
+          <h3 style={{ fontSize: '1.2rem', color: '#0f172a', margin: '0 0 0.5rem 0' }}>No portfolio projects yet</h3>
+          <p style={{ fontSize: '0.9rem', margin: '0 0 1.5rem 0' }}>Showcase your interior design work on the public website portfolio.</p>
+          <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => setShowPortfolioModal(true)}>+ Add Your First Project</button>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem', padding: '1.25rem' }}>
+          {portfolioProjects.map(p => (
+            <div key={p.id || p._id} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
+              {(p.cover_image || p.img) ? (
+                <img src={p.cover_image || p.img} alt={p.title} style={{ width: '100%', height: '180px', objectFit: 'cover' }} />
+              ) : (
+                <div style={{ width: '100%', height: '180px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>No Image</div>
+              )}
+              <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
+                    <h4 style={{ margin: '0 0 0.4rem 0', color: '#0f172a', fontSize: '1.05rem' }}>{p.title}</h4>
+                    <span style={{ fontSize: '0.75rem', fontWeight: '600', padding: '2px 8px', borderRadius: '6px', background: '#eff6ff', color: '#2563eb' }}>{p.category || 'General'}</span>
+                  </div>
+                  <div style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '0.5rem' }}>
+                    {p.location ? `📍 ${p.location}` : ''} {p.year ? `• ${p.year}` : ''}
+                  </div>
+                  {p.description && (
+                    <p style={{ fontSize: '0.85rem', color: '#475569', margin: '0 0 1rem 0', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {p.description}
+                    </p>
+                  )}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '0.75rem', borderTop: '1px solid #f1f5f9' }}>
+                  <button onClick={() => handleDeletePortfolio(p.id || p._id)} style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#ef4444', padding: '0.3rem 0.6rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '600' }}>🗑️ Delete</button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 
@@ -1868,6 +1944,103 @@ const AdminDashboard = () => {
                 <textarea rows="3" value={editingLead.adminNotes || ''} onChange={e => setEditingLead({...editingLead, adminNotes: e.target.value})} style={{...modalInputStyle, resize: 'vertical'}} placeholder="Add internal notes about this lead..."></textarea>
               </div>
               <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '0.5rem', width: '100%'}}>Save Changes</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Portfolio Project Modal */}
+      {showPortfolioModal && (
+        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.6)', zIndex: 9999, backdropFilter: 'blur(8px)'}}>
+          <div className={styles.glassCard} style={{maxWidth: '550px', width: '90%', maxHeight: '90vh', overflowY: 'auto', padding: '2rem', position: 'relative', background: '#ffffff', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'}}>
+            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: '#64748b'}} onClick={() => setShowPortfolioModal(false)}>&times;</span>
+            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem', color: '#0f172a'}}>Add Portfolio Project</h3>
+            <form onSubmit={handleSavePortfolio} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+              <div>
+                <label style={modalLabelStyle}>Project Title *</label>
+                <input type="text" required value={newPortfolioProject.title} onChange={e => setNewPortfolioProject({...newPortfolioProject, title: e.target.value})} style={modalInputStyle} placeholder="e.g. Modern Minimalist Penthouse" />
+              </div>
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
+                <div>
+                  <label style={modalLabelStyle}>Category</label>
+                  <select value={newPortfolioProject.category} onChange={e => setNewPortfolioProject({...newPortfolioProject, category: e.target.value})} style={modalInputStyle}>
+                    <option value="Residential">Residential</option>
+                    <option value="Commercial">Commercial</option>
+                    <option value="Restaurants">Restaurants & Cafes</option>
+                    <option value="Offices">Offices & Workspaces</option>
+                    <option value="Retail">Retail & Showrooms</option>
+                    <option value="Hospitality">Hospitality</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={modalLabelStyle}>Year</label>
+                  <input type="text" value={newPortfolioProject.year} onChange={e => setNewPortfolioProject({...newPortfolioProject, year: e.target.value})} style={modalInputStyle} placeholder="e.g. 2026" />
+                </div>
+              </div>
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
+                <div>
+                  <label style={modalLabelStyle}>Location / City</label>
+                  <input type="text" value={newPortfolioProject.location} onChange={e => setNewPortfolioProject({...newPortfolioProject, location: e.target.value})} style={modalInputStyle} placeholder="e.g. Worli, Mumbai" />
+                </div>
+                <div>
+                  <label style={modalLabelStyle}>Client Name (Optional)</label>
+                  <input type="text" value={newPortfolioProject.client} onChange={e => setNewPortfolioProject({...newPortfolioProject, client: e.target.value})} style={modalInputStyle} placeholder="e.g. Private Client" />
+                </div>
+              </div>
+              <div>
+                <label style={modalLabelStyle}>Description</label>
+                <textarea rows="3" value={newPortfolioProject.description} onChange={e => setNewPortfolioProject({...newPortfolioProject, description: e.target.value})} style={{...modalInputStyle, resize: 'vertical'}} placeholder="Brief description of the design, theme, and materials..."></textarea>
+              </div>
+              <div>
+                <label style={modalLabelStyle}>Cover Image</label>
+                <input type="file" accept="image/*" onChange={handlePortfolioImageUpload} style={{...modalInputStyle, padding: '0.5rem'}} />
+                {newPortfolioProject.img && (
+                  <div style={{marginTop: '0.75rem', position: 'relative'}}>
+                    <img src={newPortfolioProject.img} alt="Preview" style={{width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #cbd5e1'}} />
+                  </div>
+                )}
+              </div>
+              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '0.5rem', width: '100%'}}>Save to Portfolio</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Blog Post Modal */}
+      {showBlogModal && (
+        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.6)', zIndex: 9999, backdropFilter: 'blur(8px)'}}>
+          <div className={styles.glassCard} style={{maxWidth: '600px', width: '90%', maxHeight: '90vh', overflowY: 'auto', padding: '2rem', position: 'relative', background: '#ffffff', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'}}>
+            <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: '#64748b'}} onClick={() => setShowBlogModal(false)}>&times;</span>
+            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem', color: '#0f172a'}}>Write Blog Post</h3>
+            <form onSubmit={handleSaveBlog} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+              <div>
+                <label style={modalLabelStyle}>Post Title *</label>
+                <input type="text" required value={newBlogPost.title} onChange={e => setNewBlogPost({...newBlogPost, title: e.target.value})} style={modalInputStyle} placeholder="e.g. 5 Interior Design Trends for 2026" />
+              </div>
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
+                <div>
+                  <label style={modalLabelStyle}>Author</label>
+                  <input type="text" value={newBlogPost.author} onChange={e => setNewBlogPost({...newBlogPost, author: e.target.value})} style={modalInputStyle} placeholder="OS Interiors" />
+                </div>
+                <div>
+                  <label style={modalLabelStyle}>Tags (comma separated)</label>
+                  <input type="text" value={newBlogPost.tags} onChange={e => setNewBlogPost({...newBlogPost, tags: e.target.value})} style={modalInputStyle} placeholder="Design, Architecture, Modern" />
+                </div>
+              </div>
+              <div>
+                <label style={modalLabelStyle}>Content</label>
+                <textarea rows="6" required value={newBlogPost.content} onChange={e => setNewBlogPost({...newBlogPost, content: e.target.value})} style={{...modalInputStyle, resize: 'vertical'}} placeholder="Write your blog post content here..."></textarea>
+              </div>
+              <div>
+                <label style={modalLabelStyle}>Cover Image</label>
+                <input type="file" accept="image/*" onChange={handleBlogImageUpload} style={{...modalInputStyle, padding: '0.5rem'}} />
+                {newBlogPost.coverImage && (
+                  <div style={{marginTop: '0.75rem'}}>
+                    <img src={newBlogPost.coverImage} alt="Cover Preview" style={{width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #cbd5e1'}} />
+                  </div>
+                )}
+              </div>
+              <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '0.5rem', width: '100%'}}>Publish Post</button>
             </form>
           </div>
         </div>

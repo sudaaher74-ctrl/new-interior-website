@@ -76,12 +76,20 @@ app.use('/api/v2/leaves', require('./routes/leaves'));
 app.use('/v2/leaves', require('./routes/leaves'));
 app.use('/api/v2/notifications', require('./routes/notifications'));
 app.use('/v2/notifications', require('./routes/notifications'));
+app.use('/api/v2/portfolio', require('./routes/portfolio'));
+app.use('/v2/portfolio', require('./routes/portfolio'));
+app.use('/api/v2/blog', require('./routes/blog'));
+app.use('/v2/blog', require('./routes/blog'));
 
 // 2. Main Site APIs
 app.use('/api/leads', require('./routes/leads'));
 app.use('/leads', require('./routes/leads'));
 app.use('/api/projects', require('./routes/projects'));
 app.use('/projects', require('./routes/projects'));
+app.use('/api/portfolio', require('./routes/portfolio'));
+app.use('/portfolio', require('./routes/portfolio'));
+app.use('/api/blog', require('./routes/blog'));
+app.use('/blog', require('./routes/blog'));
 
 
 
