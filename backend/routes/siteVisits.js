@@ -216,8 +216,7 @@ router.put('/expense/:id', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager
     const { data: visit, error } = await supabase
       .from('site_visits')
       .update({
-        expense_status: status,
-        expense_admin_comment: comment || ''
+        expense_status: status
       })
       .eq('id', req.params.id)
       .select('*, projects(id, title, location), users(id, full_name, email)')
