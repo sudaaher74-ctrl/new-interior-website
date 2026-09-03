@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
@@ -80,6 +80,8 @@ const AdminDashboard = () => {
   const [expenseRecords, setExpenseRecords] = useState([]);
   const [expenseFilter, setExpenseFilter] = useState('Pending');
   const [attendanceRecords, setAttendanceRecords] = useState([]);
+  const [attendanceViewMode, setAttendanceViewMode] = useState('overview'); // 'overview' (All-at-Once) | 'logs' (Historical Logs)
+  const [attendanceStatusFilter, setAttendanceStatusFilter] = useState('all'); // 'all' | 'present' | 'completed' | 'leave' | 'absent'
   const [attStartDate, setAttStartDate] = useState('');
   const [attEndDate, setAttEndDate] = useState('');
   const [leaves, setLeaves] = useState([]);
@@ -1447,149 +1449,701 @@ const AdminDashboard = () => {
 
 
   const renderAttendanceTab = () => {
+    const todayIso = new Date().toISOString().split('T')[0];
+
+    // Compute comprehensive all-in-one attendance data for EVERY registered employee
+    const allEmployeesAttendanceData = (employees || []).map(emp => {
+      const empId = emp.id || emp._id;
+      const empEmail = emp.email?.toLowerCase();
+
+      // Today's attendance record
+      const todayRecord = (attendanceRecords || []).find(a => {
+        const matchUser = a.userId === empId || a.user?._id === empId || a.user?.id === empId || (empEmail && a.user?.email?.toLowerCase() === empEmail);
+        if (!matchUser) return false;
+        const recDate = a.date || (a.checkInTime ? a.checkInTime.split('T')[0] : '');
+        return recDate === todayIso;
+      });
+
+      // Today's approved leave
+      const todayLeave = (leaves || []).find(l => {
+        const matchUser = l.userId === empId || l.user_id === empId || (empEmail && l.user?.email?.toLowerCase() === empEmail);
+        if (!matchUser || l.status !== 'Approved') return false;
+        const start = (l.startDate || l.start_date || '').split('T')[0];
+        const end = (l.endDate || l.end_date || '').split('T')[0];
+        return todayIso >= start && todayIso <= end;
+      });
+
+      // Cumulative attendance records for this employee
+      const empAllRecords = (attendanceRecords || []).filter(a => {
+        return a.userId === empId || a.user?._id === empId || a.user?.id === empId || (empEmail && a.user?.email?.toLowerCase() === empEmail);
+      });
+
+      const daysPresent = new Set(empAllRecords.map(a => a.date || (a.checkInTime ? a.checkInTime.split('T')[0] : ''))).size;
+      const totalHoursLogged = empAllRecords.reduce((sum, a) => sum + (Number(a.totalWorkingHours) || 0), 0);
+
+      // Site visits for this employee
+      const empVisits = (siteVisits || []).filter(v => {
+        return v.userId === empId || v.user_id === empId || (empEmail && v.user?.email?.toLowerCase() === empEmail);
+      });
+      const latestVisit = empVisits[0] || null;
+
+      let statusKey = 'absent';
+      let statusLabel = 'Not Checked In';
+      let statusColor = '#64748b';
+      let statusBg = 'rgba(100, 116, 139, 0.12)';
+
+      if (todayLeave) {
+        statusKey = 'leave';
+        statusLabel = `On Leave (${todayLeave.type || 'Approved'})`;
+        statusColor = '#f59e0b';
+        statusBg = 'rgba(245, 158, 11, 0.15)';
+      } else if (todayRecord) {
+        if (todayRecord.checkOutTime) {
+          statusKey = 'completed';
+          statusLabel = 'Shift Completed';
+          statusColor = '#3b82f6';
+          statusBg = 'rgba(59, 130, 246, 0.15)';
+        } else if (todayRecord.checkInTime) {
+          statusKey = 'present';
+          statusLabel = 'Active On-Site';
+          statusColor = '#10b981';
+          statusBg = 'rgba(16, 185, 129, 0.15)';
+        }
+      }
+
+      let todayHours = 0;
+      if (todayRecord) {
+        if (todayRecord.totalWorkingHours) {
+          todayHours = todayRecord.totalWorkingHours;
+        } else if (todayRecord.checkInTime) {
+          const start = new Date(todayRecord.checkInTime).getTime();
+          const end = todayRecord.checkOutTime ? new Date(todayRecord.checkOutTime).getTime() : Date.now();
+          todayHours = Math.max(0, (end - start) / (1000 * 60 * 60));
+        }
+      }
+
+      return {
+        employee: emp,
+        empId,
+        name: emp.fullName || emp.name || 'Unnamed Employee',
+        designation: emp.designation || emp.role || 'Site Staff',
+        email: emp.email || '-',
+        mobile: emp.mobileNumber || '-',
+        statusKey,
+        statusLabel,
+        statusColor,
+        statusBg,
+        todayRecord,
+        todayLeave,
+        checkInTime: todayRecord?.checkInTime || null,
+        checkOutTime: todayRecord?.checkOutTime || null,
+        todayHours,
+        activeProject: todayRecord?.project?.name || todayRecord?.notes || latestVisit?.projects?.title || latestVisit?.notes || 'On-Site',
+        daysPresent,
+        totalHoursLogged,
+        totalVisits: empVisits.length,
+        latestVisit
+      };
+    });
+
+    // KPI Metrics
+    const totalStaff = allEmployeesAttendanceData.length;
+    const presentStaff = allEmployeesAttendanceData.filter(d => d.statusKey === 'present').length;
+    const completedStaff = allEmployeesAttendanceData.filter(d => d.statusKey === 'completed').length;
+    const onLeaveStaff = allEmployeesAttendanceData.filter(d => d.statusKey === 'leave').length;
+    const absentStaff = allEmployeesAttendanceData.filter(d => d.statusKey === 'absent').length;
+
+    // Filtered All-in-one employee rows based on search and status filter
+    const displayedStaff = allEmployeesAttendanceData.filter(d => {
+      const matchSearch = d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          d.designation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          d.email.toLowerCase().includes(searchQuery.toLowerCase());
+      if (!matchSearch) return false;
+      if (attendanceStatusFilter === 'all') return true;
+      return d.statusKey === attendanceStatusFilter;
+    });
+
+    // Detailed historical logs
     const filteredAtt = (attendanceRecords || []).filter(a => {
       const empName = a?.user?.fullName || a?.user?.name || (typeof a?.user === 'string' ? a.user : '') || '';
       const projName = a?.project?.name || a?.project?.title || a?.notes || '';
       return empName.toLowerCase().includes(searchQuery.toLowerCase()) || projName.toLowerCase().includes(searchQuery.toLowerCase());
     });
 
+    // Export all-staff overview CSV
+    const handleExportStaffSummaryCSV = () => {
+      const exportData = allEmployeesAttendanceData.map(e => ({
+        'Employee ID': e.employee.employeeId || (e.empId ? e.empId.substring(0, 6) : '-'),
+        'Employee Name': e.name,
+        'Designation': e.designation,
+        'Email': e.email,
+        'Mobile': e.mobile,
+        'Today Status': e.statusLabel,
+        'Today Check-In': e.checkInTime ? new Date(e.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-',
+        'Today Check-Out': e.checkOutTime ? new Date(e.checkOutTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (e.checkInTime ? 'Active On-Site' : '-'),
+        'Today Hours': e.todayHours > 0 ? e.todayHours.toFixed(1) : '0',
+        'Assigned Site': e.activeProject,
+        'Days Present (Month/Total)': e.daysPresent,
+        'Total Hours Logged': e.totalHoursLogged.toFixed(1),
+        'Total Site Visits': e.totalVisits
+      }));
+      handleExportCSV(exportData, `all-staff-attendance-summary-${todayIso}`);
+    };
+
     return (
       <div className={`${styles.fadeInUp} ${styles.delay1}`} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
-        {/* PDF Download Card */}
+        {/* Top Control Bar with View Mode Switcher */}
         <div style={{
-          background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)',
-          borderRadius: '16px', padding: '1.5rem 2rem',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem',
-          boxShadow: '0 8px 24px rgba(15,23,42,0.25)'
+          background: '#ffffff',
+          borderRadius: '16px',
+          padding: '1.25rem 1.75rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '1rem',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
         }}>
           <div>
-            <h3 style={{ color: 'white', margin: 0, fontSize: '1.1rem', fontWeight: '700' }}>📥 Download Monthly Attendance PDF</h3>
-            <p style={{ color: 'rgba(255,255,255,0.65)', margin: '4px 0 0', fontSize: '0.85rem' }}>
-              Includes check-in & check-out times, total hours, and travel expenses per employee
+            <h2 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span>⏰</span> Staff Attendance Center
+            </h2>
+            <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '0.85rem' }}>
+              Real-time daily roster, check-in status, and master historical logs for all team members
             </p>
           </div>
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <input
-              type="month"
-              value={reportMonth}
-              onChange={e => setReportMonth(e.target.value)}
-              style={{
-                padding: '0.5rem 0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.2)',
-                background: 'rgba(255,255,255,0.1)', color: 'white', fontSize: '0.9rem',
-                outline: 'none', cursor: 'pointer'
-              }}
-            />
+
+          <div style={{ display: 'flex', gap: '0.5rem', background: '#f1f5f9', padding: '4px', borderRadius: '12px' }}>
             <button
-              onClick={handleDownloadMonthlyPdf}
-              disabled={isDownloadingPdf}
+              onClick={() => setAttendanceViewMode('overview')}
               style={{
-                padding: '0.55rem 1.2rem', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                background: isDownloadingPdf ? 'rgba(255,255,255,0.2)' : '#10b981',
-                color: 'white', fontWeight: '700', fontSize: '0.9rem',
-                display: 'flex', alignItems: 'center', gap: '0.5rem',
+                padding: '0.55rem 1.25rem',
+                borderRadius: '9px',
+                border: 'none',
+                fontWeight: '700',
+                fontSize: '0.88rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
                 transition: 'all 0.2s ease',
-                opacity: isDownloadingPdf ? 0.7 : 1,
+                background: attendanceViewMode === 'overview' ? '#ffffff' : 'transparent',
+                color: attendanceViewMode === 'overview' ? '#0f172a' : '#64748b',
+                boxShadow: attendanceViewMode === 'overview' ? '0 2px 6px rgba(0,0,0,0.08)' : 'none'
               }}
             >
-              {isDownloadingPdf ? '⏳ Generating...' : '📄 Download PDF'}
+              <span>📊</span> All Staff Live Screen ({totalStaff})
+            </button>
+            <button
+              onClick={() => setAttendanceViewMode('logs')}
+              style={{
+                padding: '0.55rem 1.25rem',
+                borderRadius: '9px',
+                border: 'none',
+                fontWeight: '700',
+                fontSize: '0.88rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.2s ease',
+                background: attendanceViewMode === 'logs' ? '#ffffff' : 'transparent',
+                color: attendanceViewMode === 'logs' ? '#0f172a' : '#64748b',
+                boxShadow: attendanceViewMode === 'logs' ? '0 2px 6px rgba(0,0,0,0.08)' : 'none'
+              }}
+            >
+              <span>📜</span> Detailed Log History ({filteredAtt.length})
             </button>
           </div>
         </div>
 
-        {/* Attendance Logs Table */}
-        <div className={styles.tableContainer}>
-          <div className={styles.tableHeader} style={{ flexWrap: 'wrap', gap: '1rem' }}>
-            <h2 className={styles.pageTitle} style={{fontSize: '1.5rem', margin: 0}}>Master Attendance Logs</h2>
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-              <input 
-                type="date" 
-                value={attStartDate}
-                onChange={e => setAttStartDate(e.target.value)}
-                style={filterInputStyle}
-              />
-              <span style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>to</span>
-              <input 
-                type="date" 
-                value={attEndDate}
-                onChange={e => setAttEndDate(e.target.value)}
-                style={filterInputStyle}
-              />
-              <button className={`${styles.btn} ${styles.btnPrimary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={handleFetchAttendance}>Fetch</button>
-              <input 
-                type="text" 
-                placeholder="Search by employee..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={filterInputStyle}
-              />
-              <button className={`${styles.btn} ${styles.btnSecondary}`} style={{width: 'auto', padding: '0.4rem 0.8rem'}} onClick={() => handleExportCSV(filteredAtt.map(a => ({
-                Date: a?.date ? new Date(a.date).toLocaleDateString() : 'Today',
-                Employee: a?.user?.fullName || a?.user?.name || 'Employee',
-                Project: a?.project?.name || a?.notes || 'On-Site Verified',
-                CheckIn: a?.checkInTime ? new Date(a.checkInTime).toLocaleTimeString() : '-',
-                CheckOut: a?.checkOutTime ? new Date(a.checkOutTime).toLocaleTimeString() : '-',
-                TotalHours: a?.totalWorkingHours > 0 ? a.totalWorkingHours.toFixed(1) : '0',
-                Status: a?.status || 'Present',
-              })), 'master-attendance')}>⬇ CSV</button>
-            </div>
-          </div>
-          
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Employee</th>
-                <th>Project / Site</th>
-                <th>Check-In 🟢</th>
-                <th>Check-Out 🔴</th>
-                <th>Total Hours</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredAtt.map((att, idx) => {
-                const empName = att?.user?.fullName || att?.user?.name || 'Employee';
-                const projTitle = att?.project?.name || att?.notes || 'On-Site (GPS Verified)';
-                const checkIn = att?.checkInTime;
-                const checkOut = att?.checkOutTime;
-                const checkInStr = checkIn ? new Date(checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
-                const checkOutStr = checkOut ? new Date(checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—';
-                
-                let hours = att?.totalWorkingHours || 0;
-                if (!hours && checkIn && checkOut) {
-                  hours = Math.max(0, (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60));
-                }
-                const hoursStr = hours > 0 ? hours.toFixed(1) + ' hrs' : (checkIn && !checkOut ? '🟡 Active' : '-');
+        {/* ================= VIEW 1: ALL EMPLOYEES AT ONCE ================= */}
+        {attendanceViewMode === 'overview' && (
+          <>
+            {/* KPI Summary Cards Bar */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+              gap: '1rem'
+            }}>
+              {/* Card 1: Total Staff */}
+              <div 
+                onClick={() => setAttendanceStatusFilter('all')}
+                style={{
+                  background: '#ffffff', borderRadius: '14px', padding: '1.25rem',
+                  border: attendanceStatusFilter === 'all' ? '2px solid #2563eb' : '1px solid #e2e8f0',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.04)', cursor: 'pointer', transition: 'all 0.2s ease'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.8rem', fontWeight: '600' }}>
+                  <span>TOTAL REGISTERED</span>
+                  <span style={{ fontSize: '1.2rem' }}>👥</span>
+                </div>
+                <div style={{ fontSize: '1.75rem', fontWeight: '800', color: '#0f172a', marginTop: '0.4rem' }}>{totalStaff}</div>
+                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.2rem' }}>Click to view all</div>
+              </div>
 
-                return (
-                  <tr key={att?._id || idx}>
-                    <td style={{whiteSpace: 'nowrap'}}>{att?.date ? new Date(att.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Today'}</td>
-                    <td style={{fontWeight: '700', color: '#0f172a'}}>{empName}</td>
-                    <td style={{color: 'var(--text-secondary)', fontSize: '0.85rem'}}>{projTitle}</td>
-                    <td style={{color: '#10b981', fontWeight: '600'}}>🟢 {checkInStr}</td>
-                    <td style={{color: checkOut ? '#ef4444' : '#94a3b8', fontWeight: '600'}}>
-                      {checkOut ? `🔴 ${checkOutStr}` : '—'}
-                    </td>
-                    <td style={{fontWeight: 'bold', color: hours > 0 ? '#0f172a' : '#94a3b8'}}>{hoursStr}</td>
-                    <td>
-                      <span style={{ 
-                        padding: '3px 10px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '600',
-                        background: (att?.status || 'Present') === 'Present' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
-                        color: (att?.status || 'Present') === 'Present' ? '#10b981' : '#f59e0b'
-                      }}>
-                        {att?.status || 'Present'}
-                      </span>
-                    </td>
+              {/* Card 2: Active On-Site */}
+              <div 
+                onClick={() => setAttendanceStatusFilter('present')}
+                style={{
+                  background: '#ffffff', borderRadius: '14px', padding: '1.25rem',
+                  border: attendanceStatusFilter === 'present' ? '2px solid #10b981' : '1px solid #e2e8f0',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.04)', cursor: 'pointer', transition: 'all 0.2s ease'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#10b981', fontSize: '0.8rem', fontWeight: '700' }}>
+                  <span>ACTIVE ON-SITE</span>
+                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981' }}></span>
+                </div>
+                <div style={{ fontSize: '1.75rem', fontWeight: '800', color: '#10b981', marginTop: '0.4rem' }}>{presentStaff}</div>
+                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.2rem' }}>Working on duty right now</div>
+              </div>
+
+              {/* Card 3: Shift Completed */}
+              <div 
+                onClick={() => setAttendanceStatusFilter('completed')}
+                style={{
+                  background: '#ffffff', borderRadius: '14px', padding: '1.25rem',
+                  border: attendanceStatusFilter === 'completed' ? '2px solid #3b82f6' : '1px solid #e2e8f0',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.04)', cursor: 'pointer', transition: 'all 0.2s ease'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#3b82f6', fontSize: '0.8rem', fontWeight: '700' }}>
+                  <span>SHIFT COMPLETED</span>
+                  <span style={{ fontSize: '1.2rem' }}>🔴</span>
+                </div>
+                <div style={{ fontSize: '1.75rem', fontWeight: '800', color: '#3b82f6', marginTop: '0.4rem' }}>{completedStaff}</div>
+                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.2rem' }}>Checked out today</div>
+              </div>
+
+              {/* Card 4: On Approved Leave */}
+              <div 
+                onClick={() => setAttendanceStatusFilter('leave')}
+                style={{
+                  background: '#ffffff', borderRadius: '14px', padding: '1.25rem',
+                  border: attendanceStatusFilter === 'leave' ? '2px solid #f59e0b' : '1px solid #e2e8f0',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.04)', cursor: 'pointer', transition: 'all 0.2s ease'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#f59e0b', fontSize: '0.8rem', fontWeight: '700' }}>
+                  <span>ON LEAVE</span>
+                  <span style={{ fontSize: '1.2rem' }}>🏖️</span>
+                </div>
+                <div style={{ fontSize: '1.75rem', fontWeight: '800', color: '#f59e0b', marginTop: '0.4rem' }}>{onLeaveStaff}</div>
+                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.2rem' }}>Approved requests</div>
+              </div>
+
+              {/* Card 5: Absent / Not Checked In */}
+              <div 
+                onClick={() => setAttendanceStatusFilter('absent')}
+                style={{
+                  background: '#ffffff', borderRadius: '14px', padding: '1.25rem',
+                  border: attendanceStatusFilter === 'absent' ? '2px solid #ef4444' : '1px solid #e2e8f0',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.04)', cursor: 'pointer', transition: 'all 0.2s ease'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#ef4444', fontSize: '0.8rem', fontWeight: '700' }}>
+                  <span>PENDING / ABSENT</span>
+                  <span style={{ fontSize: '1.2rem' }}>⚪</span>
+                </div>
+                <div style={{ fontSize: '1.75rem', fontWeight: '800', color: '#ef4444', marginTop: '0.4rem' }}>{absentStaff}</div>
+                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.2rem' }}>No check-in recorded yet</div>
+              </div>
+            </div>
+
+            {/* Filter Pills and Action Bar */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '1rem',
+              background: '#ffffff',
+              padding: '1rem 1.5rem',
+              borderRadius: '12px',
+              border: '1px solid #e2e8f0'
+            }}>
+              {/* Filter Pills */}
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#64748b', marginRight: '0.25rem' }}>Filter:</span>
+                {[
+                  { key: 'all', label: `All Staff (${totalStaff})` },
+                  { key: 'present', label: `Active (${presentStaff})` },
+                  { key: 'completed', label: `Completed (${completedStaff})` },
+                  { key: 'leave', label: `On Leave (${onLeaveStaff})` },
+                  { key: 'absent', label: `Pending / Absent (${absentStaff})` },
+                ].map(p => (
+                  <button
+                    key={p.key}
+                    onClick={() => setAttendanceStatusFilter(p.key)}
+                    style={{
+                      padding: '0.35rem 0.85rem',
+                      borderRadius: '20px',
+                      border: attendanceStatusFilter === p.key ? '1px solid #2563eb' : '1px solid #e2e8f0',
+                      background: attendanceStatusFilter === p.key ? '#eff6ff' : '#ffffff',
+                      color: attendanceStatusFilter === p.key ? '#2563eb' : '#475569',
+                      fontWeight: attendanceStatusFilter === p.key ? '700' : '500',
+                      fontSize: '0.8rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Search & CSV Export */}
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                <input
+                  type="text"
+                  placeholder="Search by staff name..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  style={filterInputStyle}
+                />
+                <button
+                  onClick={handleExportStaffSummaryCSV}
+                  className={`${styles.btn} ${styles.btnSecondary}`}
+                  style={{ width: 'auto', padding: '0.45rem 0.9rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                >
+                  <span>📥</span> Export All CSV
+                </button>
+                <button
+                  onClick={fetchAllData}
+                  className={`${styles.btn} ${styles.btnPrimary}`}
+                  style={{ width: 'auto', padding: '0.45rem 0.9rem', fontSize: '0.85rem' }}
+                  title="Refresh Live Data"
+                >
+                  🔄 Refresh
+                </button>
+              </div>
+            </div>
+
+            {/* All Employees Master Screen Table */}
+            <div className={styles.tableContainer}>
+              <div className={styles.tableHeader}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', margin: 0, color: '#0f172a' }}>
+                  All Employee Status & Performance Matrix ({displayedStaff.length})
+                </h3>
+                <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                  Showing current live status for {new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                </span>
+              </div>
+
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Employee Name</th>
+                    <th>Designation</th>
+                    <th>Today's Live Status</th>
+                    <th>Check-In 🟢</th>
+                    <th>Check-Out 🔴</th>
+                    <th>Hours Today</th>
+                    <th>Active Project / Site</th>
+                    <th>Days Present (Total)</th>
+                    <th>Total Logged Hours</th>
+                    <th>Action</th>
                   </tr>
-                );
-              })}
-              {filteredAtt.length === 0 && (
-                <tr><td colSpan="7" style={{textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)'}}>No attendance logs found. Employees need to submit at least one site photo today.</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody>
+                  {displayedStaff.map((staff, idx) => {
+                    const checkInStr = staff.checkInTime ? new Date(staff.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—';
+                    const checkOutStr = staff.checkOutTime ? new Date(staff.checkOutTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (staff.checkInTime ? 'Active' : '—');
+                    const hoursStr = staff.todayHours > 0 ? staff.todayHours.toFixed(1) + ' hrs' : (staff.checkInTime && !staff.checkOutTime ? 'In Progress' : '—');
+
+                    return (
+                      <tr key={staff.empId || idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        {/* Employee Details */}
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <div style={{
+                              width: '38px', height: '38px', borderRadius: '50%',
+                              background: staff.statusKey === 'present' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : '#e2e8f0',
+                              color: staff.statusKey === 'present' ? 'white' : '#475569',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontWeight: '700', fontSize: '0.9rem', position: 'relative', flexShrink: 0
+                            }}>
+                              {staff.name.charAt(0).toUpperCase()}
+                              {staff.statusKey === 'present' && (
+                                <span style={{
+                                  position: 'absolute', bottom: '0', right: '0', width: '10px', height: '10px',
+                                  borderRadius: '50%', background: '#22c55e', border: '2px solid white',
+                                  boxShadow: '0 0 6px #22c55e'
+                                }}></span>
+                              )}
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: '700', color: '#0f172a', fontSize: '0.92rem' }}>{staff.name}</div>
+                              <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{staff.email}</div>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Designation */}
+                        <td>
+                          <span style={{ padding: '2px 8px', borderRadius: '6px', background: '#f1f5f9', color: '#475569', fontSize: '0.8rem', fontWeight: '600' }}>
+                            {staff.designation}
+                          </span>
+                        </td>
+
+                        {/* Today's Status Badge */}
+                        <td>
+                          <span style={{
+                            padding: '4px 12px',
+                            borderRadius: '16px',
+                            fontSize: '0.8rem',
+                            fontWeight: '700',
+                            background: staff.statusBg,
+                            color: staff.statusColor,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.4rem',
+                            whiteSpace: 'nowrap'
+                          }}>
+                            {staff.statusKey === 'present' && <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></span>}
+                            {staff.statusKey === 'completed' && <span>✓</span>}
+                            {staff.statusKey === 'leave' && <span>🏖️</span>}
+                            {staff.statusKey === 'absent' && <span>⚪</span>}
+                            {staff.statusLabel}
+                          </span>
+                        </td>
+
+                        {/* Check-In */}
+                        <td style={{ fontWeight: staff.checkInTime ? '600' : 'normal', color: staff.checkInTime ? '#10b981' : '#94a3b8' }}>
+                          {staff.checkInTime ? `🟢 ${checkInStr}` : '—'}
+                        </td>
+
+                        {/* Check-Out */}
+                        <td style={{ fontWeight: staff.checkOutTime ? '600' : 'normal', color: staff.checkOutTime ? '#ef4444' : (staff.checkInTime ? '#f59e0b' : '#94a3b8') }}>
+                          {staff.checkOutTime ? `🔴 ${checkOutStr}` : (staff.checkInTime ? '🟡 Active' : '—')}
+                        </td>
+
+                        {/* Hours Today */}
+                        <td style={{ fontWeight: '700', color: staff.todayHours > 0 ? '#0f172a' : '#94a3b8' }}>
+                          {hoursStr}
+                        </td>
+
+                        {/* Active Project */}
+                        <td style={{ color: '#475569', fontSize: '0.85rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {staff.activeProject}
+                        </td>
+
+                        {/* Days Present */}
+                        <td style={{ fontWeight: '600', color: '#0f172a' }}>
+                          {staff.daysPresent} days
+                        </td>
+
+                        {/* Total Hours Logged */}
+                        <td style={{ fontWeight: '700', color: '#2563eb' }}>
+                          {staff.totalHoursLogged.toFixed(1)} hrs
+                        </td>
+
+                        {/* Action */}
+                        <td>
+                          <button
+                            onClick={() => {
+                              setSearchQuery(staff.name);
+                              setAttendanceViewMode('logs');
+                            }}
+                            style={{
+                              padding: '0.3rem 0.75rem',
+                              borderRadius: '6px',
+                              border: '1px solid #cbd5e1',
+                              background: '#ffffff',
+                              color: '#2563eb',
+                              fontWeight: '600',
+                              fontSize: '0.78rem',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease'
+                            }}
+                            title="Filter and view daily history for this staff member"
+                          >
+                            Inspect Logs ➔
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+
+                  {displayedStaff.length === 0 && (
+                    <tr>
+                      <td colSpan="10" style={{ textAlign: 'center', padding: '3rem 1rem', color: '#64748b' }}>
+                        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>👥</div>
+                        <div style={{ fontWeight: '600', fontSize: '1rem', color: '#0f172a' }}>No Employees Found</div>
+                        <p style={{ margin: '4px 0 1rem', fontSize: '0.85rem' }}>
+                          {employees.length === 0 
+                            ? 'No employees are registered in the company yet. Add staff under the Employees tab.'
+                            : 'No employees matched your current search or status filter.'}
+                        </p>
+                        {employees.length === 0 && (
+                          <button 
+                            onClick={() => setShowAddEmployeeModal(true)} 
+                            className={`${styles.btn} ${styles.btnPrimary}`}
+                            style={{ width: 'auto', margin: '0 auto' }}
+                          >
+                            + Add First Employee
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        {/* ================= VIEW 2: HISTORICAL DAILY LOGS ================= */}
+        {attendanceViewMode === 'logs' && (
+          <>
+            {/* PDF Download Card */}
+            <div style={{
+              background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)',
+              borderRadius: '16px', padding: '1.5rem 2rem',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem',
+              boxShadow: '0 8px 24px rgba(15,23,42,0.25)'
+            }}>
+              <div>
+                <h3 style={{ color: 'white', margin: 0, fontSize: '1.1rem', fontWeight: '700' }}>📥 Download Monthly Attendance PDF</h3>
+                <p style={{ color: 'rgba(255,255,255,0.65)', margin: '4px 0 0', fontSize: '0.85rem' }}>
+                  Includes check-in & check-out times, total hours, and travel expenses per employee
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                <input
+                  type="month"
+                  value={reportMonth}
+                  onChange={e => setReportMonth(e.target.value)}
+                  style={{
+                    padding: '0.5rem 0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.2)',
+                    background: 'rgba(255,255,255,0.1)', color: 'white', fontSize: '0.9rem',
+                    outline: 'none', cursor: 'pointer'
+                  }}
+                />
+                <button
+                  onClick={handleDownloadMonthlyPdf}
+                  disabled={isDownloadingPdf}
+                  style={{
+                    padding: '0.55rem 1.2rem', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    background: isDownloadingPdf ? 'rgba(255,255,255,0.2)' : '#10b981',
+                    color: 'white', fontWeight: '700', fontSize: '0.9rem',
+                    display: 'flex', alignItems: 'center', gap: '0.5rem',
+                    transition: 'all 0.2s ease',
+                    opacity: isDownloadingPdf ? 0.7 : 1,
+                  }}
+                >
+                  {isDownloadingPdf ? '⏳ Generating...' : '📄 Download PDF'}
+                </button>
+              </div>
+            </div>
+
+            {/* Attendance Logs Table */}
+            <div className={styles.tableContainer}>
+              <div className={styles.tableHeader} style={{ flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <h2 className={styles.pageTitle} style={{ fontSize: '1.3rem', margin: 0 }}>Master Attendance Logs</h2>
+                  {searchQuery && (
+                    <span style={{ fontSize: '0.8rem', color: '#2563eb' }}>
+                      Filtered for: "{searchQuery}" <button onClick={() => setSearchQuery('')} style={{ border: 'none', background: 'none', color: '#ef4444', cursor: 'pointer', fontWeight: 'bold' }}>✕ Clear</button>
+                    </span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <input 
+                    type="date" 
+                    value={attStartDate}
+                    onChange={e => setAttStartDate(e.target.value)}
+                    style={filterInputStyle}
+                  />
+                  <span style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>to</span>
+                  <input 
+                    type="date" 
+                    value={attEndDate}
+                    onChange={e => setAttEndDate(e.target.value)}
+                    style={filterInputStyle}
+                  />
+                  <button className={`${styles.btn} ${styles.btnPrimary}`} style={{ width: 'auto', padding: '0.4rem 0.8rem' }} onClick={handleFetchAttendance}>Fetch</button>
+                  <input 
+                    type="text" 
+                    placeholder="Search by employee..." 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={filterInputStyle}
+                  />
+                  <button className={`${styles.btn} ${styles.btnSecondary}`} style={{ width: 'auto', padding: '0.4rem 0.8rem' }} onClick={() => handleExportCSV(filteredAtt.map(a => ({
+                    Date: a?.date ? new Date(a.date).toLocaleDateString() : 'Today',
+                    Employee: a?.user?.fullName || a?.user?.name || 'Employee',
+                    Project: a?.project?.name || a?.notes || 'On-Site Verified',
+                    CheckIn: a?.checkInTime ? new Date(a.checkInTime).toLocaleTimeString() : '-',
+                    CheckOut: a?.checkOutTime ? new Date(a.checkOutTime).toLocaleTimeString() : '-',
+                    TotalHours: a?.totalWorkingHours > 0 ? a.totalWorkingHours.toFixed(1) : '0',
+                    Status: a?.status || 'Present',
+                  })), 'master-attendance')}>⬇ CSV</button>
+                </div>
+              </div>
+              
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Employee</th>
+                    <th>Project / Site</th>
+                    <th>Check-In 🟢</th>
+                    <th>Check-Out 🔴</th>
+                    <th>Total Hours</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredAtt.map((att, idx) => {
+                    const empName = att?.user?.fullName || att?.user?.name || 'Employee';
+                    const projTitle = att?.project?.name || att?.notes || 'On-Site (GPS Verified)';
+                    const checkIn = att?.checkInTime;
+                    const checkOut = att?.checkOutTime;
+                    const checkInStr = checkIn ? new Date(checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+                    const checkOutStr = checkOut ? new Date(checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—';
+                    
+                    let hours = att?.totalWorkingHours || 0;
+                    if (!hours && checkIn && checkOut) {
+                      hours = Math.max(0, (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60));
+                    }
+                    const hoursStr = hours > 0 ? hours.toFixed(1) + ' hrs' : (checkIn && !checkOut ? '🟡 Active' : '-');
+
+                    return (
+                      <tr key={att?._id || idx}>
+                        <td style={{ whiteSpace: 'nowrap' }}>{att?.date ? new Date(att.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Today'}</td>
+                        <td style={{ fontWeight: '700', color: '#0f172a' }}>{empName}</td>
+                        <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{projTitle}</td>
+                        <td style={{ color: '#10b981', fontWeight: '600' }}>🟢 {checkInStr}</td>
+                        <td style={{ color: checkOut ? '#ef4444' : '#94a3b8', fontWeight: '600' }}>
+                          {checkOut ? `🔴 ${checkOutStr}` : '—'}
+                        </td>
+                        <td style={{ fontWeight: 'bold', color: hours > 0 ? '#0f172a' : '#94a3b8' }}>{hoursStr}</td>
+                        <td>
+                          <span style={{ 
+                            padding: '3px 10px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '600',
+                            background: (att?.status || 'Present') === 'Present' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                            color: (att?.status || 'Present') === 'Present' ? '#10b981' : '#f59e0b'
+                          }}>
+                            {att?.status || 'Present'}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {filteredAtt.length === 0 && (
+                    <tr><td colSpan="7" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>No attendance logs found for the selected filter.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
       </div>
     );
   };
