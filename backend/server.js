@@ -35,12 +35,17 @@ if (!process.env.VERCEL) {
 
 // Global API Rate Limiter
 const apiLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 2000, // Generous limit for portal polling and shared office IPs
   message: { msg: 'Too many requests from this IP, please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
+  skip: (req) => {
+    // Do not throttle authenticated users polling their dashboards
+    const authHeader = req.headers.authorization || req.header('Authorization');
+    return Boolean(authHeader);
+  },
 });
 app.use('/api/', apiLimiter);
 
