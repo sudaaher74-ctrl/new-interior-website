@@ -2189,11 +2189,32 @@ const AdminDashboard = () => {
               <td>{emp.employeeId || emp._id.substring(0, 6)}</td>
               <td style={{fontWeight: '500'}}>{emp.fullName || emp.name}</td>
               <td>{emp.email || emp.mobileNumber || '-'}</td>
-              <td>{emp.designation || emp.role}</td>
+              <td>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span>{emp.designation || emp.role}</span>
+                  {emp.role === 'Super Admin' && (
+                    <span style={{
+                      fontSize: '0.7rem',
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      background: 'rgba(245, 158, 11, 0.15)',
+                      color: '#b45309',
+                      fontWeight: '700',
+                      border: '1px solid rgba(245, 158, 11, 0.3)'
+                    }}>
+                      ⚡ Super Admin
+                    </span>
+                  )}
+                </div>
+              </td>
               <td>
                 <button onClick={() => setEditingEmployee(emp)} style={{marginRight: '0.5rem', padding: '0.25rem 0.5rem', background: 'rgba(37, 99, 235, 0.1)', border: '1px solid rgba(37, 99, 235, 0.3)', borderRadius: '4px', color: '#2563eb', cursor: 'pointer'}}>Edit</button>
                 <button onClick={() => handleResetPassword(emp._id)} style={{marginRight: '0.5rem', padding: '0.25rem 0.5rem', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '4px', color: '#f59e0b', cursor: 'pointer'}}>Reset Pass</button>
-                <button onClick={() => handleDeleteEmployee(emp._id)} style={{padding: '0.25rem 0.5rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#ef4444', cursor: 'pointer'}}>Delete</button>
+                {emp.role === 'Super Admin' ? (
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontStyle: 'italic', padding: '0.25rem 0.5rem' }}>Protected</span>
+                ) : (
+                  <button onClick={() => handleDeleteEmployee(emp._id)} style={{padding: '0.25rem 0.5rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#ef4444', cursor: 'pointer'}}>Delete</button>
+                )}
               </td>
             </tr>
           ))}
@@ -2372,7 +2393,11 @@ const AdminDashboard = () => {
             <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: '#64748b'}} onClick={() => setShowAddEmployeeModal(false)}>&times;</span>
             <h3 className={styles.cardTitle} style={{marginBottom: '0.5rem', color: '#0f172a'}}>Add New Employee</h3>
             <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1.25rem', lineHeight: '1.4' }}>
-              Enter the employee's Gmail address. Once saved, they can immediately sign in using <strong>"Continue with Google"</strong> to access the Site Employee Portal.
+              Enter a staff member or site engineer's Gmail address. Once saved, they can immediately sign in using <strong>"Continue with Google"</strong> to access the Site Employee Portal.
+              <br />
+              <span style={{ display: 'inline-block', marginTop: '6px', color: '#059669', fontWeight: '500' }}>
+                ✓ Note: Your Super Admin account (sudaaher74@gmail.com) is already active and has access to both portals.
+              </span>
             </p>
             <form onSubmit={handleAddEmployee} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
               <div>

@@ -18,8 +18,7 @@ router.get('/stats', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager'), as
 
     const { count: totalEmployees } = await supabase
       .from('users')
-      .select('*', { count: 'exact', head: true })
-      .eq('role', 'Employee');
+      .select('*', { count: 'exact', head: true });
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -61,13 +60,12 @@ router.get('/site-visits', auth, authorizeRoles(...ADMIN_ROLES, 'Project Manager
   }
 });
 
-// Get All Employees
+// Get All Employees / Staff Directory
 router.get('/employees', auth, authorizeRoles(...ADMIN_ROLES), async (req, res) => {
   try {
     const { data: employees, error } = await supabase
       .from('users')
       .select('id, full_name, email, mobile_number, role, employee_id, is_active, created_at, profile_photo, designation')
-      .eq('role', 'Employee')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -79,7 +77,7 @@ router.get('/employees', auth, authorizeRoles(...ADMIN_ROLES), async (req, res) 
       mobileNumber: emp.mobile_number,
       role: emp.role,
       employeeId: emp.employee_id,
-      designation: emp.designation || 'Site Engineer',
+      designation: emp.designation || (emp.role === 'Super Admin' ? 'Director / Super Admin' : 'Site Engineer'),
       isActive: emp.is_active,
       createdAt: emp.created_at,
       profilePhoto: emp.profile_photo,
@@ -182,6 +180,16 @@ router.put('/employees/:id', auth, authorizeRoles(...ADMIN_ROLES), async (req, r
 // Delete Employee
 router.delete('/employees/:id', auth, authorizeRoles(...ADMIN_ROLES), async (req, res) => {
   try {
+    const { data: targetUser } = await supabase
+      .from('users')
+      .select('role, id, email')
+      .eq('id', req.params.id)
+      .maybeSingle();
+
+    if (targetUser && targetUser.role === 'Super Admin') {
+      return res.status(403).json({ msg: 'Super Admin accounts cannot be deleted.' });
+    }
+
     const { error } = await supabase
       .from('users')
       .delete()
