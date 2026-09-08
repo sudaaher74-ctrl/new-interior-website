@@ -604,7 +604,7 @@ const EmployeeDashboard = () => {
             </button>
           </div>
           {deferredPrompt && (
-            <div style={{ padding: '1rem', borderTop: '1px solid var(--border-color)' }}>
+            <div className={styles.sidebarInstall} style={{ padding: '1rem', borderTop: '1px solid var(--border-color)' }}>
               <button 
                 onClick={handleInstallClick} 
                 className={`${styles.btn} ${styles.btnPrimary}`} 

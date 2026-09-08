@@ -8,7 +8,42 @@
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" id="apple-mobile-title" content="OS Interiors">
     <meta name="mobile-web-app-capable" content="yes">
+
+    <script>
+      (function() {
+        var p = window.location.pathname;
+        var isEmp = p.startsWith('/employee');
+        var isAdmin = p.startsWith('/admin');
+        var isLogin = p.startsWith('/login');
+        if (isEmp || isAdmin || isLogin) {
+          var href = isAdmin ? '/manifest-admin.webmanifest' : '/manifest-employee.webmanifest';
+          var title = isAdmin ? 'OS Admin' : 'OS Portal';
+          
+          function syncManifest() {
+            var links = document.querySelectorAll('link[rel="manifest"]');
+            if (links.length === 0) {
+              var l = document.createElement('link');
+              l.rel = 'manifest';
+              l.href = href;
+              document.head.appendChild(l);
+            } else {
+              links[0].href = href;
+              for (var i = 1; i < links.length; i++) {
+                links[i].parentNode && links[i].parentNode.removeChild(links[i]);
+              }
+            }
+          }
+          syncManifest();
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', syncManifest);
+          }
+          var apple = document.getElementById('apple-mobile-title');
+          if (apple) apple.content = title;
+        }
+      })();
+    </script>
 
     <!-- Primary SEO Meta Tags -->
     <title>OS Interiors — Commercial Interior & Turnkey Fit-Out Contractor | Mumbai</title>

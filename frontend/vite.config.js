@@ -78,6 +78,22 @@ export default defineConfig({
             purpose: 'any maskable',
           }
         ],
+        shortcuts: [
+          {
+            name: 'Employee Portal',
+            short_name: 'Employee',
+            description: 'Open Employee Operations Portal',
+            url: '/employee',
+            icons: [{ src: '/favicon.svg', sizes: 'any' }]
+          },
+          {
+            name: 'Admin Dashboard',
+            short_name: 'Admin',
+            description: 'Open Admin ERP Dashboard',
+            url: '/admin',
+            icons: [{ src: '/favicon.svg', sizes: 'any' }]
+          }
+        ],
       },
     })
   ],

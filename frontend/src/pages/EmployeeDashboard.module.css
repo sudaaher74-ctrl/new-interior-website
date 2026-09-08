@@ -686,8 +686,8 @@
     box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
   }
   
-  .brand, .userProfile {
-    display: none; /* Hide brand and profile on mobile bottom nav */
+  .brand, .userProfile, .sidebarInstall {
+    display: none; /* Hide brand, profile, and sidebar install on mobile bottom nav */
   }
   
   .navMenu {

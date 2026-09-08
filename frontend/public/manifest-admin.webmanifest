@@ -1,0 +1,62 @@
+{
+  "id": "/admin",
+  "name": "OS Interiors — Admin ERP",
+  "short_name": "OS Admin",
+  "description": "Enterprise Administration & Management Portal for OS Interiors.",
+  "start_url": "/admin",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Admin Overview",
+      "short_name": "Overview",
+      "description": "Open Admin Dashboard",
+      "url": "/admin",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Site Visits",
+      "short_name": "Visits",
+      "description": "View company-wide site visits",
+      "url": "/admin?tab=visits",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Attendance Tracker",
+      "short_name": "Attendance",
+      "description": "Staff attendance matrix",
+      "url": "/admin?tab=attendance",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    }
+  ]
+}

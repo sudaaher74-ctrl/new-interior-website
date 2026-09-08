@@ -1,6 +1,7 @@
 import { useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { getToken, isAdmin } from './api/session';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
@@ -56,6 +57,75 @@ function ScrollToTop() {
   return null;
 }
 
+// Synchronizes Web App Manifest, Apple mobile web app metadata, and handles
+// home-screen standalone launch redirection directly to dashboards.
+function PWAHandler() {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const isEmp = pathname.startsWith('/employee');
+    const isAdminRoute = pathname.startsWith('/admin');
+    const isLogin = pathname.startsWith('/login');
+
+    let manifestHref = '/manifest.webmanifest';
+    let appTitle = 'OS Interiors';
+
+    if (isEmp) {
+      manifestHref = '/manifest-employee.webmanifest';
+      appTitle = 'OS Portal';
+    } else if (isAdminRoute) {
+      manifestHref = '/manifest-admin.webmanifest';
+      appTitle = 'OS Admin';
+    } else if (isLogin) {
+      manifestHref = '/manifest-employee.webmanifest';
+      appTitle = 'OS Portal';
+    }
+
+    const links = document.querySelectorAll('link[rel="manifest"]');
+    if (links.length === 0) {
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = manifestHref;
+      document.head.appendChild(link);
+    } else {
+      links[0].href = manifestHref;
+      for (let i = 1; i < links.length; i++) {
+        links[i].parentNode && links[i].parentNode.removeChild(links[i]);
+      }
+    }
+
+    let appleTitle = document.getElementById('apple-mobile-title');
+    if (!appleTitle) {
+      appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+    }
+    if (!appleTitle) {
+      appleTitle = document.createElement('meta');
+      appleTitle.id = 'apple-mobile-title';
+      appleTitle.name = 'apple-mobile-web-app-title';
+      document.head.appendChild(appleTitle);
+    }
+    appleTitle.content = appTitle;
+
+    // When the app is launched from the mobile home screen in standalone mode,
+    // prevent landing on the customer marketing homepage if an employee is logged in.
+    const inStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true;
+
+    if (inStandalone && pathname === '/') {
+      const token = getToken();
+      if (token) {
+        navigate(isAdmin() ? '/admin' : '/employee', { replace: true });
+      } else {
+        navigate('/login', { replace: true });
+      }
+    }
+  }, [pathname, navigate]);
+
+  return null;
+}
+
 // Dashboards are behind a login and load on their own route, so a plain text
 // fallback is enough — nothing here is on the marketing critical path.
 const Lazily = ({ children }) => (
@@ -65,6 +135,7 @@ const Lazily = ({ children }) => (
 function App() {
   return (
     <Router>
+      <PWAHandler />
       <InstallPWA />
       <ScrollToTop />
       <Toaster position="top-right" />
