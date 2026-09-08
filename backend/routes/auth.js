@@ -173,7 +173,6 @@ router.post('/google', loginLimiter, async (req, res) => {
       new Set([
         'team.osinteriors@gmail.com',
         'sudaaher74@gmail.com',
-        'milquufresh@gmail.com',
         ...configuredAdminEmails,
       ])
     );

@@ -104,6 +104,7 @@ const AdminDashboard = () => {
   const [editingLead, setEditingLead] = useState(null);
   const [selectedTrackingEmployee, setSelectedTrackingEmployee] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [employeeRoleFilter, setEmployeeRoleFilter] = useState('all');
 
   const handleExportCSV = (data, filename) => {
     if (!data || data.length === 0) {
@@ -2150,17 +2151,77 @@ const AdminDashboard = () => {
 
 
   const renderEmployeesTab = () => {
-    const filteredEmployees = employees.filter(e => 
+    const roleFiltered = employees.filter(e => {
+      if (employeeRoleFilter === 'employees') return e.role === 'Employee';
+      if (employeeRoleFilter === 'admins') return ['Super Admin', 'Owner', 'Admin'].includes(e.role);
+      return true;
+    });
+
+    const filteredEmployees = roleFiltered.filter(e => 
       (e.fullName && e.fullName.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (e.name && e.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (e.designation && e.designation.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (e.employeeId && e.employeeId.toLowerCase().includes(searchQuery.toLowerCase()))
+      (e.employeeId && e.employeeId.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (e.email && e.email.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     return (
     <div className={`${styles.tableContainer} ${styles.fadeInUp} ${styles.delay1}`}>
-      <div className={styles.tableHeader} style={{ flexWrap: 'wrap', gap: '1rem' }}>
-        <h2 className={styles.pageTitle} style={{fontSize: '1.5rem', margin: 0}}>Employees Management</h2>
+      <div className={styles.tableHeader} style={{ flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <h2 className={styles.pageTitle} style={{fontSize: '1.5rem', margin: '0 0 0.5rem 0'}}>Employees Management</h2>
+          {/* Quick Filter Pills */}
+          <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setEmployeeRoleFilter('all')}
+              style={{
+                padding: '0.3rem 0.75rem',
+                borderRadius: '20px',
+                fontSize: '0.8rem',
+                fontWeight: employeeRoleFilter === 'all' ? '600' : '400',
+                background: employeeRoleFilter === 'all' ? '#2563eb' : '#f1f5f9',
+                color: employeeRoleFilter === 'all' ? '#ffffff' : '#475569',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              All Staff ({employees.length})
+            </button>
+            <button
+              onClick={() => setEmployeeRoleFilter('employees')}
+              style={{
+                padding: '0.3rem 0.75rem',
+                borderRadius: '20px',
+                fontSize: '0.8rem',
+                fontWeight: employeeRoleFilter === 'employees' ? '600' : '400',
+                background: employeeRoleFilter === 'employees' ? '#2563eb' : '#f1f5f9',
+                color: employeeRoleFilter === 'employees' ? '#ffffff' : '#475569',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              Employees ({employees.filter(e => e.role === 'Employee').length})
+            </button>
+            <button
+              onClick={() => setEmployeeRoleFilter('admins')}
+              style={{
+                padding: '0.3rem 0.75rem',
+                borderRadius: '20px',
+                fontSize: '0.8rem',
+                fontWeight: employeeRoleFilter === 'admins' ? '600' : '400',
+                background: employeeRoleFilter === 'admins' ? '#2563eb' : '#f1f5f9',
+                color: employeeRoleFilter === 'admins' ? '#ffffff' : '#475569',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              Admins ({employees.filter(e => ['Super Admin', 'Owner', 'Admin'].includes(e.role)).length})
+            </button>
+          </div>
+        </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <input 
             type="text" 
@@ -2184,42 +2245,54 @@ const AdminDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredEmployees.map((emp) => (
-            <tr key={emp._id}>
-              <td>{emp.employeeId || emp._id.substring(0, 6)}</td>
-              <td style={{fontWeight: '500'}}>{emp.fullName || emp.name}</td>
-              <td>{emp.email || emp.mobileNumber || '-'}</td>
-              <td>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  <span>{emp.designation || emp.role}</span>
-                  {emp.role === 'Super Admin' && (
-                    <span style={{
-                      fontSize: '0.7rem',
-                      padding: '2px 8px',
-                      borderRadius: '12px',
-                      background: 'rgba(245, 158, 11, 0.15)',
-                      color: '#b45309',
-                      fontWeight: '700',
-                      border: '1px solid rgba(245, 158, 11, 0.3)'
-                    }}>
-                      ⚡ Super Admin
-                    </span>
+          {filteredEmployees.map((emp) => {
+            const isSelf = emp.email === adminUser?.email || emp.id === adminUser?.id || emp._id === adminUser?.id;
+            const isMaster = emp.email === 'team.osinteriors@gmail.com';
+
+            return (
+              <tr key={emp._id}>
+                <td>{emp.employeeId || emp._id.substring(0, 6)}</td>
+                <td style={{fontWeight: '500'}}>
+                  {emp.fullName || emp.name}
+                  {isSelf && (
+                    <span style={{ marginLeft: '6px', fontSize: '0.72rem', color: '#059669', fontWeight: '600' }}>(You)</span>
                   )}
-                </div>
-              </td>
-              <td>
-                <button onClick={() => setEditingEmployee(emp)} style={{marginRight: '0.5rem', padding: '0.25rem 0.5rem', background: 'rgba(37, 99, 235, 0.1)', border: '1px solid rgba(37, 99, 235, 0.3)', borderRadius: '4px', color: '#2563eb', cursor: 'pointer'}}>Edit</button>
-                <button onClick={() => handleResetPassword(emp._id)} style={{marginRight: '0.5rem', padding: '0.25rem 0.5rem', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '4px', color: '#f59e0b', cursor: 'pointer'}}>Reset Pass</button>
-                {emp.role === 'Super Admin' ? (
-                  <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontStyle: 'italic', padding: '0.25rem 0.5rem' }}>Protected</span>
-                ) : (
-                  <button onClick={() => handleDeleteEmployee(emp._id)} style={{padding: '0.25rem 0.5rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#ef4444', cursor: 'pointer'}}>Delete</button>
-                )}
-              </td>
-            </tr>
-          ))}
+                </td>
+                <td>{emp.email || emp.mobileNumber || '-'}</td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <span>{emp.designation || emp.role}</span>
+                    {emp.role === 'Super Admin' && (
+                      <span style={{
+                        fontSize: '0.7rem',
+                        padding: '2px 8px',
+                        borderRadius: '12px',
+                        background: 'rgba(245, 158, 11, 0.15)',
+                        color: '#b45309',
+                        fontWeight: '700',
+                        border: '1px solid rgba(245, 158, 11, 0.3)'
+                      }}>
+                        ⚡ Super Admin
+                      </span>
+                    )}
+                  </div>
+                </td>
+                <td>
+                  <button onClick={() => setEditingEmployee(emp)} style={{marginRight: '0.5rem', padding: '0.25rem 0.5rem', background: 'rgba(37, 99, 235, 0.1)', border: '1px solid rgba(37, 99, 235, 0.3)', borderRadius: '4px', color: '#2563eb', cursor: 'pointer'}}>Edit</button>
+                  <button onClick={() => handleResetPassword(emp._id)} style={{marginRight: '0.5rem', padding: '0.25rem 0.5rem', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '4px', color: '#f59e0b', cursor: 'pointer'}}>Reset Pass</button>
+                  {isSelf ? (
+                    <span style={{ fontSize: '0.75rem', color: '#059669', fontWeight: '600', padding: '0.25rem 0.5rem' }}>Active User</span>
+                  ) : isMaster ? (
+                    <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontStyle: 'italic', padding: '0.25rem 0.5rem' }}>Primary Admin</span>
+                  ) : (
+                    <button onClick={() => handleDeleteEmployee(emp._id)} style={{padding: '0.25rem 0.5rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#ef4444', cursor: 'pointer'}}>Delete</button>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
           {filteredEmployees.length === 0 && (
-            <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>No employees found matching "{searchQuery}".</td></tr>
+            <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>No staff or employees found matching the current filter.</td></tr>
           )}
         </tbody>
       </table>

@@ -186,8 +186,16 @@ router.delete('/employees/:id', auth, authorizeRoles(...ADMIN_ROLES), async (req
       .eq('id', req.params.id)
       .maybeSingle();
 
-    if (targetUser && targetUser.role === 'Super Admin') {
-      return res.status(403).json({ msg: 'Super Admin accounts cannot be deleted.' });
+    if (!targetUser) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    if (targetUser.id === req.user.id || targetUser.email === req.user.email) {
+      return res.status(400).json({ msg: 'You cannot delete your own logged-in account.' });
+    }
+
+    if (targetUser.email === 'team.osinteriors@gmail.com') {
+      return res.status(403).json({ msg: 'The primary company master account (team.osinteriors@gmail.com) cannot be deleted.' });
     }
 
     const { error } = await supabase
@@ -196,7 +204,7 @@ router.delete('/employees/:id', auth, authorizeRoles(...ADMIN_ROLES), async (req
       .eq('id', req.params.id);
 
     if (error) throw error;
-    res.json({ msg: 'Employee removed' });
+    res.json({ msg: 'Employee removed successfully' });
   } catch (err) {
     console.error('Admin delete employee error:', err);
     res.status(500).send('Server error');
