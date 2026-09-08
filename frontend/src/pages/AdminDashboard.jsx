@@ -2370,27 +2370,61 @@ const AdminDashboard = () => {
         <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.6)', zIndex: 9999, backdropFilter: 'blur(8px)'}}>
           <div className={styles.glassCard} style={{maxWidth: '500px', width: '90%', padding: '2rem', position: 'relative', background: '#ffffff', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'}}>
             <span style={{position: 'absolute', top: '15px', right: '20px', fontSize: '2rem', cursor: 'pointer', color: '#64748b'}} onClick={() => setShowAddEmployeeModal(false)}>&times;</span>
-            <h3 className={styles.cardTitle} style={{marginBottom: '1.5rem', color: '#0f172a'}}>Add New Employee</h3>
+            <h3 className={styles.cardTitle} style={{marginBottom: '0.5rem', color: '#0f172a'}}>Add New Employee</h3>
+            <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1.25rem', lineHeight: '1.4' }}>
+              Enter the employee's Gmail address. Once saved, they can immediately sign in using <strong>"Continue with Google"</strong> to access the Site Employee Portal.
+            </p>
             <form onSubmit={handleAddEmployee} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
               <div>
-                <label style={modalLabelStyle}>Full Name</label>
-                <input type="text" required value={newEmployee.fullName} onChange={e => setNewEmployee({...newEmployee, fullName: e.target.value})} style={modalInputStyle} placeholder="e.g. Rahul Sharma" />
+                <label style={modalLabelStyle}>Email Address <span style={{ color: '#ef4444' }}>*</span></label>
+                <input 
+                  type="email" 
+                  required 
+                  value={newEmployee.email} 
+                  onChange={e => setNewEmployee({...newEmployee, email: e.target.value})} 
+                  style={modalInputStyle} 
+                  placeholder="employee@gmail.com" 
+                />
               </div>
               <div>
-                <label style={modalLabelStyle}>Email</label>
-                <input type="email" required value={newEmployee.email} onChange={e => setNewEmployee({...newEmployee, email: e.target.value})} style={modalInputStyle} placeholder="rahul@osinterior.in" />
+                <label style={modalLabelStyle}>Full Name <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 'normal' }}>(Optional)</span></label>
+                <input 
+                  type="text" 
+                  value={newEmployee.fullName} 
+                  onChange={e => setNewEmployee({...newEmployee, fullName: e.target.value})} 
+                  style={modalInputStyle} 
+                  placeholder="e.g. Rahul Sharma" 
+                />
               </div>
               <div>
-                <label style={modalLabelStyle}>Password</label>
-                <input type="password" required value={newEmployee.password} onChange={e => setNewEmployee({...newEmployee, password: e.target.value})} style={modalInputStyle} placeholder="••••••••" />
+                <label style={modalLabelStyle}>Mobile Number <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 'normal' }}>(Optional)</span></label>
+                <input 
+                  type="tel" 
+                  value={newEmployee.mobileNumber} 
+                  onChange={e => setNewEmployee({...newEmployee, mobileNumber: e.target.value})} 
+                  style={modalInputStyle} 
+                  placeholder="+91 98765 43210" 
+                />
               </div>
               <div>
-                <label style={modalLabelStyle}>Mobile Number</label>
-                <input type="tel" required value={newEmployee.mobileNumber} onChange={e => setNewEmployee({...newEmployee, mobileNumber: e.target.value})} style={modalInputStyle} placeholder="+91 98765 43210" />
+                <label style={modalLabelStyle}>Designation <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 'normal' }}>(Optional - default: Site Engineer)</span></label>
+                <input 
+                  type="text" 
+                  value={newEmployee.designation} 
+                  onChange={e => setNewEmployee({...newEmployee, designation: e.target.value})} 
+                  placeholder="e.g. Site Engineer" 
+                  style={modalInputStyle} 
+                />
               </div>
               <div>
-                <label style={modalLabelStyle}>Designation</label>
-                <input type="text" value={newEmployee.designation} onChange={e => setNewEmployee({...newEmployee, designation: e.target.value})} placeholder="e.g. Site Engineer" style={modalInputStyle} />
+                <label style={modalLabelStyle}>Fallback Password <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 'normal' }}>(Optional - default: osinterior123)</span></label>
+                <input 
+                  type="password" 
+                  value={newEmployee.password} 
+                  onChange={e => setNewEmployee({...newEmployee, password: e.target.value})} 
+                  style={modalInputStyle} 
+                  placeholder="Leave blank for default: osinterior123" 
+                />
               </div>
               <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} style={{marginTop: '0.5rem', width: '100%'}}>Save Employee</button>
             </form>

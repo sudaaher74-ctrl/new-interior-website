@@ -66,7 +66,7 @@ router.get('/employees', auth, authorizeRoles(...ADMIN_ROLES), async (req, res) 
   try {
     const { data: employees, error } = await supabase
       .from('users')
-      .select('id, full_name, email, mobile_number, role, employee_id, is_active, created_at, profile_photo')
+      .select('id, full_name, email, mobile_number, role, employee_id, is_active, created_at, profile_photo, designation')
       .eq('role', 'Employee')
       .order('created_at', { ascending: false });
 
@@ -79,6 +79,7 @@ router.get('/employees', auth, authorizeRoles(...ADMIN_ROLES), async (req, res) 
       mobileNumber: emp.mobile_number,
       role: emp.role,
       employeeId: emp.employee_id,
+      designation: emp.designation || 'Site Engineer',
       isActive: emp.is_active,
       createdAt: emp.created_at,
       profilePhoto: emp.profile_photo,
@@ -94,38 +95,54 @@ router.get('/employees', auth, authorizeRoles(...ADMIN_ROLES), async (req, res) 
 router.post('/employees', auth, authorizeRoles(...ADMIN_ROLES), async (req, res) => {
   const { fullName, email, password, mobileNumber, designation } = req.body;
   try {
+    if (!email || !String(email).trim()) {
+      return res.status(400).json({ msg: 'Employee email address is required' });
+    }
+
     const cleanEmail = String(email).toLowerCase().trim();
     const { data: existingUser } = await supabase
       .from('users')
-      .select('id')
+      .select('id, role')
       .eq('email', cleanEmail)
       .maybeSingle();
 
     if (existingUser) {
-      return res.status(400).json({ msg: 'User already exists' });
+      return res.status(400).json({
+        msg: existingUser.role === 'Super Admin'
+          ? `${cleanEmail} is already registered as a Super Admin with access to both portals.`
+          : `A user with email ${cleanEmail} already exists (${existingUser.role}).`
+      });
     }
 
+    const defaultPassword = password && String(password).trim() ? String(password).trim() : 'osinterior123';
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(defaultPassword, salt);
 
     const { count } = await supabase.from('users').select('*', { count: 'exact', head: true });
     const employeeId = 'EMP' + ((count || 0) + 1).toString().padStart(3, '0');
+
+    // Auto-generate full name from email if not provided (e.g. rahul.sharma -> Rahul Sharma)
+    const defaultName = fullName && String(fullName).trim()
+      ? String(fullName).trim()
+      : cleanEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
     const { data: user, error } = await supabase
       .from('users')
       .insert({
         employee_id: employeeId,
-        full_name: fullName,
+        full_name: defaultName,
         email: cleanEmail,
         password: hashedPassword,
-        mobile_number: mobileNumber,
+        mobile_number: mobileNumber ? String(mobileNumber).trim() : null,
+        designation: designation && String(designation).trim() ? String(designation).trim() : 'Site Engineer',
         role: 'Employee',
+        is_active: true
       })
       .select()
       .single();
 
     if (error) throw error;
-    res.json({ msg: 'Employee created successfully', user: { id: user.id, fullName: user.full_name } });
+    res.json({ msg: 'Employee created successfully', user: { id: user.id, fullName: user.full_name, employeeId: user.employee_id } });
   } catch (err) {
     console.error('Admin create employee error:', err);
     res.status(500).send('Server error');
@@ -140,6 +157,7 @@ router.put('/employees/:id', auth, authorizeRoles(...ADMIN_ROLES), async (req, r
     if (fullName) updates.full_name = fullName;
     if (email) updates.email = String(email).toLowerCase().trim();
     if (mobileNumber !== undefined) updates.mobile_number = mobileNumber;
+    if (designation !== undefined) updates.designation = designation;
 
     if (password) {
       const salt = await bcrypt.genSalt(10);
