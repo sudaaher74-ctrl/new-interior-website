@@ -164,7 +164,21 @@ router.post('/google', loginLimiter, async (req, res) => {
       if (byEmail) existingUser = byEmail;
     }
 
-    const ADMIN_GOOGLE_EMAIL = 'team.osinteriors@gmail.com';
+    const configuredAdminEmails = (process.env.ADMIN_GOOGLE_EMAILS || '')
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
+
+    const ADMIN_GOOGLE_EMAILS = Array.from(
+      new Set([
+        'team.osinteriors@gmail.com',
+        'sudaaher74@gmail.com',
+        'milquufresh@gmail.com',
+        ...configuredAdminEmails,
+      ])
+    );
+
+    const isAdminEmail = ADMIN_GOOGLE_EMAILS.includes(email);
 
     let userRow;
 
@@ -174,14 +188,14 @@ router.post('/google', loginLimiter, async (req, res) => {
         return res.status(403).json({ msg: 'Your account has been deactivated. Please contact your admin.' });
       }
 
-      // ✋ Strict Access Control: ONLY team.osinteriors@gmail.com can hold Admin/Super Admin privileges via Google
+      // ✋ Strict Access Control: ONLY authorized emails can hold Admin/Super Admin privileges via Google
       let finalRole = existingUser.role;
-      if (email === ADMIN_GOOGLE_EMAIL) {
+      if (isAdminEmail) {
         finalRole = 'Super Admin';
       } else if (['Super Admin', 'Owner', 'Admin'].includes(finalRole)) {
         console.warn(`Blocked non-authorized Google admin access attempt from ${email}`);
         return res.status(403).json({
-          msg: 'Admin portal access via Google is exclusively restricted to team.osinteriors@gmail.com.',
+          msg: 'Admin portal access via Google is restricted to authorized administrators.',
         });
       }
 
@@ -202,19 +216,29 @@ router.post('/google', loginLimiter, async (req, res) => {
         userRow = existingUser;
       }
     } else {
-      // Auto-provision team.osinteriors@gmail.com as Super Admin if not already present
-      if (email === ADMIN_GOOGLE_EMAIL) {
+      // Auto-provision authorized admin emails as Super Admin if not already present
+      if (isAdminEmail) {
+        const defaultEmpId =
+          email === 'team.osinteriors@gmail.com'
+            ? 'ADM-001'
+            : email === 'sudaaher74@gmail.com'
+            ? 'ADM-002'
+            : `ADM-${Date.now().toString().slice(-4)}`;
+        const defaultName =
+          fullName ||
+          (email === 'sudaaher74@gmail.com' ? 'Sudarshan Aher' : 'OS Interiors Admin');
+
         const { data: newAdmin, error: createErr } = await supabase
           .from('users')
           .insert({
-            email: ADMIN_GOOGLE_EMAIL,
-            full_name: fullName || 'OS Interiors Admin',
+            email,
+            full_name: defaultName,
             role: 'Super Admin',
             google_id: googleId,
             profile_photo: profilePhoto,
             auth_provider: 'google',
-            employee_id: 'ADM-001',
-            is_active: true
+            employee_id: defaultEmpId,
+            is_active: true,
           })
           .select()
           .single();

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import NotificationBell from '../components/NotificationBell';
+import { isAdmin } from '../api/session';
 import styles from './EmployeeDashboard.module.css';
 
 const EmployeeDashboard = () => {
@@ -561,6 +562,25 @@ const EmployeeDashboard = () => {
             <button className={`${styles.navItem} ${activeTab === 'attendance' ? styles.active : ''}`} onClick={() => setActiveTab('attendance')}><span>⏰</span> Attendance</button>
             <button className={`${styles.navItem} ${activeTab === 'leaves' ? styles.active : ''}`} onClick={() => setActiveTab('leaves')}><span>🏖️</span> Leave Requests</button>
             <button className={`${styles.navItem} ${activeTab === 'profile' ? styles.active : ''}`} onClick={() => setActiveTab('profile')}><span>👤</span> My Profile</button>
+            {isAdmin(user) && (
+              <>
+                <div style={{ margin: '0.75rem 0', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }} />
+                <button
+                  type="button"
+                  className={styles.navItem}
+                  onClick={() => navigate('/admin')}
+                  style={{
+                    color: '#f59e0b',
+                    background: 'rgba(245, 158, 11, 0.08)',
+                    border: '1px solid rgba(245, 158, 11, 0.2)',
+                    fontWeight: '600',
+                  }}
+                  title="Switch to Admin Management Portal"
+                >
+                  <span>👑</span> Admin Portal
+                </button>
+              </>
+            )}
           </nav>
 
           <div className={styles.userProfile} onClick={() => setActiveTab('profile')} style={{ cursor: 'pointer' }} title="View Profile">
@@ -608,7 +628,30 @@ const EmployeeDashboard = () => {
               {activeTab === 'leaves' && 'My Leave Requests'}
               {activeTab === 'profile' && 'My Profile & Account Details'}
             </h1>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              {isAdmin(user) && (
+                <button
+                  type="button"
+                  onClick={() => navigate('/admin')}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: 'rgba(245, 158, 11, 0.12)',
+                    color: '#f59e0b',
+                    border: '1px solid rgba(245, 158, 11, 0.3)',
+                    borderRadius: '8px',
+                    padding: '6px 14px',
+                    fontSize: '0.85rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                  title="Switch to Admin Management Portal"
+                >
+                  <span>👑</span> Admin Portal
+                </button>
+              )}
               <div className={styles.dateDisplay}>{currentDate}</div>
               <NotificationBell />
             </div>

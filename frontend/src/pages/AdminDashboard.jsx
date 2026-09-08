@@ -2254,6 +2254,22 @@ const AdminDashboard = () => {
             </button>
             <button className={`${styles.navItem} ${activeTab === 'portfolio' ? styles.active : ''}`} onClick={() => setActiveTab('portfolio')}><span>🖼️</span> Portfolio Projects</button>
             <button className={`${styles.navItem} ${activeTab === 'blog' ? styles.active : ''}`} onClick={() => setActiveTab('blog')}><span>✍️</span> Blog Content</button>
+
+            <div style={{ margin: '0.75rem 0', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }} />
+            <button
+              type="button"
+              className={styles.navItem}
+              onClick={() => navigate('/employee')}
+              style={{
+                color: '#60a5fa',
+                background: 'rgba(59, 130, 246, 0.08)',
+                border: '1px solid rgba(59, 130, 246, 0.2)',
+                fontWeight: '500',
+              }}
+              title="Open Site Employee Portal"
+            >
+              <span>👷</span> Employee Portal
+            </button>
           </nav>
 
           <div className={styles.userProfile}>
@@ -2296,7 +2312,28 @@ const AdminDashboard = () => {
         <main className={styles.mainContent}>
           <header className={styles.header}>
             <h1 className={styles.pageTitle} style={{textTransform: 'capitalize'}}>{activeTab.replace('-', ' ')}</h1>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <button
+                type="button"
+                onClick={() => navigate('/employee')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'rgba(59, 130, 246, 0.12)',
+                  color: '#60a5fa',
+                  border: '1px solid rgba(59, 130, 246, 0.3)',
+                  borderRadius: '8px',
+                  padding: '6px 14px',
+                  fontSize: '0.85rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+                title="Switch to Site Employee Portal"
+              >
+                <span>👷</span> Employee Portal
+              </button>
               <div className={styles.dateDisplay}>{currentDate}</div>
               <NotificationBell />
             </div>
