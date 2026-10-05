@@ -113,9 +113,9 @@ The platform uses a role-based access matrix:
 The repository is configured for zero-configuration continuous deployment with **Vercel**:
 
 1. **Connect Repository**: Link the GitHub repository `new-interior-website` to your Vercel project.
-2. **Framework Preset**: Select **Vite** (Build command: `npm run build`, Output directory: `frontend/dist`).
+2. **Root Directory & Framework Preset**: Set **Root Directory** to `frontend` in Project Settings (or select **Next.js** framework preset). Do not set an Output Directory override; Next.js manages `.next` automatically.
 3. **Add Environment Variables**: Populate all environment variables listed in Section 4 above in **Vercel Project Settings → Environment Variables**.
-4. **Deploy**: Every push to the `main` branch automatically builds and deploys both the frontend static bundle and serverless API handlers (`/api/*`).
+4. **Deploy**: Every push to the `main` branch automatically builds and deploys the Next.js platform.
 
 ---
 
