@@ -2,17 +2,19 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
-  { label: 'Project', href: '#projects' },
-  { label: 'About Us', href: '#about' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Project', href: '/projects' },
+  { label: 'About Us', href: '/about' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -29,6 +31,23 @@ export default function Navbar() {
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : '';
   }, [mobileOpen]);
+
+  // Check if link is currently active
+  const isLinkActive = (href: string) => {
+    if (href === '/') {
+      return pathname === '/';
+    }
+    if (href === '/projects') {
+      return pathname.startsWith('/project');
+    }
+    if (href === '/about') {
+      return pathname.startsWith('/about');
+    }
+    if (href === '/contact') {
+      return pathname.startsWith('/contact');
+    }
+    return pathname.startsWith(href);
+  };
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 transition-all duration-500 pointer-events-none">
@@ -54,21 +73,35 @@ export default function Navbar() {
 
               {/* Desktop Nav Links: Home, Project, About Us, Contact */}
               <nav className="hidden md:flex items-center gap-7 lg:gap-9">
-                {NAV_LINKS.map((link) => (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    className="text-xs uppercase tracking-[0.16em] font-light text-white/80 hover:text-[#C5A880] transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+                {NAV_LINKS.map((link) => {
+                  const active = isLinkActive(link.href);
+                  return (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      className={`relative py-1 text-xs uppercase tracking-[0.16em] transition-colors ${
+                        active
+                          ? 'text-[#C5A880] font-medium'
+                          : 'text-white/80 hover:text-[#C5A880] font-light'
+                      }`}
+                    >
+                      {link.label}
+                      {active && (
+                        <motion.span
+                          layoutId="activeNavIndicator"
+                          className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-[#C5A880]"
+                          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                        />
+                      )}
+                    </Link>
+                  );
+                })}
               </nav>
 
               {/* Right CTA Button & Mobile Trigger */}
               <div className="flex items-center gap-3">
                 <Link
-                  href="#contact"
+                  href="/contact"
                   className="hidden sm:inline-flex items-center justify-center rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-[0.14em] bg-white text-black hover:bg-[#C5A880] hover:text-[#0A0A0B] transition-all duration-300 shadow-md"
                 >
                   Initiate Project
@@ -104,21 +137,29 @@ export default function Navbar() {
                 Navigation
               </span>
               <nav className="flex flex-col gap-2">
-                {NAV_LINKS.map((link) => (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    onClick={() => setMobileOpen(false)}
-                    className="py-2.5 text-sm uppercase tracking-[0.16em] text-white hover:text-[#C5A880] transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+                {NAV_LINKS.map((link) => {
+                  const active = isLinkActive(link.href);
+                  return (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={`py-2.5 text-sm uppercase tracking-[0.16em] transition-colors flex items-center justify-between ${
+                        active
+                          ? 'text-[#C5A880] font-medium'
+                          : 'text-white hover:text-[#C5A880]'
+                      }`}
+                    >
+                      <span>{link.label}</span>
+                      {active && <span className="h-1.5 w-1.5 rounded-full bg-[#C5A880]" />}
+                    </Link>
+                  );
+                })}
               </nav>
 
               <div className="pt-4 border-t border-white/10">
                 <Link
-                  href="#contact"
+                  href="/contact"
                   onClick={() => setMobileOpen(false)}
                   className="flex w-full items-center justify-center rounded-full bg-[#C5A880] text-[#0A0A0B] py-3 text-xs uppercase tracking-[0.16em] font-semibold hover:bg-white transition-all shadow-xl"
                 >

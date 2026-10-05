@@ -110,13 +110,13 @@ export default function HeroShowreel() {
           className="mt-8 flex flex-wrap items-center justify-center gap-4"
         >
           <Link
-            href="#projects"
+            href="/projects"
             className="rounded-full px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] bg-white text-black hover:bg-[#C5A880] transition-all duration-300 shadow-xl"
           >
             Explore Realizations
           </Link>
           <Link
-            href="#contact"
+            href="/contact"
             className="rounded-full px-8 py-3.5 text-xs font-light uppercase tracking-[0.16em] border border-white/20 text-white hover:border-[#C5A880] hover:text-[#C5A880] transition-all duration-300 bg-[#121216]/50 backdrop-blur-sm"
           >
             Schedule Private Audit

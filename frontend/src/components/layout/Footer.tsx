@@ -68,27 +68,27 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3 text-sm font-light text-[#A1A1AA]">
               <li>
-                <Link href="#services" className="hover:text-white transition-colors">
+                <Link href="/about" className="hover:text-white transition-colors">
                   Commercial Fit-Outs
                 </Link>
               </li>
               <li>
-                <Link href="#services" className="hover:text-white transition-colors">
+                <Link href="/about" className="hover:text-white transition-colors">
                   Spatial Masterplanning
                 </Link>
               </li>
               <li>
-                <Link href="#services" className="hover:text-white transition-colors">
+                <Link href="/projects?category=Restaurants+%26+Dining" className="hover:text-white transition-colors">
                   Hospitality &amp; Dining Spaces
                 </Link>
               </li>
               <li>
-                <Link href="#services" className="hover:text-white transition-colors">
+                <Link href="/about" className="hover:text-white transition-colors">
                   Turnkey MEP &amp; Civil Execution
                 </Link>
               </li>
               <li>
-                <Link href="#services" className="hover:text-white transition-colors">
+                <Link href="/projects?category=Bespoke+Joinery" className="hover:text-white transition-colors">
                   Bespoke Joinery &amp; Millwork
                 </Link>
               </li>
@@ -102,28 +102,28 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3 text-sm font-light text-[#A1A1AA]">
               <li>
-                <Link href="#projects" className="hover:text-white transition-colors">
+                <Link href="/projects" className="hover:text-white transition-colors">
                   Bombay Barbeque (Malad)
                 </Link>
               </li>
               <li>
-                <Link href="#projects" className="hover:text-white transition-colors">
+                <Link href="/projects" className="hover:text-white transition-colors">
                   NETWIN Ventures (CBD Belapur)
                 </Link>
               </li>
               <li>
-                <Link href="#projects" className="hover:text-white transition-colors">
+                <Link href="/projects" className="hover:text-white transition-colors">
                   99 Wok Street (Kandivali)
                 </Link>
               </li>
               <li>
-                <Link href="#projects" className="hover:text-white transition-colors">
+                <Link href="/projects" className="hover:text-white transition-colors">
                   Caravan Lounge &amp; Dining
                 </Link>
               </li>
               <li>
-                <Link href="#projects" className="text-[#C5A880] hover:underline flex items-center gap-1">
-                  <span>View All Works</span>
+                <Link href="/projects" className="text-[#C5A880] hover:underline flex items-center gap-1">
+                  <span>View All 12+ Realizations</span>
                   <ArrowUpRight className="h-3 w-3" />
                 </Link>
               </li>
@@ -137,23 +137,23 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3 text-sm font-light text-[#A1A1AA]">
               <li>
-                <Link href="#philosophy" className="hover:text-white transition-colors">
+                <Link href="/about" className="hover:text-white transition-colors">
                   Our Philosophy
                 </Link>
               </li>
               <li>
-                <Link href="#reviews" className="hover:text-white transition-colors">
-                  Client Trust
+                <Link href="/about" className="hover:text-white transition-colors">
+                  Client Trust &amp; Reviews
                 </Link>
               </li>
               <li>
-                <Link href="#faq" className="hover:text-white transition-colors">
+                <Link href="/contact" className="hover:text-white transition-colors">
                   Project Inquiries
                 </Link>
               </li>
               <li>
-                <Link href="#contact" className="hover:text-white transition-colors">
-                  Consultation
+                <Link href="/contact" className="hover:text-white transition-colors">
+                  Spatial Consultation
                 </Link>
               </li>
             </ul>

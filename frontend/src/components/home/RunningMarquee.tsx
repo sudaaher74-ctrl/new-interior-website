@@ -88,15 +88,24 @@ export default function RunningMarquee() {
             </span>
           </motion.h2>
 
-          <motion.p
+          <motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="text-sm text-[#A1A1AA] max-w-md font-light leading-relaxed"
+            className="flex flex-col items-start lg:items-end gap-3"
           >
-            Explore our portfolio of corporate campuses, luxury dining venues, flagship retail spaces, and bespoke atelier millwork delivered across metropolitan hubs.
-          </motion.p>
+            <p className="text-sm text-[#A1A1AA] max-w-md font-light leading-relaxed text-left lg:text-right">
+              Explore our portfolio of corporate campuses, luxury dining venues, flagship retail spaces, and bespoke atelier millwork delivered across metropolitan hubs.
+            </p>
+            <Link
+              href="/projects"
+              className="inline-flex items-center gap-2 rounded-full bg-white text-black hover:bg-[#C5A880] hover:text-[#0A0A0B] px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] transition-all shadow-xl"
+            >
+              <span>Explore All 12+ Projects</span>
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </motion.div>
         </div>
 
         {/* Category Filter Tabs */}
@@ -375,7 +384,7 @@ export default function RunningMarquee() {
                     Interested in replicating similar architectural finishes for your space?
                   </span>
                   <Link
-                    href="#contact"
+                    href={`/contact?project=${encodeURIComponent(selectedProject.name)}`}
                     onClick={() => setSelectedProject(null)}
                     className="w-full sm:w-auto inline-flex items-center justify-center rounded-full px-8 py-3 text-xs font-semibold uppercase tracking-[0.16em] bg-[#C5A880] text-[#0A0A0B] hover:bg-white transition-all shadow-xl"
                   >
