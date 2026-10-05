@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 import { Poppins, Cormorant_Garamond } from 'next/font/google';
-import Script from 'next/script';
 import './globals.css';
 import SiteShell from '@/components/layout/SiteShell';
 
@@ -74,25 +73,26 @@ export default function RootLayout({
       lang="en"
       className={`${poppins.variable} ${cormorant.variable} scroll-smooth`}
     >
-      <body className="bg-[#0A0A0B] text-[#D4D4D8] font-sans antialiased selection:bg-[#C5A880] selection:text-[#0A0A0B]">
+      <head>
         {/* Google tag (gtag.js) */}
-        <Script
-          strategy="afterInteractive"
-          src="https://www.googletagmanager.com/gtag/js?id=G-5WYK0F8R4T"
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-F20YCSZN2V"
         />
-        <Script
-          id="google-analytics"
-          strategy="afterInteractive"
+        <script
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
 
+              gtag('config', 'G-F20YCSZN2V');
               gtag('config', 'G-5WYK0F8R4T');
             `,
           }}
         />
+      </head>
+      <body className="bg-[#0A0A0B] text-[#D4D4D8] font-sans antialiased selection:bg-[#C5A880] selection:text-[#0A0A0B]">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
