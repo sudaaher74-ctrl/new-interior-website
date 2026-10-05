@@ -16,11 +16,11 @@ app.use(helmet({
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://accounts.google.com/gsi/client", "https://apis.google.com"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://accounts.google.com/gsi/client", "https://apis.google.com", "https://www.googletagmanager.com"],
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://unpkg.com", "https://accounts.google.com/gsi/style"],
         fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
-        imgSrc: ["'self'", "data:", "blob:", "https://*.basemaps.cartocdn.com", "https://res.cloudinary.com", "https://unpkg.com", "https://lh3.googleusercontent.com", "https://*.googleusercontent.com"],
-        connectSrc: ["'self'", "https://api.cloudinary.com", "https://accounts.google.com/gsi/"],
+        imgSrc: ["'self'", "data:", "blob:", "https://*.basemaps.cartocdn.com", "https://res.cloudinary.com", "https://unpkg.com", "https://lh3.googleusercontent.com", "https://*.googleusercontent.com", "https://*.google-analytics.com", "https://*.googletagmanager.com"],
+        connectSrc: ["'self'", "https://api.cloudinary.com", "https://accounts.google.com/gsi/", "https://*.google-analytics.com", "https://*.analytics.google.com", "https://*.googletagmanager.com"],
         frameSrc: ["'self'", "https://accounts.google.com/gsi/"],
       },
     },
