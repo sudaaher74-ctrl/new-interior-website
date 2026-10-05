@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0A0A0B;
+  --surface: #121216;
+  --surface-elevated: #181820;
+  --deep-footer: #050505;
+  --accent: #C5A880;
+  --accent-light: #E2C799;
+  --accent-muted: #8D7458;
+  --ink: #FFFFFF;
+  --ink-secondary: #D4D4D8;
+  --ink-muted: #A1A1AA;
+  --line: rgba(255, 255, 255, 0.10);
+  --line-divider: rgba(255, 255, 255, 0.05);
+  --line-hover: rgba(197, 168, 128, 0.50);
+}
+
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: auto; /* Lenis handles inertia smooth scroll */
+    background-color: var(--bg);
+    color: var(--ink-secondary);
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--ink-secondary);
+    font-family: var(--font-poppins), sans-serif;
+    font-weight: 300;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Text Selection styling */
+  ::selection {
+    background-color: #C5A880;
+    color: #0A0A0B;
+  }
+
+  /* Lenis CSS integration */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
+    color: var(--ink);
+  }
+}
+
+@layer components {
+  /* Standard Editorial Container */
+  .container-px {
+    @apply mx-auto w-full px-5 sm:px-8 max-w-[1400px];
+  }
+
+  /* Glass pill navbar */
+  .glass-pill {
+    background-color: rgba(10, 10, 11, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  /* Editorial Card Surface */
+  .luxury-card {
+    background-color: #121216;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    transition: border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .luxury-card:hover {
+    border-color: rgba(197, 168, 128, 0.50);
+  }
+
+  /* Gold Hairline Divider */
+  .gold-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(197, 168, 128, 0.6) 50%, transparent);
+  }
+
+  /* Subtle Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0A0A0B;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #181820;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #C5A880;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
