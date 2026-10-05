@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 
 export default function EditorialManifesto() {
   return (
-    <section id="philosophy" className="relative overflow-hidden bg-[#0A0A0B] text-white py-24 md:py-36 px-5 sm:px-8 border-b border-white/10">
+    <section id="about" className="relative overflow-hidden bg-[#0A0A0B] text-white py-24 md:py-36 px-5 sm:px-8 border-b border-white/10">
+      <span id="philosophy" className="sr-only" />
       {/* Subtle ambient radial background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-[#C5A880]/5 blur-[120px] rounded-full pointer-events-none" />
 

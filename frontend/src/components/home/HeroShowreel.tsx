@@ -19,7 +19,7 @@ export default function HeroShowreel() {
   };
 
   return (
-    <section className="relative h-screen min-h-[640px] w-full overflow-hidden bg-[#0A0A0B] flex items-center justify-center">
+    <section id="home" className="relative h-screen min-h-[640px] w-full overflow-hidden bg-[#0A0A0B] flex items-center justify-center">
       {/* Background Media Container */}
       <div className="absolute inset-0 z-0">
         {/* Architectural Background Media */}
