@@ -4,6 +4,10 @@ export interface ProjectItem {
   category: string;
   image: string;
   slug: string;
+  gallery?: string[];
+  scope?: string;
+  deliverables?: string[];
+  description?: string;
 }
 
 export interface MetricItem {
@@ -68,55 +72,126 @@ export const METRICS: MetricItem[] = [
   },
 ];
 
-export const MARQUEE_PROJECTS: ProjectItem[] = [
+export const ALL_PROJECTS: ProjectItem[] = [
   {
     name: 'BOMBAY BARBEQUE',
     location: 'Malad, Mumbai',
-    category: 'Turnkey Hospitality',
+    category: 'Restaurants & Dining',
     image: '/images/bombayB1.webp',
     slug: 'bombay-barbeque',
+    gallery: ['/images/bombayB1.webp', '/images/bombayB2.webp', '/images/IMG_2706.webp'],
+    scope: 'Turnkey Hospitality',
+    deliverables: ['Civil Works', 'MEP & HVAC', 'Custom Millwork', 'Acoustic Ceilings', 'Lighting'],
+    description:
+      'A turnkey 6,500 sq.ft full-service dining venue. Optimized kitchen circulation, warm smoked oak veneers, fluted paneling, and custom banquet seating executed under single-contract accountability.',
   },
   {
     name: 'NETWIN VENTURES',
-    location: 'CBD Belapur',
-    category: 'Corporate Headquarters',
+    location: 'CBD Belapur, Navi Mumbai',
+    category: 'Corporate Offices',
     image: '/images/BelapurC2.webp',
     slug: 'netwin-ventures',
+    gallery: ['/images/BelapurC2.webp', '/images/BelapurC3.webp', '/images/IMG_2701.webp', '/images/IMG_2702.webp'],
+    scope: 'Turnkey Commercial',
+    deliverables: ['Executive Boardrooms', 'Open Workstations', 'Acoustic Partitions', 'Civil & MEP'],
+    description:
+      'High-performance corporate headquarters designed for agile collaboration and focused deep work. Features clean architectural lines, circadian LED fixtures, and integrated power infrastructure.',
   },
   {
     name: '99 WOK STREET',
     location: 'Kandivali, Mumbai',
-    category: 'Architectural F&B',
+    category: 'Restaurants & Dining',
     image: '/images/Kandivali!.webp',
     slug: '99-wok-street',
-  },
-  {
-    name: 'CARAVAN LOUNGE',
-    location: 'Bandra, Mumbai',
-    category: 'Hospitality & Dining',
-    image: '/images/caravab1.webp',
-    slug: 'caravan-lounge',
+    gallery: ['/images/Kandivali!.webp', '/images/caffe.webp', '/images/IMG_2697.webp'],
+    scope: 'Turnkey F&B Fit-Out',
+    deliverables: ['Kitchen MEP & Exhaust', 'Custom Banquet Seating', 'Signage & Facade', 'Designer Tile Flooring'],
+    description:
+      'High-throughput urban culinary concept featuring dramatic architectural contrasts, custom stainless kitchen extractors, and bespoke banquet seating.',
   },
   {
     name: 'JUICE CRUSH FLAGSHIP',
-    location: 'South Mumbai',
+    location: 'Kandivali & Kurla, Mumbai',
     category: 'Luxury Retail',
     image: '/images/juice1.webp',
     slug: 'juice-crush',
+    gallery: ['/images/juice1.webp', '/images/juice2.webp', '/images/juice3.webp'],
+    scope: 'Turnkey Retail',
+    deliverables: ['Joinery & Millwork', 'Food Grade Solid Surfaces', 'Illuminated Fascia', 'Civil Works'],
+    description:
+      'Vibrant retail flagship design optimized for customer ordering flow, rapid preparation cycles, and striking brand visual identity.',
+  },
+  {
+    name: 'CARAVAN LOUNGE',
+    location: 'Bandra West, Mumbai',
+    category: 'Hospitality & Lounge',
+    image: '/images/caravab1.webp',
+    slug: 'caravan-lounge',
+    gallery: ['/images/caravab1.webp', '/images/carvan2.webp', '/images/carvan3.webp'],
+    scope: 'Turnkey Hospitality',
+    deliverables: ['Curved Bar Joinery', 'Mood & Scene Lighting', 'Acoustic Baffles', 'Civil & HVAC'],
+    description:
+      'Sophisticated nightspot featuring curved brass bar counters, textured concrete walls, and bespoke velvet seating modules.',
+  },
+  {
+    name: 'RADHAKRISHNA CUISINE',
+    location: 'Bhayandar, Mumbai',
+    category: 'Restaurants & Dining',
+    image: '/images/caffe.webp',
+    slug: 'radhakrishna-cuisine',
+    gallery: ['/images/caffe.webp', '/images/caravab1.webp', '/images/carvan2.webp'],
+    scope: 'Turnkey Dining Interior',
+    deliverables: ['Civil Works', 'MEP & Plumbing', 'Bespoke Joinery', 'Architectural Lighting'],
+    description:
+      'Warm heritage tones fused with contemporary architectural brutalism. Hand-crafted acoustic wood paneling and intimate dining booths.',
+  },
+  {
+    name: 'BOOMERANG CORPORATE PARK',
+    location: 'Sakinaka, Mumbai',
+    category: 'Corporate Offices',
+    image: '/images/IMG_2698.webp',
+    slug: 'boomerang-park',
+    gallery: ['/images/IMG_2698.webp', '/images/IMG_2697.webp', '/images/IMG_2702.webp'],
+    scope: 'Commercial Fit-Out',
+    deliverables: ['MEP Engineering', 'Acoustic Glass Partitions', 'Designer Flooring', 'Grid Ceilings'],
+    description:
+      'Large-scale corporate floorplates delivered on an accelerated schedule. Minimalist glass demising partitions and integrated conference facilities.',
+  },
+  {
+    name: 'LA LOCO GRILL',
+    location: 'Thane, Mumbai',
+    category: 'Restaurants & Dining',
+    image: '/images/bombayB2.webp',
+    slug: 'la-loco-grill',
+    gallery: ['/images/bombayB2.webp', '/images/bombayB1.webp', '/images/IMG_2706.webp'],
+    scope: 'Turnkey Fit-Out',
+    deliverables: ['Civil Construction', 'Exhaust & Firefighting', 'Furniture Fabrication', 'Signage'],
+    description:
+      'Rustic modern grill venue featuring exposed brickwork, custom black steel frames, and precision extraction ducting.',
   },
   {
     name: 'STUDIO AKAAI SUITE',
     location: 'Navi Mumbai',
-    category: 'Commercial Spaces',
+    category: 'Corporate Offices',
     image: '/images/IMG_2701.webp',
     slug: 'studio-akaai',
+    gallery: ['/images/IMG_2701.webp', '/images/IMG_2702.webp', '/images/BelapurC3.webp'],
+    scope: 'Commercial Interiors',
+    deliverables: ['Executive Suites', 'Private Pods', 'Joinery', 'Ambient Track Lighting'],
+    description:
+      'Tailored executive workspace designed for creative direction, private consultations, and confidential strategy sessions.',
   },
   {
     name: 'ZENITH EXECUTIVE FLOORS',
-    location: 'CBD Belapur',
-    category: 'Grade-A Office',
+    location: 'CBD Belapur, Navi Mumbai',
+    category: 'Corporate Offices',
     image: '/images/IMG_2702.webp',
     slug: 'zenith-floors',
+    gallery: ['/images/IMG_2702.webp', '/images/IMG_2701.webp', '/images/BelapurC2.webp'],
+    scope: 'Grade-A Interior Architecture',
+    deliverables: ['Boardroom AV Tech', 'Custom Credenzas', 'Executive Restrooms', 'Lighting Controls'],
+    description:
+      'C-suite boardroom and executive floor with bookmatched veneer conference tables and seamless acoustic paneling.',
   },
   {
     name: 'THE VELVET ATELIER',
@@ -124,8 +199,27 @@ export const MARQUEE_PROJECTS: ProjectItem[] = [
     category: 'Bespoke Joinery',
     image: '/images/IMG_2695.webp',
     slug: 'velvet-atelier',
+    gallery: ['/images/IMG_2695.webp', '/images/IMG_2705.webp', '/images/IMG_2696.webp'],
+    scope: 'Bespoke Millwork',
+    deliverables: ['Custom Millwork', 'Fluted Marble Monoliths', 'Champagne Brass Accents', 'Joinery'],
+    description:
+      'In-house atelier fabrication showcasing high-precision cabinetry, fluted stone reception monoliths, and hand-finished bronze hardware.',
+  },
+  {
+    name: 'ARCHITECTURAL FACADE & CLADDING',
+    location: 'Andheri, Mumbai',
+    category: 'Exteriors & Facade',
+    image: '/images/IMG_2696.webp',
+    slug: 'exterior-facade',
+    gallery: ['/images/IMG_2696.webp', '/images/IMG_2695.webp', '/images/IMG_2705.webp'],
+    scope: 'Exterior Cladding',
+    deliverables: ['ACP Cladding', 'Structural Glazing', 'Waterproofing Barriers', 'Perimeter LED Lighting'],
+    description:
+      'High-durability commercial building elevation with precision composite panels, perimeter thermal barriers, and architectural accent illumination.',
   },
 ];
+
+export const MARQUEE_PROJECTS: ProjectItem[] = ALL_PROJECTS;
 
 export const SERVICES_TOTEM: ServiceItem[] = [
   {
