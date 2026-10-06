@@ -9,26 +9,26 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: '#0A0A0B',
-        surface: '#121216',
-        surfaceElevated: '#181820',
-        deepFooter: '#050505',
-        canvas: '#0A0A0B',
+        background: '#FAFAF9',
+        surface: '#FFFFFF',
+        surfaceElevated: '#F5F3EE',
+        deepFooter: '#F5F3EE',
+        canvas: '#FAFAF9',
         gold: {
-          DEFAULT: '#C5A880',
-          light: '#E2C799',
-          muted: '#8D7458',
+          DEFAULT: '#8F6E38',
+          light: '#A37E42',
+          muted: '#BFA06C',
         },
         ink: {
-          DEFAULT: '#FFFFFF',
-          secondary: '#D4D4D8',
-          muted: '#A1A1AA',
+          DEFAULT: '#0F0F12',
+          secondary: '#3F3F46',
+          muted: '#71717A',
         },
         line: {
-          DEFAULT: 'rgba(255, 255, 255, 0.10)',
-          hairline: 'rgba(255, 255, 255, 0.10)',
-          divider: 'rgba(255, 255, 255, 0.05)',
-          gold: 'rgba(197, 168, 128, 0.50)',
+          DEFAULT: 'rgba(0, 0, 0, 0.08)',
+          hairline: 'rgba(0, 0, 0, 0.08)',
+          divider: 'rgba(0, 0, 0, 0.04)',
+          gold: 'rgba(143, 110, 56, 0.45)',
         },
       },
       fontFamily: {

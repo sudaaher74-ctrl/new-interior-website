@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { SITE_URL, SERVICES_CATALOG, LOCATIONS_CATALOG, BLOG_POSTS } from '@/data/businessConfig';
+import { SITE_URL, SERVICES_CATALOG, LOCATIONS_CATALOG, BLOG_POSTS } from '@/seo';
 import { ALL_PROJECTS } from '@/data/interiorData';
 
 export default function sitemap(): MetadataRoute.Sitemap {

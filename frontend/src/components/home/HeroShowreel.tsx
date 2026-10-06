@@ -19,7 +19,7 @@ export default function HeroShowreel() {
   };
 
   return (
-    <section id="home" className="relative h-screen min-h-[640px] w-full overflow-hidden bg-[#0A0A0B] flex items-center justify-center">
+    <section id="home" className="relative h-screen min-h-[640px] w-full overflow-hidden bg-[#FAFAF9] flex items-center justify-center">
       {/* Background Media Container */}
       <div className="absolute inset-0 z-0">
         {/* Architectural Background Media */}
@@ -55,9 +55,9 @@ export default function HeroShowreel() {
           />
         </div>
 
-        {/* Cinematic Edge Overlays: Top navbar fade, bottom canvas transition, side vignettes */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0B] via-transparent to-black/60 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0A0A0B]/60 via-transparent to-[#0A0A0B]/60 pointer-events-none" />
+        {/* Cinematic Edge Overlays: Top navbar fade, bottom canvas transition into #FAFAF9 */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FAFAF9] via-[#0A0A0B]/40 to-black/60 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-black/50 pointer-events-none" />
         <div className="absolute inset-0 bg-black/25 pointer-events-none" />
       </div>
 
@@ -68,13 +68,13 @@ export default function HeroShowreel() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-6"
+          className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-black/40 border border-white/20 backdrop-blur-md mb-6"
         >
-          <span className="text-[#C5A880] text-xs">✦</span>
-          <span className="text-[11px] sm:text-xs uppercase tracking-[0.3em] font-medium text-[#C5A880]">
+          <span className="text-[#E8CD9B] text-xs">✦</span>
+          <span className="text-[11px] sm:text-xs uppercase tracking-[0.3em] font-medium text-[#E8CD9B]">
             Corporate Fit-Out &bull; Turnkey Contracting &bull; In-House Millwork
           </span>
-          <span className="text-[#C5A880] text-xs">✦</span>
+          <span className="text-[#E8CD9B] text-xs">✦</span>
         </motion.div>
 
         {/* Master Heading Pairing */}
@@ -87,7 +87,7 @@ export default function HeroShowreel() {
           <span className="font-display font-light text-[32px] sm:text-[50px] md:text-[66px] lg:text-[78px] tracking-tight uppercase text-white block leading-[1.05]">
             Corporate &amp; Commercial
           </span>
-          <span className="font-serif italic font-normal text-[36px] sm:text-[56px] md:text-[72px] lg:text-[88px] text-[#C5A880] block -mt-1 sm:-mt-2">
+          <span className="font-serif italic font-normal text-[36px] sm:text-[56px] md:text-[72px] lg:text-[88px] text-[#E8CD9B] block -mt-1 sm:-mt-2">
             Interior Designers in Mumbai
           </span>
         </motion.h1>
@@ -97,7 +97,7 @@ export default function HeroShowreel() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-6 max-w-2xl text-sm sm:text-base text-[#D4D4D8] font-light leading-relaxed"
+          className="mt-6 max-w-2xl text-sm sm:text-base text-stone-200 font-light leading-relaxed drop-shadow"
         >
           Single-point turnkey interior contracting for enterprise headquarters, executive boardrooms, and high-performance commercial spaces across Mumbai, Navi Mumbai, and pan-India.
         </motion.p>
@@ -111,13 +111,13 @@ export default function HeroShowreel() {
         >
           <Link
             href="/services"
-            className="rounded-full px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] bg-white text-black hover:bg-[#C5A880] hover:text-black transition-all duration-300 shadow-xl"
+            className="rounded-full px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] bg-white text-[#0F0F12] hover:bg-[#8F6E38] hover:text-white transition-all duration-300 shadow-xl"
           >
             Explore Services
           </Link>
           <Link
             href="/contact"
-            className="rounded-full px-8 py-3.5 text-xs font-light uppercase tracking-[0.16em] border border-white/20 text-white hover:border-[#C5A880] hover:text-[#C5A880] transition-all duration-300 bg-[#121216]/50 backdrop-blur-sm"
+            className="rounded-full px-8 py-3.5 text-xs font-medium uppercase tracking-[0.16em] border border-white/30 text-white hover:border-[#8F6E38] hover:text-white transition-all duration-300 bg-black/40 backdrop-blur-sm"
           >
             Request Consultation
           </Link>
@@ -127,26 +127,26 @@ export default function HeroShowreel() {
       {/* Floating Bottom HUD Bar */}
       <div className="absolute bottom-6 sm:bottom-10 inset-x-0 z-20 container-px flex items-center justify-between pointer-events-none">
         {/* Left: Status Pill with Pulsing Gold Dot */}
-        <div className="pointer-events-auto flex items-center gap-3 px-4 py-2 rounded-full bg-[#0A0A0B]/85 backdrop-blur-md border border-white/10 shadow-xl">
+        <div className="pointer-events-auto flex items-center gap-3 px-4 py-2 rounded-full bg-white/90 backdrop-blur-md border border-stone-200/90 shadow-xl text-[#0F0F12]">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C5A880] opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C5A880]" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#8F6E38] opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#8F6E38]" />
           </span>
-          <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] font-medium text-white/90">
-            Live Showreel <span className="text-[#A1A1AA] font-light hidden sm:inline">&bull; Interior Portfolio</span>
+          <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] font-semibold text-[#0F0F12]">
+            Live Showreel <span className="text-stone-500 font-normal hidden sm:inline">&bull; Interior Portfolio</span>
           </span>
         </div>
 
         {/* Center: Bounce Scroll Prompt */}
         <div className="hidden md:flex flex-col items-center gap-1 text-center pointer-events-auto">
-          <span className="text-[10px] uppercase tracking-[0.3em] text-[#A1A1AA] font-light">
+          <span className="text-[10px] uppercase tracking-[0.3em] text-stone-600 font-medium">
             Scroll
           </span>
           <motion.div
             animate={{ y: [0, 6, 0] }}
             transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
           >
-            <ArrowDown className="h-3.5 w-3.5 text-[#C5A880]" />
+            <ArrowDown className="h-3.5 w-3.5 text-[#8F6E38]" />
           </motion.div>
         </div>
 
@@ -154,7 +154,7 @@ export default function HeroShowreel() {
         <button
           type="button"
           onClick={toggleMute}
-          className="pointer-events-auto flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-[#0A0A0B]/85 backdrop-blur-md border border-white/15 text-white hover:text-[#C5A880] hover:border-[#C5A880]/60 transition-all duration-300 shadow-xl focus:outline-none"
+          className="pointer-events-auto flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-white/90 backdrop-blur-md border border-stone-200/90 text-[#0F0F12] hover:text-[#8F6E38] hover:border-[#8F6E38]/60 transition-all duration-300 shadow-xl focus:outline-none"
           aria-label={isMuted ? 'Unmute Showreel Audio' : 'Mute Showreel Audio'}
           title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
         >

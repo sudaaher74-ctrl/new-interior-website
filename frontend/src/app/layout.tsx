@@ -3,8 +3,7 @@ import { Poppins, Cormorant_Garamond } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 import SiteShell from '@/components/layout/SiteShell';
-import { SITE_URL, BUSINESS_INFO } from '@/data/businessConfig';
-import { getOrganizationSchema, getLocalBusinessSchema } from '@/lib/seo';
+import { SITE_URL, BUSINESS_INFO, getOrganizationSchema, getLocalBusinessSchema } from '@/seo';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -22,7 +21,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const viewport: Viewport = {
-  themeColor: '#0A0A0B',
+  themeColor: '#FAFAF9',
   width: 'device-width',
   initialScale: 1,
 };
@@ -127,7 +126,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className="bg-[#0A0A0B] text-[#D4D4D8] font-sans antialiased selection:bg-[#C5A880] selection:text-[#0A0A0B]">
+      <body className="bg-[#FAFAF9] text-[#3F3F46] font-sans antialiased selection:bg-[#8F6E38] selection:text-white">
         {/* Core Organization & Local Business Schema */}
         <script
           type="application/ld+json"

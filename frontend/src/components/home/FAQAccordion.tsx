@@ -12,7 +12,7 @@ export default function FAQAccordion() {
   };
 
   return (
-    <section id="faq" className="relative overflow-hidden bg-[#0A0A0B] text-white py-24 md:py-36 px-5 sm:px-8 border-b border-white/10">
+    <section id="faq" className="relative overflow-hidden bg-[#FAFAF9] text-[#0F0F12] py-24 md:py-36 px-5 sm:px-8 border-b border-stone-200/80">
       <div className="container-px">
         {/* Section Header with Signature Formula */}
         <div className="max-w-3xl mb-16">
@@ -21,7 +21,7 @@ export default function FAQAccordion() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="text-xs uppercase tracking-[0.3em] font-medium text-[#C5A880] block mb-3"
+            className="text-xs uppercase tracking-[0.3em] font-medium text-[#8F6E38] block mb-3"
           >
             ✦ CLARITY &amp; DILIGENCE ✦
           </motion.span>
@@ -31,10 +31,10 @@ export default function FAQAccordion() {
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           >
-            <span className="font-display font-light text-[36px] sm:text-[48px] md:text-[60px] tracking-tight uppercase text-white block leading-[1.05]">
+            <span className="font-display font-light text-[36px] sm:text-[48px] md:text-[60px] tracking-tight uppercase text-[#0F0F12] block leading-[1.05]">
               FREQUENTLY POSED
             </span>
-            <span className="font-serif italic font-normal text-[36px] sm:text-[48px] md:text-[60px] text-[#C5A880]">
+            <span className="font-serif italic font-normal text-[36px] sm:text-[48px] md:text-[60px] text-[#8F6E38]">
               Questions.
             </span>
           </motion.h2>
@@ -43,7 +43,7 @@ export default function FAQAccordion() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-6 text-sm sm:text-base text-[#A1A1AA] font-light leading-relaxed"
+            className="mt-6 text-sm sm:text-base text-stone-600 font-light leading-relaxed"
           >
             Answers regarding our turnkey methodology, concurrent prefabrication schedules, and project director protocols.
           </motion.p>
@@ -60,7 +60,7 @@ export default function FAQAccordion() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-50px' }}
                 transition={{ duration: 0.5, delay: idx * 0.06, ease: [0.22, 1, 0.36, 1] }}
-                className="rounded-[20px] bg-[#121216] border border-white/10 hover:border-[#C5A880]/40 overflow-hidden transition-all duration-300 shadow-lg"
+                className="rounded-[20px] bg-white border border-stone-200/90 hover:border-[#8F6E38]/40 overflow-hidden transition-all duration-300 shadow-sm"
               >
                 {/* Accordion Question Trigger */}
                 <button
@@ -69,10 +69,10 @@ export default function FAQAccordion() {
                   className="w-full text-left p-6 sm:p-8 flex items-center justify-between gap-4 select-none focus:outline-none group cursor-pointer"
                   aria-expanded={isOpen}
                 >
-                  <span className="font-display font-medium text-base sm:text-lg text-white tracking-wide uppercase leading-snug group-hover:text-[#C5A880] transition-colors">
+                  <span className="font-display font-medium text-base sm:text-lg text-[#0F0F12] tracking-wide uppercase leading-snug group-hover:text-[#8F6E38] transition-colors">
                     {faq.question}
                   </span>
-                  <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#181820] text-white flex items-center justify-center font-bold text-sm shrink-0 border border-white/10 group-hover:border-[#C5A880]/50 transition-colors">
+                  <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-stone-100 text-[#0F0F12] flex items-center justify-center font-bold text-sm shrink-0 border border-stone-200 group-hover:border-[#8F6E38]/50 transition-colors">
                     {isOpen ? '−' : '+'}
                   </span>
                 </button>
@@ -86,7 +86,7 @@ export default function FAQAccordion() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                     >
-                      <div className="px-6 pb-8 sm:px-8 text-sm sm:text-base text-[#A1A1AA] font-light leading-relaxed border-t border-white/10 pt-5">
+                      <div className="px-6 pb-8 sm:px-8 text-sm sm:text-base text-stone-600 font-light leading-relaxed border-t border-stone-100 pt-5">
                         {faq.answer}
                       </div>
                     </motion.div>

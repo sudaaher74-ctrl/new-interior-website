@@ -25,12 +25,12 @@ export default function StickyContact() {
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => trackConversion('whatsapp_click')}
-        className="group relative flex h-11 w-11 sm:h-13 sm:w-13 items-center justify-center rounded-full bg-[#121216]/90 backdrop-blur-md text-[#25D366] border border-white/20 hover:border-[#25D366] shadow-[0_4px_25px_rgba(0,0,0,0.8)] transition-all duration-300 hover:scale-110 hover:shadow-[0_0_25px_rgba(37,211,102,0.4)]"
+        className="group relative flex h-11 w-11 sm:h-13 sm:w-13 items-center justify-center rounded-full bg-white/95 backdrop-blur-md text-[#25D366] border border-stone-200 hover:border-[#25D366] shadow-[0_4px_20px_rgba(0,0,0,0.12)] transition-all duration-300 hover:scale-110"
         aria-label="Chat with OS Interior on WhatsApp"
       >
         <span className="sr-only">Chat with OS Interior on WhatsApp</span>
         {/* Tooltip on left */}
-        <span className="pointer-events-none absolute right-full mr-3 whitespace-nowrap rounded-full bg-[#0A0A0B]/95 backdrop-blur-md px-3.5 py-1.5 text-[11px] uppercase tracking-wider font-medium text-[#25D366] opacity-0 shadow-xl transition-opacity duration-200 group-hover:opacity-100 border border-white/15">
+        <span className="pointer-events-none absolute right-full mr-3 whitespace-nowrap rounded-full bg-white/95 backdrop-blur-md px-3.5 py-1.5 text-[11px] uppercase tracking-wider font-medium text-stone-800 opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 border border-stone-200">
           WhatsApp Studio
         </span>
         <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 sm:h-6 sm:w-6">
@@ -43,12 +43,12 @@ export default function StickyContact() {
         id="sticky-call-btn"
         href="tel:+918959173790"
         onClick={() => trackConversion('phone_click')}
-        className="group relative flex h-11 w-11 sm:h-13 sm:w-13 items-center justify-center rounded-full bg-[#121216]/90 backdrop-blur-md text-[#C5A880] border border-white/20 hover:border-[#C5A880] shadow-[0_4px_25px_rgba(0,0,0,0.8)] transition-all duration-300 hover:scale-110 hover:shadow-[0_0_25px_rgba(197,168,128,0.4)]"
+        className="group relative flex h-11 w-11 sm:h-13 sm:w-13 items-center justify-center rounded-full bg-white/95 backdrop-blur-md text-[#8F6E38] border border-stone-200 hover:border-[#8F6E38] shadow-[0_4px_20px_rgba(0,0,0,0.12)] transition-all duration-300 hover:scale-110"
         aria-label="Call OS Interior Direct Line"
       >
         <span className="sr-only">Call OS Interior Direct Line</span>
         {/* Tooltip on left */}
-        <span className="pointer-events-none absolute right-full mr-3 whitespace-nowrap rounded-full bg-[#0A0A0B]/95 backdrop-blur-md px-3.5 py-1.5 text-[11px] uppercase tracking-wider font-medium text-[#C5A880] opacity-0 shadow-xl transition-opacity duration-200 group-hover:opacity-100 border border-white/15">
+        <span className="pointer-events-none absolute right-full mr-3 whitespace-nowrap rounded-full bg-white/95 backdrop-blur-md px-3.5 py-1.5 text-[11px] uppercase tracking-wider font-medium text-stone-800 opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 border border-stone-200">
           +91 89591 73790
         </span>
         <Phone className="h-5 w-5 sm:h-6 sm:w-6" />

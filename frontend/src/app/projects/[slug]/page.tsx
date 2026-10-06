@@ -7,16 +7,10 @@ import {
   MapPin,
   CheckCircle2,
   ArrowUpRight,
-  Building2,
-  Layers,
-  Phone,
-  Calendar,
-  Compass,
 } from 'lucide-react';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { ALL_PROJECTS } from '@/data/interiorData';
-import { SITE_URL, SERVICES_CATALOG, LOCATIONS_CATALOG } from '@/data/businessConfig';
-import { getProjectSchema } from '@/lib/seo';
+import { SITE_URL, SERVICES_CATALOG, LOCATIONS_CATALOG, getProjectSchema } from '@/seo';
 
 interface ProjectPageProps {
   params: Promise<{
@@ -107,15 +101,15 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
   ).slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] text-white pt-28 sm:pt-36 pb-24">
+    <div className="min-h-screen bg-[#FAFAF9] text-[#0F0F12] pt-28 sm:pt-36 pb-24">
       {/* Schema.org CreativeWork Injection */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(projectSchema) }}
       />
 
-      {/* Radial Ambient Glow */}
-      <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[850px] h-[500px] bg-[#C5A880]/5 blur-[160px] rounded-full pointer-events-none" />
+      {/* Soft Ambient Glow */}
+      <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[850px] h-[500px] bg-[#8F6E38]/5 blur-[160px] rounded-full pointer-events-none" />
 
       {/* Hero Header */}
       <section className="container-px relative z-10 mb-12 sm:mb-16">
@@ -126,25 +120,25 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
           ]}
         />
 
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-white/10">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-stone-200">
           <div className="max-w-3xl">
             <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="px-3 py-1 rounded-full bg-[#C5A880]/20 border border-[#C5A880]/40 text-[10px] uppercase tracking-widest text-[#C5A880] font-semibold">
+              <span className="px-3 py-1 rounded-full bg-[#8F6E38]/10 border border-[#8F6E38]/30 text-[10px] uppercase tracking-widest text-[#8F6E38] font-semibold">
                 {project.category}
               </span>
               {project.scope && (
-                <span className="px-3 py-1 rounded-full bg-white/10 text-[10px] uppercase tracking-widest text-white/80">
+                <span className="px-3 py-1 rounded-full bg-stone-100 text-[10px] uppercase tracking-widest text-stone-700 font-medium">
                   {project.scope}
                 </span>
               )}
             </div>
 
-            <h1 className="font-display font-light text-3xl sm:text-5xl lg:text-6xl uppercase tracking-tight text-white leading-[1.06]">
+            <h1 className="font-display font-light text-3xl sm:text-5xl lg:text-6xl uppercase tracking-tight text-[#0F0F12] leading-[1.06]">
               {project.name}
             </h1>
 
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-[#A1A1AA] font-light mt-3">
-              <MapPin className="h-4 w-4 text-[#C5A880] shrink-0" />
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-stone-500 font-light mt-3">
+              <MapPin className="h-4 w-4 text-[#8F6E38] shrink-0" />
               <span>{project.location}</span>
             </div>
           </div>
@@ -152,7 +146,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
           <div className="flex flex-wrap items-center gap-3 shrink-0">
             <Link
               href={`/contact?project=${encodeURIComponent(project.name)}`}
-              className="inline-flex items-center gap-2 rounded-full bg-[#C5A880] text-[#0A0A0B] px-7 py-3 text-xs font-semibold uppercase tracking-[0.16em] hover:bg-white transition-all shadow-xl"
+              className="inline-flex items-center gap-2 rounded-full bg-[#0F0F12] text-white px-7 py-3 text-xs font-semibold uppercase tracking-[0.16em] hover:bg-[#8F6E38] transition-all shadow-md"
             >
               <span>Commission Similar Space</span>
               <ArrowUpRight className="h-4 w-4" />
@@ -163,7 +157,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
 
       {/* Main Project Hero Visual */}
       <section className="container-px relative z-10 mb-16 sm:mb-20">
-        <div className="relative aspect-[16/9] w-full rounded-[24px] overflow-hidden border border-white/10 shadow-2xl bg-[#121216]">
+        <div className="relative aspect-[16/9] w-full rounded-[24px] overflow-hidden border border-stone-200/90 shadow-lg bg-stone-100">
           <Image
             src={project.image}
             alt={`${project.name} interior architecture in ${project.location}`}
@@ -172,7 +166,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
             sizes="100vw"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0B] via-transparent to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60" />
         </div>
       </section>
 
@@ -182,13 +176,13 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
           {/* Left Column: Architectural Brief & Deliverables (8 cols) */}
           <div className="lg:col-span-8 space-y-10">
             <div>
-              <span className="text-xs uppercase tracking-[0.25em] text-[#C5A880] font-semibold block mb-2">
+              <span className="text-xs uppercase tracking-[0.25em] text-[#8F6E38] font-semibold block mb-2">
                 Case Study Overview
               </span>
-              <h2 className="font-display text-2xl sm:text-3xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-display text-2xl sm:text-3xl uppercase tracking-tight text-[#0F0F12] mb-4">
                 Architectural Approach &amp; Scope
               </h2>
-              <p className="text-sm sm:text-base text-[#D4D4D8] font-light leading-relaxed">
+              <p className="text-sm sm:text-base text-stone-600 font-light leading-relaxed">
                 {project.description ||
                   `A complete turnkey interior fit-out executed under single-contract master accountability by OS Interior. The project combined space planning, licensed civil works, MEP engineering, and custom factory-manufactured millwork.`}
               </p>
@@ -196,14 +190,14 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
 
             {/* Deliverables Checklist */}
             {project.deliverables && project.deliverables.length > 0 && (
-              <div className="rounded-2xl bg-[#121216] border border-white/10 p-8">
-                <h3 className="font-display text-lg uppercase tracking-tight text-white mb-4">
+              <div className="rounded-2xl bg-white border border-stone-200/90 p-8 shadow-sm">
+                <h3 className="font-display text-lg uppercase tracking-tight text-[#0F0F12] mb-4">
                   Executed Deliverables &amp; Civil Scope
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-[#D4D4D8] font-light">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-stone-700 font-light">
                   {project.deliverables.map((item) => (
                     <div key={item} className="flex items-center gap-2.5">
-                      <CheckCircle2 className="h-4 w-4 text-[#C5A880] shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 text-[#8F6E38] shrink-0" />
                       <span>{item}</span>
                     </div>
                   ))}
@@ -214,14 +208,14 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
             {/* Multi-Angle Photo Gallery */}
             {project.gallery && project.gallery.length > 0 && (
               <div>
-                <h3 className="font-display text-xl uppercase tracking-tight text-white mb-6">
+                <h3 className="font-display text-xl uppercase tracking-tight text-[#0F0F12] mb-6">
                   Project Gallery &amp; Detail Angles
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {project.gallery.map((imgUrl, idx) => (
                     <div
                       key={idx}
-                      className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-white/10 bg-black shadow-lg"
+                      className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-stone-200 bg-stone-100 shadow-sm"
                     >
                       <Image
                         src={imgUrl}
@@ -239,73 +233,73 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
 
           {/* Right Column: Project Meta Sidebar (4 cols) */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="rounded-[24px] bg-[#121216] border border-white/10 p-6 sm:p-8 space-y-6 shadow-xl">
-              <h3 className="font-display text-lg uppercase tracking-tight text-white pb-3 border-b border-white/10">
+            <div className="rounded-[24px] bg-white border border-stone-200/90 p-6 sm:p-8 space-y-6 shadow-sm">
+              <h3 className="font-display text-lg uppercase tracking-tight text-[#0F0F12] pb-3 border-b border-stone-100">
                 Project Dossier
               </h3>
 
               <div className="space-y-4 text-xs font-light">
                 <div>
-                  <span className="text-[10px] uppercase tracking-wider text-[#A1A1AA] block">
+                  <span className="text-[10px] uppercase tracking-wider text-stone-500 block">
                     Client / Establishment
                   </span>
-                  <span className="text-sm font-medium text-white">{project.name}</span>
+                  <span className="text-sm font-medium text-[#0F0F12]">{project.name}</span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] uppercase tracking-wider text-[#A1A1AA] block">
+                  <span className="text-[10px] uppercase tracking-wider text-stone-500 block">
                     Location
                   </span>
-                  <span className="text-sm font-medium text-white">{project.location}</span>
+                  <span className="text-sm font-medium text-[#0F0F12]">{project.location}</span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] uppercase tracking-wider text-[#A1A1AA] block">
+                  <span className="text-[10px] uppercase tracking-wider text-stone-500 block">
                     Typology
                   </span>
-                  <span className="text-sm font-medium text-white">{project.category}</span>
+                  <span className="text-sm font-medium text-[#0F0F12]">{project.category}</span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] uppercase tracking-wider text-[#A1A1AA] block">
+                  <span className="text-[10px] uppercase tracking-wider text-stone-500 block">
                     Contract Model
                   </span>
-                  <span className="text-sm font-medium text-[#C5A880]">
+                  <span className="text-sm font-medium text-[#8F6E38]">
                     Single-Point Turnkey Design &amp; Build
                   </span>
                 </div>
               </div>
 
               {/* Contextual Cross-Links */}
-              <div className="pt-6 border-t border-white/10 space-y-3">
-                <span className="text-[10px] uppercase tracking-wider text-[#A1A1AA] block font-medium">
+              <div className="pt-6 border-t border-stone-100 space-y-3">
+                <span className="text-[10px] uppercase tracking-wider text-stone-500 block font-medium">
                   Related Specialization:
                 </span>
                 <Link
                   href={`/services/${matchedService.slug}`}
-                  className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:border-[#C5A880] text-xs text-white group"
+                  className="flex items-center justify-between p-3 rounded-xl bg-stone-50 border border-stone-200 hover:border-[#8F6E38] text-xs text-[#0F0F12] group transition-all"
                 >
                   <span>{matchedService.title}</span>
-                  <ArrowUpRight className="h-3.5 w-3.5 text-[#C5A880] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  <ArrowUpRight className="h-3.5 w-3.5 text-[#8F6E38] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </Link>
 
-                <span className="text-[10px] uppercase tracking-wider text-[#A1A1AA] block font-medium pt-2">
+                <span className="text-[10px] uppercase tracking-wider text-stone-500 block font-medium pt-2">
                   Regional Delivery Hub:
                 </span>
                 <Link
                   href={`/locations/${matchedLocation.slug}`}
-                  className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:border-[#C5A880] text-xs text-white group"
+                  className="flex items-center justify-between p-3 rounded-xl bg-stone-50 border border-stone-200 hover:border-[#8F6E38] text-xs text-[#0F0F12] group transition-all"
                 >
                   <span>{matchedLocation.name} Commercial Hub</span>
-                  <ArrowUpRight className="h-3.5 w-3.5 text-[#C5A880] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  <ArrowUpRight className="h-3.5 w-3.5 text-[#8F6E38] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </Link>
               </div>
 
               {/* CTA Box */}
-              <div className="pt-6 border-t border-white/10">
+              <div className="pt-6 border-t border-stone-100">
                 <Link
                   href={`/contact?project=${encodeURIComponent(project.name)}`}
-                  className="flex w-full items-center justify-center gap-2 rounded-full bg-[#C5A880] text-[#0A0A0B] py-3 text-xs uppercase tracking-[0.16em] font-semibold hover:bg-white transition-all shadow-xl"
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0F0F12] text-white py-3 text-xs uppercase tracking-[0.16em] font-semibold hover:bg-[#8F6E38] transition-all shadow-md"
                 >
                   <span>Inquire for Similar Space</span>
                   <ArrowUpRight className="h-4 w-4" />
@@ -320,15 +314,15 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
       {relatedProjects.length > 0 && (
         <section className="container-px relative z-10 mb-20">
           <div className="flex items-center justify-between gap-4 mb-8">
-            <h2 className="font-display text-xl sm:text-2xl uppercase tracking-tight text-white">
+            <h2 className="font-display text-xl sm:text-2xl uppercase tracking-tight text-[#0F0F12]">
               Related {project.category} Spaces
             </h2>
             <Link
               href="/projects"
-              className="text-xs uppercase tracking-wider text-[#C5A880] hover:text-white flex items-center gap-1"
+              className="text-xs uppercase tracking-wider text-[#8F6E38] hover:text-[#0F0F12] flex items-center gap-1 font-semibold transition-colors"
             >
               <span>View All Projects</span>
-              <ArrowUpRight className="h-3 w-3" />
+              <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
@@ -337,9 +331,9 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
               <Link
                 key={p.slug}
                 href={`/projects/${p.slug}`}
-                className="group rounded-2xl bg-[#121216] border border-white/10 overflow-hidden hover:border-[#C5A880]/50 transition-all flex flex-col justify-between"
+                className="group rounded-2xl bg-white border border-stone-200/90 overflow-hidden hover:border-[#8F6E38]/50 hover:shadow-md transition-all flex flex-col justify-between shadow-sm"
               >
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-black">
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-stone-100">
                   <Image
                     src={p.image}
                     alt={p.name}
@@ -348,10 +342,10 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                   />
                 </div>
                 <div className="p-5">
-                  <h3 className="font-display text-base uppercase text-white group-hover:text-[#C5A880] transition-colors">
+                  <h3 className="font-display text-base uppercase text-[#0F0F12] group-hover:text-[#8F6E38] transition-colors">
                     {p.name}
                   </h3>
-                  <span className="text-xs text-[#A1A1AA] font-light mt-1 block">
+                  <span className="text-xs text-stone-500 font-light mt-1 block">
                     {p.location}
                   </span>
                 </div>

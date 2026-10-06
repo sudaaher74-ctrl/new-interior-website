@@ -6,7 +6,7 @@ import { CLIENT_ADVANTAGES } from '@/data/interiorData';
 
 // Custom SVG geometric symbols in champagne gold
 function GeometricIcon({ shape }: { shape: string }) {
-  const iconClass = 'w-6 h-6 text-[#C5A880] stroke-current fill-none stroke-[1.5]';
+  const iconClass = 'w-6 h-6 text-[#8F6E38] stroke-current fill-none stroke-[1.5]';
 
   switch (shape) {
     case 'square':
@@ -62,7 +62,7 @@ function GeometricIcon({ shape }: { shape: string }) {
 
 export default function ClientAdvantages() {
   return (
-    <section className="relative overflow-hidden bg-[#0A0A0B] text-white py-24 md:py-36 px-5 sm:px-8 border-b border-white/10">
+    <section className="relative overflow-hidden bg-[#FAFAF9] text-[#0F0F12] py-24 md:py-36 px-5 sm:px-8 border-b border-stone-200/80">
       <div className="container-px">
         {/* Section Header with Signature Formula */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
@@ -72,7 +72,7 @@ export default function ClientAdvantages() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="text-xs uppercase tracking-[0.3em] font-medium text-[#C5A880] block mb-3"
+              className="text-xs uppercase tracking-[0.3em] font-medium text-[#8F6E38] block mb-3"
             >
               ✦ ARCHITECTURAL RIGOR ✦
             </motion.span>
@@ -82,10 +82,10 @@ export default function ClientAdvantages() {
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             >
-              <span className="font-display font-light text-[36px] sm:text-[48px] md:text-[60px] tracking-tight uppercase text-white block leading-[1.05]">
+              <span className="font-display font-light text-[36px] sm:text-[48px] md:text-[60px] tracking-tight uppercase text-[#0F0F12] block leading-[1.05]">
                 WHY CLIENTS CHOOSE
               </span>
-              <span className="font-serif italic font-normal text-[36px] sm:text-[48px] md:text-[60px] text-[#C5A880]">
+              <span className="font-serif italic font-normal text-[36px] sm:text-[48px] md:text-[60px] text-[#8F6E38]">
                 OS Interiors.
               </span>
             </motion.h2>
@@ -96,7 +96,7 @@ export default function ClientAdvantages() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="text-sm sm:text-base text-[#A1A1AA] max-w-md font-light leading-relaxed"
+            className="text-sm sm:text-base text-stone-600 max-w-md font-light leading-relaxed"
           >
             We remove the traditional vulnerabilities of commercial fit-outs: fragmented contracts, schedule slippages, and diluted architectural integrity.
           </motion.p>
@@ -111,34 +111,34 @@ export default function ClientAdvantages() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, delay: idx * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              className="group rounded-[20px] bg-[#121216] p-8 border border-white/10 hover:border-[#C5A880]/60 transition-all duration-300 flex flex-col justify-between shadow-xl"
+              className="group rounded-[20px] bg-white p-8 border border-stone-200/90 hover:border-[#8F6E38]/60 transition-all duration-300 flex flex-col justify-between shadow-sm hover:shadow-lg"
             >
               <div>
                 {/* Top Geometric Symbol in Champagne Gold */}
                 <div className="flex items-center justify-between mb-6">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-white/10 group-hover:border-[#C5A880]/50 transition-colors">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-stone-50 border border-stone-200 group-hover:border-[#8F6E38]/50 transition-colors">
                     <GeometricIcon shape={adv.shape} />
                   </div>
-                  <span className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#C5A880] px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                  <span className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#8F6E38] px-3 py-1 rounded-full bg-stone-100 border border-stone-200">
                     {adv.highlight}
                   </span>
                 </div>
 
                 {/* Advantage Title */}
-                <h3 className="font-display font-medium text-lg sm:text-xl text-white uppercase tracking-wide group-hover:text-[#E2C799] transition-colors">
+                <h3 className="font-display font-medium text-lg sm:text-xl text-[#0F0F12] uppercase tracking-wide group-hover:text-[#8F6E38] transition-colors">
                   {adv.title}
                 </h3>
 
                 {/* Description */}
-                <p className="mt-4 text-xs sm:text-sm text-[#A1A1AA] font-light leading-relaxed">
+                <p className="mt-4 text-xs sm:text-sm text-stone-600 font-light leading-relaxed">
                   {adv.description}
                 </p>
               </div>
 
               {/* Bottom Hairline Highlight */}
-              <div className="mt-8 pt-4 border-t border-white/5 flex items-center justify-between text-[11px] uppercase tracking-wider text-white/40">
+              <div className="mt-8 pt-4 border-t border-stone-100 flex items-center justify-between text-[11px] uppercase tracking-wider text-stone-400">
                 <span>Verified Standard</span>
-                <span className="text-[#C5A880]">0{idx + 1}</span>
+                <span className="text-[#8F6E38] font-medium">0{idx + 1}</span>
               </div>
             </motion.div>
           ))}
