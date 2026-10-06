@@ -186,19 +186,9 @@ function ContactContent() {
                   <MapPin className="h-4 w-4 text-[#C5A880] shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-white block font-medium uppercase tracking-wider text-[11px] mb-0.5">
-                      Mumbai Headquarters &amp; Studio
+                      Mumbai Headquarters &amp; Atelier
                     </strong>
-                    Link Road, Malad West, Mumbai, Maharashtra 400064
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-4 w-4 text-[#C5A880] shrink-0 mt-0.5" />
-                  <div>
-                    <strong className="text-white block font-medium uppercase tracking-wider text-[11px] mb-0.5">
-                      Navi Mumbai Branch Office
-                    </strong>
-                    Sector 11, CBD Belapur, Navi Mumbai, Maharashtra 400614
+                    Kandivali West, Mumbai, Maharashtra 400067
                   </div>
                 </div>
 
@@ -206,9 +196,19 @@ function ContactContent() {
                   <Building className="h-4 w-4 text-[#C5A880] shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-white block font-medium uppercase tracking-wider text-[11px] mb-0.5">
-                      Atelier Joinery &amp; Millwork Unit
+                      Dedicated Millwork Atelier
                     </strong>
-                    Goregaon / Andheri Industrial Area, Mumbai
+                    Kandivali Fabrication Workshop, Western Mumbai
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <MapPin className="h-4 w-4 text-[#C5A880] shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white block font-medium uppercase tracking-wider text-[11px] mb-0.5">
+                      Key Project Service Corridors
+                    </strong>
+                    Serving businesses across Kandivali, Borivali, Malad, Goregaon, Andheri, BKC, Powai, Lower Parel, Thane &amp; Navi Mumbai (CBD Belapur, Vashi, Airoli).
                   </div>
                 </div>
 

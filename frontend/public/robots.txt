@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /employee
-Disallow: /admin
-Disallow: /login
-
-Sitemap: https://www.osinteriors.in/sitemap.xml

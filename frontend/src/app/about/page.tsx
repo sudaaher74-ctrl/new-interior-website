@@ -7,6 +7,8 @@ import { motion } from 'framer-motion';
 import { METRICS, CLIENT_ADVANTAGES, CLIENT_REVIEWS, SERVICES_TOTEM } from '@/data/interiorData';
 import { ChevronRight, ArrowUpRight, CheckCircle2, ShieldCheck, Hammer, Compass, Award, Building2 } from 'lucide-react';
 
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
+
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white pt-28 sm:pt-36 pb-24">
@@ -15,14 +17,12 @@ export default function AboutPage() {
 
       {/* Hero Section */}
       <section className="container-px relative z-10 mb-16 sm:mb-24">
-        {/* Breadcrumbs */}
-        <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] font-medium text-[#C5A880] mb-4">
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
-          <ChevronRight className="h-3 w-3 text-white/30" />
-          <span className="text-white/60">Studio</span>
-          <ChevronRight className="h-3 w-3 text-white/30" />
-          <span>About Us &amp; Atelier</span>
-        </div>
+        {/* Structured Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { name: 'About OS Interior', path: '/about' },
+          ]}
+        />
 
         <div className="max-w-4xl">
           <motion.h1
@@ -31,9 +31,9 @@ export default function AboutPage() {
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="font-display font-light text-4xl sm:text-5xl lg:text-6xl uppercase tracking-tight text-white leading-[1.05]"
           >
-            OBSIDIAN LUXURY. <br />
+            COMMERCIAL &amp; CORPORATE <br />
             <span className="font-serif italic font-normal text-[#C5A880]">
-              UNIFIED TURNKEY EXECUTION.
+              TURNKEY INTERIOR CONTRACTING
             </span>
           </motion.h1>
 
@@ -43,7 +43,7 @@ export default function AboutPage() {
             transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="mt-6 text-base sm:text-lg text-[#A1A1AA] font-light leading-relaxed max-w-3xl"
           >
-            OS Interiors was founded with a singular conviction: fine architecture should never be compromised by the chaotic fragmentation of multi-contractor construction. We unite spatial planning, MEP engineering, and in-house millwork into a single, cohesive discipline.
+            Headquartered in Kandivali, Mumbai, OS Interior was founded with a singular conviction: fine architecture should never be compromised by multi-vendor fragmentation. We unite spatial planning, MEP engineering, and in-house factory millwork under unified master contractor accountability.
           </motion.p>
         </div>
 

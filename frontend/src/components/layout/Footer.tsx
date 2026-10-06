@@ -47,16 +47,16 @@ export default function Footer() {
           <div className="lg:col-span-4">
             <Link href="/" className="inline-block group mb-5">
               <span className="font-display font-medium text-lg tracking-[0.2em] uppercase text-white group-hover:text-[#C5A880] transition-colors">
-                OS <span className="text-[#C5A880]">INTERIORS</span>
+                OS <span className="text-[#C5A880]">INTERIOR</span>
               </span>
             </Link>
             <p className="text-sm text-[#A1A1AA] font-light leading-relaxed max-w-sm mb-6">
-              Obsidian editorial dark luxury &amp; architectural brutalism. Dedicated to transforming high-stakes commercial environments and bespoke residences through single-point master accountability.
+              Premier commercial and corporate interior design and contracting firm. Delivering high-performance office fit-outs, executive boardrooms, and bespoke atelier millwork across Mumbai and pan-India.
             </p>
             <div className="flex items-start gap-2.5 text-xs text-[#A1A1AA] font-light">
               <MapPin className="h-4 w-4 text-[#C5A880] shrink-0 mt-0.5" />
               <span>
-                Studio &amp; Fabrication Atelier: Mumbai &bull; Malad &bull; Navi Mumbai &bull; Indore
+                Headquarters &amp; Atelier: Kandivali West, Mumbai &bull; Serving Mumbai, Navi Mumbai &amp; Pan-India
               </span>
             </div>
           </div>
@@ -64,96 +64,131 @@ export default function Footer() {
           {/* Col 2: Core Disciplines (3 cols) */}
           <div className="lg:col-span-3">
             <h4 className="text-xs uppercase tracking-[0.25em] font-medium text-[#C5A880] mb-5">
-              Disciplines
+              Commercial Services
             </h4>
-            <ul className="space-y-3 text-sm font-light text-[#A1A1AA]">
+            <ul className="space-y-2.5 text-xs font-light text-[#A1A1AA]">
               <li>
-                <Link href="/about" className="hover:text-white transition-colors">
-                  Commercial Fit-Outs
+                <Link href="/services/corporate-interiors" className="hover:text-white transition-colors">
+                  Corporate Interior Design
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-white transition-colors">
-                  Spatial Masterplanning
+                <Link href="/services/commercial-interiors" className="hover:text-white transition-colors">
+                  Commercial Interior Design
                 </Link>
               </li>
               <li>
-                <Link href="/projects?category=Restaurants+%26+Dining" className="hover:text-white transition-colors">
-                  Hospitality &amp; Dining Spaces
+                <Link href="/services/office-interiors" className="hover:text-white transition-colors">
+                  Office Interior Design
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-white transition-colors">
-                  Turnkey MEP &amp; Civil Execution
+                <Link href="/services/turnkey-interiors" className="hover:text-white transition-colors">
+                  Turnkey Interior Contracting
                 </Link>
               </li>
               <li>
-                <Link href="/projects?category=Bespoke+Joinery" className="hover:text-white transition-colors">
-                  Bespoke Joinery &amp; Millwork
+                <Link href="/services/office-fit-out" className="hover:text-white transition-colors">
+                  Office Fit-Out Solutions
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/office-renovation" className="hover:text-white transition-colors">
+                  Office Renovation &amp; Refits
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/design-build" className="hover:text-white transition-colors">
+                  Design &amp; Build Contracting
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/workspace-planning" className="hover:text-white transition-colors">
+                  Workspace Spatial Planning
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Col 3: Selected Realizations (3 cols) */}
+          {/* Col 3: Regional Hubs & Case Studies (3 cols) */}
           <div className="lg:col-span-3">
             <h4 className="text-xs uppercase tracking-[0.25em] font-medium text-[#C5A880] mb-5">
-              Realizations
+              Locations &amp; Projects
             </h4>
-            <ul className="space-y-3 text-sm font-light text-[#A1A1AA]">
+            <ul className="space-y-2.5 text-xs font-light text-[#A1A1AA]">
               <li>
-                <Link href="/projects" className="hover:text-white transition-colors">
-                  Bombay Barbeque (Malad)
+                <Link href="/locations/mumbai" className="hover:text-white transition-colors">
+                  Mumbai Corporate Hub
                 </Link>
               </li>
               <li>
-                <Link href="/projects" className="hover:text-white transition-colors">
+                <Link href="/locations/kandivali" className="hover:text-white transition-colors">
+                  Kandivali West HQ &amp; Studio
+                </Link>
+              </li>
+              <li>
+                <Link href="/locations/navi-mumbai" className="hover:text-white transition-colors">
+                  Navi Mumbai Delivery Hub
+                </Link>
+              </li>
+              <li>
+                <Link href="/locations/andheri" className="hover:text-white transition-colors">
+                  Andheri &amp; Sakinaka Hub
+                </Link>
+              </li>
+              <li className="pt-2 border-t border-white/5">
+                <Link href="/projects/netwin-ventures" className="hover:text-white transition-colors">
                   NETWIN Ventures (CBD Belapur)
                 </Link>
               </li>
               <li>
-                <Link href="/projects" className="hover:text-white transition-colors">
-                  99 Wok Street (Kandivali)
+                <Link href="/projects/bombay-barbeque" className="hover:text-white transition-colors">
+                  Bombay Barbeque (Malad)
                 </Link>
               </li>
               <li>
-                <Link href="/projects" className="hover:text-white transition-colors">
-                  Caravan Lounge &amp; Dining
-                </Link>
-              </li>
-              <li>
-                <Link href="/projects" className="text-[#C5A880] hover:underline flex items-center gap-1">
-                  <span>View All 12+ Realizations</span>
-                  <ArrowUpRight className="h-3 w-3" />
+                <Link href="/projects/boomerang-park" className="hover:text-white transition-colors">
+                  Boomerang Corporate Park (Andheri)
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Col 4: Studio Philosophy (2 cols) */}
+          {/* Col 4: Studio Navigation (2 cols) */}
           <div className="lg:col-span-2">
             <h4 className="text-xs uppercase tracking-[0.25em] font-medium text-[#C5A880] mb-5">
-              Studio
+              Studio &amp; Insights
             </h4>
-            <ul className="space-y-3 text-sm font-light text-[#A1A1AA]">
+            <ul className="space-y-2.5 text-xs font-light text-[#A1A1AA]">
               <li>
                 <Link href="/about" className="hover:text-white transition-colors">
-                  Our Philosophy
+                  About OS Interior
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-white transition-colors">
-                  Client Trust &amp; Reviews
+                <Link href="/services" className="hover:text-white transition-colors">
+                  All Services
+                </Link>
+              </li>
+              <li>
+                <Link href="/projects" className="hover:text-white transition-colors">
+                  Commercial Portfolio
+                </Link>
+              </li>
+              <li>
+                <Link href="/blog" className="hover:text-white transition-colors">
+                  Advisory &amp; Cost Guides
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="hover:text-white transition-colors">
-                  Project Inquiries
+                  Contact Studio
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-white transition-colors">
-                  Spatial Consultation
+                <Link href="/contact" className="text-[#C5A880] hover:underline flex items-center gap-1 pt-1">
+                  <span>Site Consultation</span>
+                  <ArrowUpRight className="h-3 w-3" />
                 </Link>
               </li>
             </ul>

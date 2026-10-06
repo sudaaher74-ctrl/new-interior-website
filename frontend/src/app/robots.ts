@@ -1,0 +1,23 @@
+import { MetadataRoute } from 'next';
+import { SITE_URL } from '@/data/businessConfig';
+
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: [
+          '/admin',
+          '/admin/*',
+          '/employee',
+          '/employee/*',
+          '/login',
+          '/api/',
+          '/api/*',
+        ],
+      },
+    ],
+    sitemap: `${SITE_URL}/sitemap.xml`,
+  };
+}

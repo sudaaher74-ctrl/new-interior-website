@@ -8,8 +8,10 @@ import { Menu, X } from 'lucide-react';
 
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
-  { label: 'Project', href: '/projects' },
-  { label: 'About Us', href: '/about' },
+  { label: 'Services', href: '/services' },
+  { label: 'Projects', href: '/projects' },
+  { label: 'Guides', href: '/blog' },
+  { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ];
 
@@ -37,8 +39,14 @@ export default function Navbar() {
     if (href === '/') {
       return pathname === '/';
     }
+    if (href === '/services') {
+      return pathname.startsWith('/services');
+    }
     if (href === '/projects') {
       return pathname.startsWith('/project');
+    }
+    if (href === '/blog') {
+      return pathname.startsWith('/blog');
     }
     if (href === '/about') {
       return pathname.startsWith('/about');

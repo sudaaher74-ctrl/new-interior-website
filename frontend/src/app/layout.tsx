@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from 'next';
 import { Poppins, Cormorant_Garamond } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import SiteShell from '@/components/layout/SiteShell';
+import { SITE_URL, BUSINESS_INFO } from '@/data/businessConfig';
+import { getOrganizationSchema, getLocalBusinessSchema } from '@/lib/seo';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -25,42 +28,73 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'OS Interiors | Obsidian Architectural Brutalism & Luxury Interior Firm',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'Corporate Interior Designers in Mumbai | OS Interior',
+    template: '%s | OS Interior',
+  },
   description:
-    'Award-winning architectural and turnkey interior design studio specializing in corporate headquarters, luxury dining, retail flagships, and bespoke atelier millwork.',
+    'Corporate and commercial interior designers in Mumbai. Turnkey office fit-outs, executive headquarters, space planning & commercial renovations across Mumbai, Navi Mumbai & Pan-India.',
   keywords: [
-    'Interior Architecture Studio',
-    'Turnkey Commercial Fit-Outs',
-    'Luxury Office Interiors Mumbai',
-    'Bespoke Joinery & Millwork',
-    'Hospitality Interior Contractors',
-    'Obsidian Dark Luxury Design',
+    'corporate interior designers Mumbai',
+    'commercial interior designers Mumbai',
+    'office interior designers Mumbai',
+    'corporate interior company Mumbai',
+    'turnkey interior contractors Mumbai',
+    'office fit out company Mumbai',
+    'office interior contractors Mumbai',
+    'corporate office interior Mumbai',
+    'workspace interior designers Mumbai',
+    'design and build company Mumbai',
+    'office interior designers Kandivali',
+    'office interior designers Navi Mumbai',
   ],
-  authors: [{ name: 'OS Interiors Studio' }],
+  authors: [{ name: 'OS Interior Studio' }],
+  creator: 'OS Interior',
+  publisher: 'OS Interior',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
-    title: 'OS Interiors | Architectural Brutalism & Luxury Design',
+    title: 'Corporate Interior Designers in Mumbai | OS Interior',
     description:
-      'Deep obsidian canvas, hairline architectural linework, warm champagne gold accents, and turnkey master execution.',
-    type: 'website',
+      'Premier commercial interior design and turnkey contracting studio in Mumbai. Executive headquarters, commercial fit-outs, and bespoke atelier millwork.',
+    url: SITE_URL,
+    siteName: 'OS Interior',
     locale: 'en_IN',
-    siteName: 'OS Interiors',
+    type: 'website',
+    images: [
+      {
+        url: '/images/bombayB1.webp',
+        width: 1200,
+        height: 630,
+        alt: 'OS Interior — Corporate & Commercial Interior Design Studio Mumbai',
+      },
+    ],
   },
-};
-
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'ProfessionalService',
-  name: 'OS Interiors',
-  description:
-    'Ultra-luxury architectural brutalism, corporate turnkey fit-outs, and bespoke atelier joinery.',
-  address: {
-    '@type': 'PostalAddress',
-    addressLocality: 'Mumbai',
-    addressRegion: 'Maharashtra',
-    addressCountry: 'IN',
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Corporate Interior Designers in Mumbai | OS Interior',
+    description:
+      'Turnkey corporate & commercial interior design studio in Mumbai. Specialized in office fit-outs, space planning, and bespoke architectural millwork.',
+    images: ['/images/bombayB1.webp'],
   },
-  telephone: '+91 89591 73790',
-  priceRange: '₹₹₹₹',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({
@@ -68,34 +102,42 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const orgSchema = getOrganizationSchema();
+  const localBusinessSchema = getLocalBusinessSchema();
+
   return (
     <html
       lang="en"
       className={`${poppins.variable} ${cormorant.variable} scroll-smooth`}
     >
       <head>
-        {/* Google tag (gtag.js) */}
-        <script
-          async
+        {/* Google Analytics via next/script */}
+        <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-XG07N4CDCF"
+          strategy="afterInteractive"
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-
-              gtag('config', 'G-XG07N4CDCF');
-            `,
-          }}
-        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-XG07N4CDCF', {
+              page_path: window.location.pathname,
+            });
+          `}
+        </Script>
       </head>
       <body className="bg-[#0A0A0B] text-[#D4D4D8] font-sans antialiased selection:bg-[#C5A880] selection:text-[#0A0A0B]">
+        {/* Core Organization & Local Business Schema */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+        />
+
         <SiteShell>{children}</SiteShell>
       </body>
     </html>

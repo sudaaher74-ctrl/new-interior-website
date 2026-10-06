@@ -72,7 +72,7 @@ export default function HeroShowreel() {
         >
           <span className="text-[#C5A880] text-xs">✦</span>
           <span className="text-[11px] sm:text-xs uppercase tracking-[0.3em] font-medium text-[#C5A880]">
-            Architecture &bull; Turnkey Fit-Out &bull; Atelier Joinery
+            Corporate Fit-Out &bull; Turnkey Contracting &bull; In-House Millwork
           </span>
           <span className="text-[#C5A880] text-xs">✦</span>
         </motion.div>
@@ -84,11 +84,11 @@ export default function HeroShowreel() {
           transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           className="max-w-5xl"
         >
-          <span className="font-display font-light text-[38px] sm:text-[56px] md:text-[72px] lg:text-[86px] tracking-tight uppercase text-white block leading-[1.02]">
-            SHAPING SPATIAL
+          <span className="font-display font-light text-[32px] sm:text-[50px] md:text-[66px] lg:text-[78px] tracking-tight uppercase text-white block leading-[1.05]">
+            Corporate &amp; Commercial
           </span>
-          <span className="font-serif italic font-normal text-[44px] sm:text-[64px] md:text-[80px] lg:text-[98px] text-[#C5A880] block -mt-1 sm:-mt-3">
-            Grandeur.
+          <span className="font-serif italic font-normal text-[36px] sm:text-[56px] md:text-[72px] lg:text-[88px] text-[#C5A880] block -mt-1 sm:-mt-2">
+            Interior Designers in Mumbai
           </span>
         </motion.h1>
 
@@ -97,9 +97,9 @@ export default function HeroShowreel() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-6 max-w-xl text-sm sm:text-base text-[#D4D4D8] font-light leading-relaxed"
+          className="mt-6 max-w-2xl text-sm sm:text-base text-[#D4D4D8] font-light leading-relaxed"
         >
-          We orchestrate obsidian brutalism, Italian tactile marbles, and micro-tolerance turnkey craftsmanship for discerning enterprise leaders and luxury proprietors.
+          Single-point turnkey interior contracting for enterprise headquarters, executive boardrooms, and high-performance commercial spaces across Mumbai, Navi Mumbai, and pan-India.
         </motion.p>
 
         {/* Hero Action Buttons */}
@@ -110,16 +110,16 @@ export default function HeroShowreel() {
           className="mt-8 flex flex-wrap items-center justify-center gap-4"
         >
           <Link
-            href="/projects"
-            className="rounded-full px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] bg-white text-black hover:bg-[#C5A880] transition-all duration-300 shadow-xl"
+            href="/services"
+            className="rounded-full px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] bg-white text-black hover:bg-[#C5A880] hover:text-black transition-all duration-300 shadow-xl"
           >
-            Explore Realizations
+            Explore Services
           </Link>
           <Link
             href="/contact"
             className="rounded-full px-8 py-3.5 text-xs font-light uppercase tracking-[0.16em] border border-white/20 text-white hover:border-[#C5A880] hover:text-[#C5A880] transition-all duration-300 bg-[#121216]/50 backdrop-blur-sm"
           >
-            Schedule Private Audit
+            Request Consultation
           </Link>
         </motion.div>
       </div>

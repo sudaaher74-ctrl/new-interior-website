@@ -1,7 +1,18 @@
+'use client';
+
 import React from 'react';
 import { Phone } from 'lucide-react';
 
 export default function StickyContact() {
+  const trackConversion = (eventName: string) => {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', eventName, {
+        event_category: 'lead_conversion',
+        event_label: 'sticky_hud_action',
+      });
+    }
+  };
+
   return (
     <aside
       aria-label="Quick contact"
@@ -9,13 +20,15 @@ export default function StickyContact() {
     >
       {/* WhatsApp Action */}
       <a
-        href="https://wa.me/918959173790?text=Hello%20OS%20Interiors%2C%20I%20would%20like%20to%20inquire%20about%20an%20interior%20architecture%20and%20turnkey%20fit-out%20project."
+        id="sticky-whatsapp-btn"
+        href="https://wa.me/918959173790?text=Hello%20OS%20Interior%2C%20I%20would%20like%20to%20inquire%20about%20a%20corporate%20interior%20and%20turnkey%20fit-out%20project."
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackConversion('whatsapp_click')}
         className="group relative flex h-11 w-11 sm:h-13 sm:w-13 items-center justify-center rounded-full bg-[#121216]/90 backdrop-blur-md text-[#25D366] border border-white/20 hover:border-[#25D366] shadow-[0_4px_25px_rgba(0,0,0,0.8)] transition-all duration-300 hover:scale-110 hover:shadow-[0_0_25px_rgba(37,211,102,0.4)]"
-        aria-label="Chat with OS Interiors on WhatsApp"
+        aria-label="Chat with OS Interior on WhatsApp"
       >
-        <span className="sr-only">Chat with OS Interiors on WhatsApp</span>
+        <span className="sr-only">Chat with OS Interior on WhatsApp</span>
         {/* Tooltip on left */}
         <span className="pointer-events-none absolute right-full mr-3 whitespace-nowrap rounded-full bg-[#0A0A0B]/95 backdrop-blur-md px-3.5 py-1.5 text-[11px] uppercase tracking-wider font-medium text-[#25D366] opacity-0 shadow-xl transition-opacity duration-200 group-hover:opacity-100 border border-white/15">
           WhatsApp Studio
@@ -27,11 +40,13 @@ export default function StickyContact() {
 
       {/* Call Direct Action */}
       <a
+        id="sticky-call-btn"
         href="tel:+918959173790"
+        onClick={() => trackConversion('phone_click')}
         className="group relative flex h-11 w-11 sm:h-13 sm:w-13 items-center justify-center rounded-full bg-[#121216]/90 backdrop-blur-md text-[#C5A880] border border-white/20 hover:border-[#C5A880] shadow-[0_4px_25px_rgba(0,0,0,0.8)] transition-all duration-300 hover:scale-110 hover:shadow-[0_0_25px_rgba(197,168,128,0.4)]"
-        aria-label="Call OS Interiors Direct Line"
+        aria-label="Call OS Interior Direct Line"
       >
-        <span className="sr-only">Call OS Interiors Direct Line</span>
+        <span className="sr-only">Call OS Interior Direct Line</span>
         {/* Tooltip on left */}
         <span className="pointer-events-none absolute right-full mr-3 whitespace-nowrap rounded-full bg-[#0A0A0B]/95 backdrop-blur-md px-3.5 py-1.5 text-[11px] uppercase tracking-wider font-medium text-[#C5A880] opacity-0 shadow-xl transition-opacity duration-200 group-hover:opacity-100 border border-white/15">
           +91 89591 73790

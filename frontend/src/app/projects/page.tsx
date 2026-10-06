@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ALL_PROJECTS, ProjectItem } from '@/data/interiorData';
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { MapPin, ArrowUpRight, X, CheckCircle2, Layers, Sparkles, Filter, ChevronRight } from 'lucide-react';
 
 const CATEGORIES = [
@@ -66,23 +67,20 @@ function ProjectsContent() {
 
       {/* Hero Header */}
       <div className="container-px relative z-10 mb-12 sm:mb-16">
-        {/* Breadcrumb / Tag */}
-        <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] font-medium text-[#C5A880] mb-4">
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
-          <ChevronRight className="h-3 w-3 text-white/30" />
-          <span className="text-white/60">Portfolio</span>
-          <ChevronRight className="h-3 w-3 text-white/30" />
-          <span>Realized Projects</span>
-        </div>
+        <Breadcrumbs
+          items={[
+            { name: 'Projects', path: '/projects' },
+          ]}
+        />
 
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-white/10">
           <div>
             <h1 className="font-display font-light text-4xl sm:text-5xl lg:text-6xl uppercase tracking-tight text-white leading-[1.05]">
-              ARCHITECTURAL <br />
-              <span className="font-serif italic font-normal text-[#C5A880]">PORTFOLIO</span>
+              COMMERCIAL INTERIOR <br />
+              <span className="font-serif italic font-normal text-[#C5A880]">PROJECTS &amp; CASE STUDIES</span>
             </h1>
             <p className="mt-4 text-sm sm:text-base text-[#A1A1AA] font-light max-w-2xl leading-relaxed">
-              Explore our realized turnkey environments—from high-density corporate headquarters and iconic hospitality spaces to bespoke joinery fabrication. Every square foot is engineered with single-point master accountability.
+              Explore our realized turnkey environments—from high-density corporate headquarters and iconic hospitality spaces to bespoke joinery fabrication across Mumbai, Navi Mumbai, and pan-India.
             </p>
           </div>
 
@@ -230,6 +228,20 @@ function ProjectsContent() {
                       )}
                     </div>
                   )}
+
+                  <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs">
+                    <span className="text-[10px] uppercase tracking-wider text-[#A1A1AA]">
+                      {project.scope || 'Turnkey Scope'}
+                    </span>
+                    <Link
+                      href={`/projects/${project.slug}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-[#C5A880] hover:text-white uppercase tracking-wider text-[11px] font-semibold flex items-center gap-1"
+                    >
+                      <span>Read Case Study</span>
+                      <ArrowUpRight className="h-3 w-3" />
+                    </Link>
+                  </div>
                 </div>
               </motion.article>
             ))}
@@ -396,6 +408,15 @@ function ProjectsContent() {
                     >
                       <span>Inquire About This Space Typology</span>
                       <ArrowUpRight className="h-4 w-4" />
+                    </Link>
+
+                    <Link
+                      href={`/projects/${selectedProject.slug}`}
+                      className="flex w-full items-center justify-center gap-2 rounded-full border border-white/20 text-white py-3 text-xs uppercase tracking-[0.16em] font-light hover:border-[#C5A880] hover:text-[#C5A880] transition-all"
+                      onClick={() => setSelectedProject(null)}
+                    >
+                      <span>Open Full Case Study Page</span>
+                      <ArrowUpRight className="h-3.5 w-3.5" />
                     </Link>
 
                     <div className="flex items-center justify-center gap-1.5 text-[11px] text-[#A1A1AA] font-light">
