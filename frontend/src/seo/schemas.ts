@@ -62,6 +62,8 @@ export function getOrganizationSchema() {
       'Mechanical, Electrical & Plumbing (MEP) Engineering',
       'HVAC Systems & Acoustics',
       'Bespoke Joinery & Millwork',
+      'Airport Commercial Interior Design',
+      'Aviation Office & Lounge Fit-Outs',
     ],
   };
 }

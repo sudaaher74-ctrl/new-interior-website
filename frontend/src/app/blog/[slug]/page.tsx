@@ -10,9 +10,18 @@ import {
   MapPin,
   Briefcase,
   AlertCircle,
+  HelpCircle,
 } from 'lucide-react';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
-import { BLOG_POSTS, SERVICES_CATALOG, LOCATIONS_CATALOG, SITE_URL, getArticleSchema, getBreadcrumbSchema } from '@/seo';
+import {
+  BLOG_POSTS,
+  SERVICES_CATALOG,
+  LOCATIONS_CATALOG,
+  SITE_URL,
+  getArticleSchema,
+  getBreadcrumbSchema,
+  getFAQSchema,
+} from '@/seo';
 import { ALL_PROJECTS } from '@/data/interiorData';
 
 interface BlogPostPageProps {
@@ -82,6 +91,7 @@ export default async function BlogPostDetailPage({ params }: BlogPostPageProps) 
     { name: 'Advisory Guides', path: '/blog' },
     { name: post.title, path: `/blog/${post.slug}` },
   ]);
+  const faqSchema = post.faqs && post.faqs.length > 0 ? getFAQSchema(post.faqs) : null;
 
   return (
     <div className="min-h-screen bg-[#FAFAF9] text-[#0F0F12] pt-28 sm:pt-36 pb-24">
@@ -94,6 +104,12 @@ export default async function BlogPostDetailPage({ params }: BlogPostPageProps) 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
 
       {/* Soft Ambient Glow */}
       <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[850px] h-[500px] bg-[#8F6E38]/5 blur-[160px] rounded-full pointer-events-none" />
@@ -304,6 +320,33 @@ export default async function BlogPostDetailPage({ params }: BlogPostPageProps) 
                 )}
               </section>
             ))}
+
+            {/* Optional Structured FAQs */}
+            {post.faqs && post.faqs.length > 0 && (
+              <section id="faqs" className="scroll-mt-32 pt-6">
+                <div className="flex items-center gap-2.5 mb-6 pb-3 border-b border-stone-200">
+                  <HelpCircle className="h-6 w-6 text-[#8F6E38]" />
+                  <h2 className="font-display font-light text-2xl sm:text-3xl uppercase tracking-tight text-[#0F0F12]">
+                    Frequently Answered Questions
+                  </h2>
+                </div>
+                <div className="space-y-4">
+                  {post.faqs.map((faq, fIdx) => (
+                    <div
+                      key={fIdx}
+                      className="rounded-[18px] bg-white border border-stone-200/90 p-5 sm:p-6 shadow-sm hover:border-[#8F6E38]/40 transition-colors"
+                    >
+                      <h3 className="font-display font-light text-base sm:text-lg text-[#0F0F12] mb-2">
+                        {faq.question}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-stone-600 font-light leading-relaxed">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {/* Bottom Conversion Box */}
             <div className="rounded-[24px] bg-[#F5F3EE] border border-stone-200/90 p-8 sm:p-10 shadow-sm text-center">
