@@ -53,6 +53,7 @@ function ContactContent() {
 
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (requestedProject) {
@@ -63,15 +64,42 @@ function ContactContent() {
     }
   }, [requestedProject]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setErrorMessage(null);
 
-    // Simulate submission delay and feedback
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          projectType: formData.projectType,
+          requirement: `${formData.projectType}${formData.area ? ` (${formData.area})` : ''}`,
+          location: formData.location,
+          budget: formData.budget,
+          area: formData.area,
+          message: formData.message,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.msg || 'Unable to submit your inquiry at this moment.');
+      }
+
       setSubmitted(true);
-    }, 900);
+    } catch (err: any) {
+      console.error('Lead submission error:', err);
+      setErrorMessage(
+        err.message || 'Submission encountered an issue. You can also connect directly via WhatsApp or phone.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const whatsappMessage = encodeURIComponent(
@@ -420,6 +448,26 @@ function ContactContent() {
                       className="w-full rounded-xl bg-stone-50 border border-stone-200 px-4 py-3 text-sm text-[#0F0F12] placeholder-stone-400 focus:border-[#8F6E38] focus:bg-white focus:outline-none transition-colors"
                     />
                   </div>
+
+                  {/* Error Alert if any */}
+                  {errorMessage && (
+                    <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 text-xs text-amber-900 flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-semibold">{errorMessage}</p>
+                        <p className="mt-1 text-amber-700">
+                          You can also reach our Studio Director directly on WhatsApp at{' '}
+                          <a
+                            href={`https://wa.me/918959173790?text=${whatsappMessage}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline font-bold text-emerald-800"
+                          >
+                            +91 89591 73790
+                          </a>
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Submit Button */}
                   <button

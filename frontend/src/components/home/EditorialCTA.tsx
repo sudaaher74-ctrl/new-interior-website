@@ -7,6 +7,8 @@ import { ArrowRight, Phone, Send, CheckCircle2 } from 'lucide-react';
 
 export default function EditorialCTA() {
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -15,17 +17,53 @@ export default function EditorialCTA() {
     message: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFormSubmitted(true);
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          projectType: formData.projectType,
+          requirement: formData.projectType,
+          location: formData.city,
+          message: formData.message,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.msg || 'Unable to transmit your inquiry.');
+      }
+
+      setFormSubmitted(true);
+    } catch (err: any) {
+      console.error('Lead error:', err);
+      setErrorMessage(
+        err.message || 'Submission encountered an issue. You can call or WhatsApp our Studio Director directly.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const whatsappMessage = encodeURIComponent(
+    `Hello OS Interiors Studio. I would like to discuss an architectural interior project.\nName: ${
+      formData.name || 'Client'
+    }\nPhone: ${formData.phone}\nType: ${formData.projectType}\nLocation: ${formData.city}`
+  );
 
   return (
     <section id="contact" className="relative overflow-hidden bg-[#FAFAF9] text-[#0F0F12] py-24 md:py-36 px-5 sm:px-8 border-b border-stone-200/80">
       {/* Background Architectural Photo with 10% Opacity */}
       <div className="absolute inset-0 pointer-events-none select-none opacity-10">
         <Image
-          src="/images/bombayB2.webp"
+          src="/images/BelapurC2.webp"
           alt="Architectural space background"
           fill
           sizes="100vw"
@@ -87,12 +125,36 @@ export default function EditorialCTA() {
               <h3 className="font-display font-light text-2xl uppercase tracking-wider text-[#0F0F12]">
                 Inquiry Received
               </h3>
-              <p className="mt-2 text-sm text-stone-600 max-w-md font-light">
-                Thank you for considering OS Interiors. Our Principal Project Director will review your spatial requirements and contact you within 24 hours.
+              <p className="mt-2 text-sm text-stone-600 max-w-md font-light mb-6">
+                Thank you, <span className="font-semibold text-[#0F0F12]">{formData.name}</span>. Our Principal Project Director has received your inquiry and will reach out within 24 hours.
               </p>
+              <a
+                href={`https://wa.me/918959173790?text=${whatsappMessage}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-emerald-600 text-white px-6 py-3 text-xs uppercase tracking-[0.14em] font-semibold hover:bg-emerald-700 transition-all shadow-md"
+              >
+                <span>Continue on WhatsApp Immediately</span>
+              </a>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              {errorMessage && (
+                <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-900">
+                  <p className="font-semibold">{errorMessage}</p>
+                  <p className="mt-1 text-amber-700">
+                    Reach us directly on WhatsApp:{' '}
+                    <a
+                      href={`https://wa.me/918959173790?text=${whatsappMessage}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline font-bold text-emerald-800"
+                    >
+                      +91 89591 73790
+                    </a>
+                  </p>
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1.5 font-medium">
@@ -169,10 +231,11 @@ export default function EditorialCTA() {
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <button
                   type="submit"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-full bg-[#0F0F12] text-white hover:bg-[#8F6E38] text-xs uppercase tracking-[0.16em] font-semibold transition-all duration-300 shadow-md cursor-pointer"
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-full bg-[#0F0F12] text-white hover:bg-[#8F6E38] text-xs uppercase tracking-[0.16em] font-semibold transition-all duration-300 shadow-md cursor-pointer disabled:opacity-50"
                 >
                   <Send className="h-3.5 w-3.5" />
-                  <span>Transmit Inquiry</span>
+                  <span>{isSubmitting ? 'Transmitting...' : 'Transmit Inquiry'}</span>
                 </button>
 
                 <a

@@ -32,36 +32,73 @@ const leadLimiter = rateLimit({
   validate: { xForwardedForHeader: false },
 });
 
+const { notifyAdmins } = require('./notifications');
+
 // Create a new lead (public endpoint, from contact form)
 router.post('/', leadLimiter, async (req, res) => {
   try {
-    if (req.body.website) return res.json({ ok: true });
+    if (req.body.website) return res.json({ ok: true, success: true });
 
-    const { name, phone, email, projectType, message, requirement, location, budget } = req.body;
+    const { name, phone, email, projectType, message, requirement, location, budget, area } = req.body;
     if (!name || !phone) {
       return res.status(400).json({ msg: 'Name and phone are required.' });
     }
 
+    const cleanName = String(name).trim().slice(0, 120);
+    const cleanPhone = String(phone).trim().slice(0, 40);
+    const cleanEmail = email ? String(email).trim().slice(0, 160) : null;
+    const reqText = (requirement || projectType) ? String(requirement || projectType).trim().slice(0, 200) : null;
+    const locText = location ? String(location).trim().slice(0, 200) : null;
+
+    // Parse numeric budget if valid, otherwise keep null for DB column
+    let numericBudget = null;
+    if (typeof budget === 'number' && !isNaN(budget)) {
+      numericBudget = budget;
+    } else if (typeof budget === 'string' && /^\d+$/.test(budget.trim())) {
+      numericBudget = parseInt(budget.trim(), 10);
+    }
+
+    // Build structured notes capturing all message, area, and budget details
+    const noteParts = [
+      message ? String(message).trim() : null,
+      area ? `Area: ${String(area).trim()}` : null,
+      budget && numericBudget === null ? `Budget: ${String(budget).trim()}` : null,
+    ].filter(Boolean);
+    const notes = noteParts.length > 0 ? noteParts.join(' | ').slice(0, 4000) : null;
+
     const { data, error } = await supabase
       .from('leads')
       .insert({
-        name: String(name).slice(0, 120),
-        phone: String(phone).slice(0, 40),
-        email: email ? String(email).slice(0, 160) : null,
-        requirement: (requirement || projectType) ? String(requirement || projectType).slice(0, 200) : null,
-        location: location ? String(location).slice(0, 200) : null,
-        budget: budget ? Number(budget) : null,
-        notes: message ? String(message).slice(0, 4000) : null,
+        name: cleanName,
+        phone: cleanPhone,
+        email: cleanEmail,
+        requirement: reqText,
+        location: locText,
+        budget: numericBudget,
+        notes: notes,
         status: 'New',
       })
       .select()
       .single();
 
     if (error) throw error;
-    res.json(formatLead(data));
+
+    // Notify admins in dashboard
+    if (typeof notifyAdmins === 'function') {
+      notifyAdmins({
+        senderName: cleanName,
+        type: 'lead',
+        message: `New Lead: ${cleanName} (${cleanPhone}) — ${reqText || 'Commercial Inquiry'}`,
+        link: '/employee-dashboard.html',
+      }).catch((notifErr) => {
+        console.error('Failed to send admin notification:', notifErr);
+      });
+    }
+
+    res.json({ success: true, lead: formatLead(data) });
   } catch (err) {
     console.error('Lead create error:', err);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: 'Server error creating enquiry. Please contact directly via WhatsApp.' });
   }
 });
 
