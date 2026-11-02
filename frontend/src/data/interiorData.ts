@@ -79,7 +79,7 @@ export const ALL_PROJECTS: ProjectItem[] = [
     category: 'Restaurants & Dining',
     image: '/images/bombayB1.webp',
     slug: 'bombay-barbeque',
-    gallery: ['/images/bombayB1.webp', '/images/bombayB2.webp', '/images/IMG_2706.webp'],
+    gallery: ['/images/bombayB1.webp', '/images/bombayB2.webp'],
     scope: 'Turnkey Hospitality',
     deliverables: ['Civil Works', 'MEP & HVAC', 'Custom Millwork', 'Acoustic Ceilings', 'Lighting'],
     description:
@@ -91,7 +91,7 @@ export const ALL_PROJECTS: ProjectItem[] = [
     category: 'Corporate Offices',
     image: '/images/BelapurC2.webp',
     slug: 'netwin-ventures',
-    gallery: ['/images/BelapurC2.webp', '/images/BelapurC3.webp', '/images/IMG_2701.webp', '/images/IMG_2702.webp', '/images/IMG_2697.webp'],
+    gallery: ['/images/BelapurC2.webp', '/images/BelapurC3.webp', '/images/IMG_2701.webp', '/images/IMG_2702.webp', '/images/IMG_2697.webp', '/images/IMG_2706.webp'],
     scope: 'Turnkey Commercial',
     deliverables: ['Executive Boardrooms', 'Open Workstations', 'Acoustic Partitions', 'Civil & MEP'],
     description:
