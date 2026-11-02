@@ -14,3 +14,4 @@ if (typeof self !== 'undefined' && self.define) {
     };
   });
 }
+
