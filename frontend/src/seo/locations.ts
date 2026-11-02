@@ -54,7 +54,7 @@ export const LOCATIONS_CATALOG: LocationDetail[] = [
       'Experienced in Grade-A commercial real estate park protocols (Mindspace, Nesco, Boomerang)',
       'Overnight and weekend silent-execution capability for operational business parks',
     ],
-    verifiedLocalProjects: ['bombay-barbeque', '99-wok-street', 'juice-crush', 'caravan-lounge', 'boomerang-park', 'velvet-atelier', 'exterior-facade'],
+    verifiedLocalProjects: ['bombay-barbeque', '99-wok-street', 'juice-crush', 'caravan-lounge', 'radhakrishna-cuisine'],
     logisticsHub: 'Headquartered in Kandivali West, Mumbai with dedicated in-house millwork facility.',
     faqs: [
       {
@@ -144,12 +144,12 @@ export const LOCATIONS_CATALOG: LocationDetail[] = [
       'Factory-prefabricated joinery dispatched directly from Mumbai to Navi Mumbai sites',
       'Experienced in high-density IT workstation layouts and round-the-clock server room MEP',
     ],
-    verifiedLocalProjects: ['netwin-ventures', 'zenith-floors', 'studio-akaai'],
+    verifiedLocalProjects: ['netwin-ventures'],
     logisticsHub: 'Dedicated Navi Mumbai execution team backed by our central Mumbai fabrication facility.',
     faqs: [
       {
         question: 'Does OS Interior execute office interiors in CBD Belapur and Vashi?',
-        answer: 'Yes. Navi Mumbai is a primary market where we have completed flagship corporate projects like NETWIN Ventures and Zenith Executive Floors in CBD Belapur.',
+        answer: 'Yes. Navi Mumbai is a primary market where we have completed flagship corporate projects like NETWIN Ventures in CBD Belapur.',
       },
       {
         question: 'Do you have a physical office in Navi Mumbai?',
@@ -181,22 +181,22 @@ export const LOCATIONS_CATALOG: LocationDetail[] = [
       'Andheri is Mumbai\'s primary commercial hub for corporate HQs, tech campuses, and grade-A business complexes. OS Interior engineers turnkey office interiors and commercial fit-outs throughout Andheri East and West, including MIDC, SEEPZ, Chakala, and Sakinaka.',
     keyBusinessZones: [
       'Andheri East MIDC & SEEPZ: Major multinational headquarters, tech parks, and corporate hubs',
-      'Sakinaka & Andheri-Kurla Road: Landmark commercial parks including Boomerang Corporate Park',
+      'Sakinaka & Andheri-Kurla Road: Landmark commercial parks and prime business hubs',
       'Chakala & Solitaire Corporate Park: Consulting firms, fintech offices, and enterprise regional hubs',
       'Andheri West Link Road: High-traffic commercial flagships, media studios, and boutique executive offices',
     ],
     localCapabilities: [
-      'Proven project delivery inside grade-A commercial developments including Boomerang Corporate Park',
+      'Proven turnkey project delivery across grade-A Western Suburb commercial complexes',
       'Fast 20-minute mobilization from our Kandivali headquarters via Western Express Highway & Metro',
       'Extensive experience with overnight silent civil works and strict complex security handbooks',
       'Full compliance coordination with BMC and MIDC building infrastructure departments',
     ],
-    verifiedLocalProjects: ['boomerang-park', 'exterior-facade'],
+    verifiedLocalProjects: ['bombay-barbeque', '99-wok-street'],
     logisticsHub: 'Headquartered in Kandivali West, Mumbai with rapid deployment across Andheri corridors.',
     faqs: [
       {
-        question: 'What commercial projects has OS Interior completed in Andheri?',
-        answer: 'We have executed large-scale commercial fit-outs in Andheri including corporate office floors in Boomerang Corporate Park (Sakinaka) and high-durability exterior facade projects in Andheri.',
+        question: 'What commercial projects has OS Interior completed in the Western Suburbs?',
+        answer: 'We have executed flagship commercial and restaurant fit-outs across the Western Suburbs including Bombay Barbeque (Malad) and 99 Wok Street (Kandivali).',
       },
       {
         question: 'Can you work during restricted night hours in Andheri commercial parks?',

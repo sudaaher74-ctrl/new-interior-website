@@ -13,8 +13,6 @@ const CATEGORIES = [
   'Restaurants & Dining',
   'Luxury Retail',
   'Hospitality & Lounge',
-  'Bespoke Joinery',
-  'Exteriors & Facade',
 ];
 
 export default function RunningMarquee() {

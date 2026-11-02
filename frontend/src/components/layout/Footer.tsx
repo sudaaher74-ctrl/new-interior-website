@@ -147,8 +147,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/projects/boomerang-park" className="hover:text-[#0F0F12] transition-colors">
-                  Boomerang Corporate Park (Andheri)
+                <Link href="/projects/caravan-lounge" className="hover:text-[#0F0F12] transition-colors">
+                  Caravan Lounge (Bandra)
                 </Link>
               </li>
             </ul>

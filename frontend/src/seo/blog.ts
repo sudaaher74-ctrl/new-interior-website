@@ -154,10 +154,10 @@ export const BLOG_POSTS: BlogPost[] = [
     category: 'Workplace Strategy',
     excerpt:
       'Deciding between taking possession of a new bare-shell property or modernizing your existing corporate office? A direct comparison of cost, timeline, and operational downtime.',
-    image: '/images/IMG_2702.webp',
+    image: '/images/BelapurC2.webp',
     relatedServiceSlug: 'office-renovation',
     relatedLocationSlug: 'mumbai',
-    relatedProjectSlug: 'boomerang-park',
+    relatedProjectSlug: 'netwin-ventures',
     tableOfContents: [
       { id: 'core-definitions', title: '1. What Is the Fundamental Difference?' },
       { id: 'comparison-matrix', title: '2. Fit-Out vs Renovation: Direct Comparison' },
@@ -311,7 +311,7 @@ export const BLOG_POSTS: BlogPost[] = [
     image: '/images/BelapurC3.webp',
     relatedServiceSlug: 'workspace-planning',
     relatedLocationSlug: 'mumbai',
-    relatedProjectSlug: 'zenith-floors',
+    relatedProjectSlug: 'netwin-ventures',
     tableOfContents: [
       { id: 'area-calculation', title: '1. Carpet Area Calculation: How Many Square Feet Do You Need?' },
       { id: 'zoning-blueprint', title: '2. Room & Amenity Breakdown for 100 Staff' },

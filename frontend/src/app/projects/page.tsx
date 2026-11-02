@@ -15,8 +15,6 @@ const CATEGORIES = [
   'Restaurants & Dining',
   'Luxury Retail',
   'Hospitality & Lounge',
-  'Bespoke Joinery',
-  'Exteriors & Facade',
 ];
 
 function ProjectsContent() {
@@ -87,7 +85,9 @@ function ProjectsContent() {
           {/* Quick Metrics Badge */}
           <div className="flex items-center gap-6 sm:gap-8 bg-white border border-stone-200/90 rounded-2xl px-6 py-4 shrink-0 shadow-sm">
             <div>
-              <div className="text-2xl sm:text-3xl font-display font-medium text-[#8F6E38]">12+</div>
+              <div className="text-2xl sm:text-3xl font-display font-medium text-[#8F6E38]">
+                {ALL_PROJECTS.length}+
+              </div>
               <div className="text-[10px] uppercase tracking-[0.2em] text-stone-500 mt-0.5">Projects Realized</div>
             </div>
             <div className="h-8 w-[1px] bg-stone-200" />

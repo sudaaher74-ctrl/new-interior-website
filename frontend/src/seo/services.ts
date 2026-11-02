@@ -89,7 +89,7 @@ export const SERVICES_CATALOG: ServiceDetail[] = [
       { step: '04', title: 'Quality Audits & Commissioning', desc: 'Pre-handover statutory testing, air balancing, acoustic decibel verification, and formal handover.' },
     ],
     relevantIndustries: ['Banking & Financial Services', 'Corporate Headquarters', 'Tech & IT Campuses', 'Legal & Consulting Firms', 'Conglomerates & MNCs'],
-    relatedProjectSlugs: ['netwin-ventures', 'zenith-floors', 'studio-akaai'],
+    relatedProjectSlugs: ['netwin-ventures'],
     faqs: [
       {
         question: 'What is the typical timeline for a corporate office interior project in Mumbai?',
@@ -227,7 +227,7 @@ export const SERVICES_CATALOG: ServiceDetail[] = [
       { step: '04', title: 'Ergonomic Testing & Handover', desc: 'Final cleaning, acoustic balance testing, furniture placement, and snag-free client sign-off.' },
     ],
     relevantIndustries: ['Technology & Software Firms', 'Financial & Investment Offices', 'Consulting & Advisory Practices', 'Creative & Media Agencies', 'Co-working & Enterprise Incubators'],
-    relatedProjectSlugs: ['netwin-ventures', 'boomerang-park', 'zenith-floors'],
+    relatedProjectSlugs: ['netwin-ventures', '99-wok-street'],
     faqs: [
       {
         question: 'What is the average cost per square foot for an office interior in Mumbai?',
@@ -361,7 +361,7 @@ export const SERVICES_CATALOG: ServiceDetail[] = [
       { step: '04', title: 'Final Handover & Certification', desc: 'Securing building management clearances, Fire NOC compliance, and seamless tenant move-in.' },
     ],
     relevantIndustries: ['Corporate Floorplates', 'Financial Services', 'IT & Tech Campuses', 'BPO & Call Centers', 'Coworking Space Operators'],
-    relatedProjectSlugs: ['netwin-ventures', 'boomerang-park', 'zenith-floors'],
+    relatedProjectSlugs: ['netwin-ventures', 'bombay-barbeque'],
     faqs: [
       {
         question: 'What is the difference between a Cat A and Cat B office fit-out?',
@@ -369,7 +369,7 @@ export const SERVICES_CATALOG: ServiceDetail[] = [
       },
       {
         question: 'Can you work within strict commercial building management rules?',
-        answer: 'Yes. We have worked extensively in major business complexes such as Boomerang Park, BKC towers, and Belapur IT parks, coordinating closely with building facility teams regarding lift access, noise hours, and debris management.',
+        answer: 'Yes. We have worked extensively in major business complexes such as BKC towers, Mindspace, and Belapur IT parks, coordinating closely with building facility teams regarding lift access, noise hours, and debris management.',
       },
     ],
   },
@@ -428,7 +428,7 @@ export const SERVICES_CATALOG: ServiceDetail[] = [
       { step: '04', title: 'Handover & Immediate Occupancy', desc: 'Progressive clean-up and snag-free zone handover, allowing seamless employee migration.' },
     ],
     relevantIndustries: ['Established Corporate HQs', 'Financial & Stockbroking Firms', 'MNC Regional Offices', 'Healthcare Institutions', 'Educational Administrative Wings'],
-    relatedProjectSlugs: ['netwin-ventures', 'boomerang-park', 'zenith-floors'],
+    relatedProjectSlugs: ['netwin-ventures', 'caravan-lounge'],
     faqs: [
       {
         question: 'Can you renovate our office while our employees are still working in the building?',
@@ -495,7 +495,7 @@ export const SERVICES_CATALOG: ServiceDetail[] = [
       { step: '04', title: 'Commissioning & Seamless Handover', desc: 'Fire life-safety testing, acoustic decibel audits, and snag-free key handover.' },
     ],
     relevantIndustries: ['Corporate Headquarters', 'Financial & Investment Firms', 'Technology & IT Campuses', 'Healthcare & Life Sciences', 'Commercial Experience Centers'],
-    relatedProjectSlugs: ['netwin-ventures', 'bombay-barbeque', 'zenith-floors'],
+    relatedProjectSlugs: ['netwin-ventures', 'bombay-barbeque', '99-wok-street'],
     faqs: [
       {
         question: 'What are the cost and timeline advantages of a design & build contract?',
@@ -562,7 +562,7 @@ export const SERVICES_CATALOG: ServiceDetail[] = [
       { step: '04', title: 'Final Spatial Blueprint & Execution Pack', desc: 'Delivering millimeter-accurate architectural layouts ready for turnkey site build.' },
     ],
     relevantIndustries: ['Technology & Software Firms', 'Banking & Asset Management', 'Consulting & Legal Practices', 'Fast-Growing Startups', 'Corporate Head Offices'],
-    relatedProjectSlugs: ['boomerang-park', 'netwin-ventures', 'studio-akaai'],
+    relatedProjectSlugs: ['netwin-ventures', 'juice-crush'],
     faqs: [
       {
         question: 'How much square footage is needed per employee in a modern Mumbai office?',
