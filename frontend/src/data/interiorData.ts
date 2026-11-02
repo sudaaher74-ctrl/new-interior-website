@@ -91,7 +91,7 @@ export const ALL_PROJECTS: ProjectItem[] = [
     category: 'Corporate Offices',
     image: '/images/BelapurC2.webp',
     slug: 'netwin-ventures',
-    gallery: ['/images/BelapurC2.webp', '/images/BelapurC3.webp', '/images/IMG_2701.webp', '/images/IMG_2702.webp'],
+    gallery: ['/images/BelapurC2.webp', '/images/BelapurC3.webp', '/images/IMG_2701.webp', '/images/IMG_2702.webp', '/images/IMG_2697.webp'],
     scope: 'Turnkey Commercial',
     deliverables: ['Executive Boardrooms', 'Open Workstations', 'Acoustic Partitions', 'Civil & MEP'],
     description:
@@ -103,7 +103,7 @@ export const ALL_PROJECTS: ProjectItem[] = [
     category: 'Restaurants & Dining',
     image: '/images/Kandivali!.webp',
     slug: '99-wok-street',
-    gallery: ['/images/Kandivali!.webp', '/images/caffe.webp', '/images/IMG_2697.webp'],
+    gallery: ['/images/Kandivali!.webp', '/images/caffe.webp'],
     scope: 'Turnkey F&B Fit-Out',
     deliverables: ['Kitchen MEP & Exhaust', 'Custom Banquet Seating', 'Signage & Facade', 'Designer Tile Flooring'],
     description:
