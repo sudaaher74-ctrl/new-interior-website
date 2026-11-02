@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { ALL_PROJECTS } from '@/data/interiorData';
-import { SITE_URL, SERVICES_CATALOG, LOCATIONS_CATALOG, getProjectSchema } from '@/seo';
+import { SITE_URL, SERVICES_CATALOG, LOCATIONS_CATALOG, BLOG_POSTS, getProjectSchema } from '@/seo';
 
 interface ProjectPageProps {
   params: Promise<{
@@ -94,6 +94,9 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
   const matchedLocation = LOCATIONS_CATALOG.find(
     (l) => l.verifiedLocalProjects.includes(project.slug)
   ) || LOCATIONS_CATALOG[0];
+
+  // Cross-link to matched technical guide / blog
+  const matchedGuide = BLOG_POSTS.find((b) => b.relatedProjectSlug === project.slug);
 
   // Other related projects
   const relatedProjects = ALL_PROJECTS.filter(
@@ -293,6 +296,21 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
                   <span>{matchedLocation.name} Commercial Hub</span>
                   <ArrowUpRight className="h-3.5 w-3.5 text-[#8F6E38] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </Link>
+
+                {matchedGuide && (
+                  <>
+                    <span className="text-[10px] uppercase tracking-wider text-stone-500 block font-medium pt-2">
+                      Technical Case Study &amp; Specs:
+                    </span>
+                    <Link
+                      href={`/blog/${matchedGuide.slug}`}
+                      className="flex items-center justify-between p-3 rounded-xl bg-[#F5F3EE] border border-[#8F6E38]/40 hover:border-[#8F6E38] text-xs text-[#0F0F12] group transition-all"
+                    >
+                      <span className="line-clamp-1 font-medium">{matchedGuide.title}</span>
+                      <ArrowUpRight className="h-3.5 w-3.5 text-[#8F6E38] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform shrink-0 ml-1.5" />
+                    </Link>
+                  </>
+                )}
               </div>
 
               {/* CTA Box */}

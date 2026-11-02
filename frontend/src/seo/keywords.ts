@@ -45,6 +45,16 @@ export const COMMERCIAL_KEYWORD_STRATEGY = {
     'airport cargo and lounge fit out contractors Mumbai',
     'Navi Mumbai International Airport office interior designers',
     'aviation turnkey fit out contractors Mumbai',
+    'restaurant interior designers in Mumbai',
+    'restaurant interior fit out cost Mumbai',
+    'barbeque restaurant interior design Mumbai',
+    'corporate interior designers CBD Belapur',
+    'restaurant interior designers Kandivali',
+    'retail interior designers Mumbai',
+    'lounge interior designers Mumbai',
+    'restaurant interior renovation contractors Mumbai',
+    'cafe interior fit out contractor Bandra Mumbai',
+    'turnkey dining interior contractor Bhayandar Mira Road',
   ],
 
   nationalReachKeywords: [

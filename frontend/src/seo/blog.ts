@@ -545,4 +545,646 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: 'restaurant-interior-design-cost-mumbai-bombay-barbeque',
+    title: 'Restaurant Interior Design Cost & Execution in Mumbai: Bombay Barbeque Case Study (6,500 Sq Ft)',
+    metaTitle: 'Restaurant Interior Design Cost Mumbai | Bombay Barbeque Case Study',
+    metaDescription:
+      'Commercial restaurant interior design cost per sq ft in Mumbai: 6,500 sq ft Bombay Barbeque case study. Live grill table MEP, kitchen extraction, acoustic baffles & millwork.',
+    h1: 'Restaurant Interior Design & Turnkey Fit-Out in Mumbai: Bombay Barbeque Case Study',
+    primaryKeyword: 'restaurant interior designers in Mumbai',
+    secondaryKeywords: [
+      'restaurant interior fit out cost Mumbai',
+      'barbeque restaurant interior design Mumbai',
+      'turnkey restaurant contractor Malad Mumbai',
+      'commercial kitchen exhaust and MEP contractor Mumbai',
+      'buffet restaurant layout and interior design',
+      'restaurant interior cost per sq ft Mumbai',
+    ],
+    readTime: '9 min read',
+    publishedDate: '2026-03-01T10:00:00+05:30',
+    modifiedDate: '2026-03-05T12:00:00+05:30',
+    author: 'OS Interior Commercial Hospitality Team',
+    category: 'Hospitality & Restaurants',
+    excerpt:
+      'How OS Interior engineered and delivered the 6,500 sq.ft Bombay Barbeque flagship in Malad, Mumbai. Deep dive into live-grill table ventilation, commercial kitchen exhaust engineering, high-traffic acoustic management, and 2026 restaurant fit-out cost benchmarks.',
+    image: '/images/bombayB1.webp',
+    relatedServiceSlug: 'commercial-interiors',
+    relatedLocationSlug: 'mumbai',
+    relatedProjectSlug: 'bombay-barbeque',
+    tableOfContents: [
+      { id: 'project-overview', title: '1. Project Profile: 6,500 Sq Ft Full-Service Dining in Malad' },
+      { id: 'live-grill-mep', title: '2. Live Grill & Buffet MEP: Underfloor Ducting & Exhaust Design' },
+      { id: 'spatial-planning', title: '3. Spatial Ergonomics: Buffet Traffic Flow & Banquet Zoning' },
+      { id: 'acoustics-lighting', title: '4. Acoustic Baffles & 2700K Warm Hospitality Lighting' },
+      { id: 'cost-breakdown', title: '5. 2026 Restaurant Fit-Out Cost Per Sq Ft in Mumbai' },
+      { id: 'why-turnkey', title: '6. Why Single-Contract Turnkey Delivery is Critical for F&B' },
+    ],
+    faqs: [
+      {
+        question: 'What is the average restaurant interior fit-out cost per sq ft in Mumbai?',
+        answer: 'In Mumbai, turnkey restaurant interior fit-outs typically cost between ₹2,200 and ₹3,500 per sq ft for casual dining, and ₹3,200 to ₹4,800+ per sq ft for full-service dining with live-grill MEP and heavy kitchen extraction like Bombay Barbeque.',
+      },
+      {
+        question: 'How do you handle smoke and heat from live grills embedded in dining tables?',
+        answer: 'Each table features dedicated underground or underfloor low-velocity suction ducting tied to central kitchen exhaust blowers with electrostatic precipitators (ESP), capturing smoke at the source before it enters guest breathing zones.',
+      },
+      {
+        question: 'What is the standard execution timeline for a 6,500 sq ft restaurant in Mumbai?',
+        answer: 'A comprehensive 6,000–7,000 sq ft dining project typically requires 60 to 75 calendar days from civil bare-shell handover to trial kitchen testing, supported by off-site millwork pre-fabrication.',
+      },
+    ],
+    sections: [
+      {
+        id: 'project-overview',
+        heading: '1. Project Profile: 6,500 Sq Ft Full-Service Dining in Malad',
+        content: [
+          'Designing and executing a large-format restaurant like Bombay Barbeque in Malad, Mumbai, requires solving high-density customer movement, intense kitchen thermal loads, and heavy civil wear while creating an inviting, theatrical dining atmosphere.',
+          'Encompassing 6,500 sq.ft of carpet area with a 220+ guest seating capacity, the venue features live skewers embedded directly into dining tables, a centralized multi-cuisine buffet counter, live chaat and dessert stations, and private family party alcoves.',
+          'OS Interior took on the full turnkey responsibility—encompassing interior architecture, 3D visualization, heavy MEP and kitchen ventilation contracting, bespoke carpentry, acoustic ceilings, and statutory municipal fire safety coordination.',
+        ],
+      },
+      {
+        id: 'live-grill-mep',
+        heading: '2. Live Grill & Buffet MEP: Underfloor Ducting & Exhaust Design',
+        content: [
+          'The primary engineering hurdle in live-barbeque venues is thermal and smoke management. Having 50+ live charcoal or electric grills operating simultaneously indoors can rapidly overwhelm ordinary air-conditioning:',
+          '• Dedicated Underfloor Extraction: We engineered a sunken floor trench network routing high-gauge GI exhaust ductwork beneath every table cluster, pulling smoke downward into a secondary plenum before venting.',
+          '• Electrostatic Precipitators (ESP) & Scrubber Units: Kitchen and table fumes are scrubbed through multi-stage oil mist collectors and electrostatic filters, ensuring zero smoke emission complaints from neighboring commercial occupants.',
+          '• Treated Fresh Air (TFA) Positive Pressure: We maintained 25 CFM per person of treated, pre-cooled fresh air to counteract the high extraction CFM, preventing drafts and maintaining a stable 22°C dining ambient.',
+        ],
+        callout: {
+          title: 'Engineering Rule for Live Table Grills',
+          text: 'Failing to balance extraction and supply air in a live-grill restaurant creates severe negative pressure, pulling kitchen odors and heat directly into the guest dining room. OS Interior calculates exact air-balancing metrics before duct fabrication begins.',
+        },
+      },
+      {
+        id: 'spatial-planning',
+        heading: '3. Spatial Ergonomics: Buffet Traffic Flow & Banquet Zoning',
+        content: [
+          'Buffet operations fail when guest circulation conflicts with service staff clearing plates or replenishing steaming hot chafing dishes:',
+          '• Continuous Loop Buffet Circulation: We designed 2.4-meter wide perimeter aisles around the central buffet monolith, allowing dual-sided self-service without bottlenecks.',
+          '• Smoked Oak & Fluted Wall Partitions: Intimate dining booths were segregated using vertical smoked oak fluted timber screens, offering visual seclusion for corporate lunches and family gatherings without blocking overall sightlines.',
+          '• Ergonomic Banquet Padding: Custom high-resilience foam banquettes upholstered in commercial-grade anti-stain leatherette ensure guest comfort across extended 90-minute dining sessions.',
+        ],
+      },
+      {
+        id: 'acoustics-lighting',
+        heading: '4. Acoustic Baffles & 2700K Warm Hospitality Lighting',
+        content: [
+          'With 220 guests chatting and background music playing, dining rooms can easily spike beyond 80 dB without specialized acoustic attenuation:',
+          '• Micro-Perforated Timber Baffles: Suspended sound-absorbing ceiling slats absorb mid-frequency human speech, maintaining comfortable conversational acoustic levels below 65 dB.',
+          '• Layered 2700K Warm Lighting: We integrated low-glare brass pendant fixtures over tables with narrow-beam 15° spots illuminating skewers, paired with indirect cove warm LED washes along smoked timber wall textures.',
+        ],
+      },
+      {
+        id: 'cost-breakdown',
+        heading: '5. 2026 Restaurant Fit-Out Cost Per Sq Ft in Mumbai',
+        content: [
+          'A transparent commercial cost benchmark for full-service hospitality fit-outs in Mumbai:',
+        ],
+        table: {
+          headers: ['Budget Component', 'Area / Specification', 'Cost Range (Per Sq Ft)', 'Percentage of Budget'],
+          rows: [
+            ['Civil, Tiling & Waterproofing', 'Heavy-duty non-slip industrial vitrified flooring & kitchen wet areas', '₹450 – ₹650 / sq ft', '15%'],
+            ['Kitchen Exhaust, HVAC & Table MEP', 'Sunken ducting, ESP filtration, TFA fresh air & extraction blowers', '₹950 – ₹1,450 / sq ft', '32%'],
+            ['Custom Millwork & Banquet Joinery', 'Smoked oak veneers, fluted paneling, solid surface counters & booths', '₹850 – ₹1,250 / sq ft', '28%'],
+            ['Acoustic Ceilings & Lighting', 'Suspended micro-perforated baffles, warm brass downlights & DMX scenes', '₹450 – ₹650 / sq ft', '14%'],
+            ['Life Safety, Fire & Approvals', 'Addressable smoke detectors, sprinkler drops & statutory clearances', '₹250 – ₹400 / sq ft', '11%'],
+          ],
+        },
+      },
+      {
+        id: 'why-turnkey',
+        heading: '6. Why Single-Contract Turnkey Delivery is Critical for F&B',
+        content: [
+          'In restaurant projects, delays mean empty chairs and wasted high-street rent. By executing Bombay Barbeque under a single turnkey contract, OS Interior unified civil workers, MEP duct fabricators, and master carpenters under one accountable project manager.',
+          'The result: complete handover in 68 days with zero trade disputes and a flawless opening night.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'corporate-office-interior-design-cbd-belapur-netwin',
+    title: 'Corporate Office Interior Design in CBD Belapur: The NETWIN Ventures Case Study',
+    metaTitle: 'Corporate Office Interior Designers CBD Belapur | NETWIN Case Study',
+    metaDescription:
+      'Turnkey corporate office interior design in CBD Belapur, Navi Mumbai: NETWIN Ventures case study. Executive boardrooms, ergonomic workstations, acoustic glass demising & MEP.',
+    h1: 'Corporate Office Interior Design in CBD Belapur, Navi Mumbai: NETWIN Ventures Case Study',
+    primaryKeyword: 'corporate interior designers CBD Belapur',
+    secondaryKeywords: [
+      'office interior designers Navi Mumbai',
+      'turnkey corporate fit out CBD Belapur',
+      'executive boardroom interior design Mumbai',
+      'office workstation space planning Navi Mumbai',
+      'grade A commercial office contractor Navi Mumbai',
+      'office interior cost per sq ft Navi Mumbai',
+    ],
+    readTime: '9 min read',
+    publishedDate: '2026-02-28T10:00:00+05:30',
+    modifiedDate: '2026-03-05T12:00:00+05:30',
+    author: 'OS Interior Corporate Architecture Team',
+    category: 'Corporate Offices',
+    excerpt:
+      'Inside the turnkey transformation of NETWIN Ventures headquarters in CBD Belapur, Navi Mumbai. How OS Interior integrated executive C-suite boardrooms, high-density modular workstations, circadian lighting, and soundproof demising within an accelerated 45-day handover schedule.',
+    image: '/images/BelapurC2.webp',
+    relatedServiceSlug: 'corporate-interiors',
+    relatedLocationSlug: 'navi-mumbai',
+    relatedProjectSlug: 'netwin-ventures',
+    tableOfContents: [
+      { id: 'belapur-context', title: '1. The CBD Belapur Commercial Corridor: Project Context' },
+      { id: 'boardroom-engineering', title: '2. Executive Boardrooms: STC 48+ Acoustic Demising & AV' },
+      { id: 'workstation-ergonomics', title: '3. Agile Open Workstations & Circadian LED Grids' },
+      { id: 'mep-data-infrastructure', title: '4. Concealed Power Raceways & 24/7 IT Rack Infrastructure' },
+      { id: 'fitout-cost-analysis', title: '5. Corporate Office Fit-Out Cost Per Sq Ft in Navi Mumbai' },
+      { id: 'execution-milestones', title: '6. The 45-Day Handover: Factory Pre-Fabrication Advantage' },
+    ],
+    faqs: [
+      {
+        question: 'Who are the top corporate interior designers in CBD Belapur, Navi Mumbai?',
+        answer: 'OS Interior is a leading turnkey corporate contractor in CBD Belapur, known for delivering flagship commercial headquarters including NETWIN Ventures, featuring executive boardrooms, acoustic glass demising, and integrated MEP.',
+      },
+      {
+        question: 'What is the cost of corporate office interior fit-outs in CBD Belapur?',
+        answer: 'Grade-A corporate office fit-outs in CBD Belapur typically range between ₹1,800 and ₹2,600 per sq ft for functional workstations, and ₹2,800 to ₹4,200 per sq ft for executive C-suite suites with bookmatched veneer and double-glazed acoustics.',
+      },
+      {
+        question: 'How fast can a corporate office be delivered in Navi Mumbai?',
+        answer: 'With off-site CNC panel fabrication and pre-engineered modular partition systems, OS Interior typically delivers completed corporate offices (5,000 to 15,000 sq ft) within 45 to 60 calendar days.',
+      },
+    ],
+    sections: [
+      {
+        id: 'belapur-context',
+        heading: '1. The CBD Belapur Commercial Corridor: Project Context',
+        content: [
+          'CBD Belapur stands as the financial and shipping administrative heart of Navi Mumbai. When NETWIN Ventures acquired their executive commercial floorplate, their leadership mandated a workspace that projected international institutional stability while maximizing team productivity.',
+          'The brief required a balance of high-density operational work zones for development teams, confidential executive managerial cabins, a high-tech boardroom for investor presentations, and modern employee breakout facilities.',
+          'OS Interior managed the entire delivery lifecycle: conceptual 3D BIM spatial planning, building management coordination with Belapur commercial authorities, MEP engineering, and turnkey on-site execution.',
+        ],
+      },
+      {
+        id: 'boardroom-engineering',
+        heading: '2. Executive Boardrooms: STC 48+ Acoustic Demising & AV',
+        content: [
+          'High-stakes corporate negotiations demand absolute acoustic confidentiality:',
+          '• Double-Glazed Acoustic Demising: We installed 12mm + 10mm laminated glass partitions with acoustic PVB interlayers and sound-dampened drop seals, achieving an STC rating of 48+ that completely insulates boardroom conversations.',
+          '• Monolithic Bookmatched Veneer Table: Built at OS Interior\'s Mumbai atelier, the central 16-seater conference table features imported natural smoked walnut veneer, integrated pop-up motorized cable cubbies, and concealed HDMI/Cat-6 raceways.',
+          '• Acoustic Fabric Slat Paneling: Perimeter walls feature fluted fabric baffles that eliminate audio flutter echo during video conferences with international stakeholders.',
+        ],
+      },
+      {
+        id: 'workstation-ergonomics',
+        heading: '3. Agile Open Workstations & Circadian LED Grids',
+        content: [
+          'Employee focus depends heavily on physical ergonomics and optical comfort:',
+          '• Linear Modular Desking: High-pressure laminate desking bays with chamfered shark-nose PVC edging, powder-coated steel loop legs, and acoustic pinnable felt privacy screens.',
+          '• Circadian 4000K Lighting: Glare-free recessed linear architectural luminaires (UGR<19) engineered to simulate natural daylight progression, reducing visual fatigue during long coding and data analysis sprints.',
+        ],
+      },
+      {
+        id: 'mep-data-infrastructure',
+        heading: '4. Concealed Power Raceways & 24/7 IT Rack Infrastructure',
+        content: [
+          'Nothing undermines a modern corporate office faster than exposed spaghetti wiring or unreliable power:',
+          '• Dual-Compartment Underfloor Wire Trays: Segregated conduits for raw power and clean UPS lines ensure zero electromagnetic interference across sensitive communication channels.',
+          '• Dedicated Server & Hub Room: Precision split cooling with FM-200 gas-based fire suppression, protecting critical client databases and server uptime.',
+        ],
+        callout: {
+          title: 'Navi Mumbai Building Code Compliance',
+          text: 'CBD Belapur commercial towers have strict guidelines regarding core-drilling and floor slab loading. OS Interior coordinates all structural engineering reviews to ensure zero slab compromise and rapid society NOC sign-offs.',
+        },
+      },
+      {
+        id: 'fitout-cost-analysis',
+        heading: '5. Corporate Office Fit-Out Cost Per Sq Ft in Navi Mumbai',
+        content: [
+          'Cost breakdown for enterprise corporate fit-outs in CBD Belapur and Vashi:',
+        ],
+        table: {
+          headers: ['Functional Zone', 'Key Deliverables', 'Typical Cost / Sq Ft (INR)', 'Specification Level'],
+          rows: [
+            ['Open Workstation Bays', 'Modular linear desking, cable raceways, ergonomic mesh seating', '₹1,600 – ₹2,200', 'Corporate Standard'],
+            ['Managerial & CXO Cabins', 'Double-glazed glass demising, executive credenza, warm downlights', '₹2,400 – ₹3,200', 'Grade-A Executive'],
+            ['Main Investor Boardroom', 'Bookmatched veneer table, STC 48+ acoustics, dual AV matrix', '₹3,200 – ₹4,500', 'C-Suite Luxury'],
+            ['Reception & Monolith Lobby', 'Fluted stone reception desk, back-painted glass, 3D backlit branding', '₹2,600 – ₹3,600', 'High-Impact Brand'],
+            ['Server Room & Core MEP', 'Precision AC, dual busbar panels, addressable fire detection', '₹1,800 – ₹2,800', 'High-Uptime IT'],
+          ],
+        },
+      },
+      {
+        id: 'execution-milestones',
+        heading: '6. The 45-Day Handover: Factory Pre-Fabrication Advantage',
+        content: [
+          'By manufacturing all credenzas, pantry cabinetry, and workstation frames in our central Mumbai workshop concurrently with on-site civil and electrical works, we compressed a standard 75-day schedule into just 45 days.',
+          'NETWIN Ventures commenced enterprise operations on the exact target date with zero defect snags.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'pan-asian-restaurant-interior-design-kandivali-99-wok',
+    title: 'Pan-Asian Restaurant Interior Design in Kandivali: 99 Wok Street Fit-Out Case Study',
+    metaTitle: 'Restaurant Interior Designers Kandivali | 99 Wok Street Case Study',
+    metaDescription:
+      'Urban Asian restaurant interior fit-out in Kandivali, Mumbai: 99 Wok Street case study. High-velocity wok exhaust MEP, custom banquet booths, anti-slip flooring & turnkey execution.',
+    h1: 'Pan-Asian Restaurant Interior Design in Kandivali, Mumbai: 99 Wok Street Fit-Out',
+    primaryKeyword: 'restaurant interior designers Kandivali',
+    secondaryKeywords: [
+      'asian restaurant interior design Mumbai',
+      'turnkey restaurant fit out Kandivali West',
+      'commercial kitchen ventilation contractor Kandivali',
+      'fast casual dining interior design Mumbai',
+      'restaurant banquet seating fabrication Mumbai',
+      'restaurant interior designers Borivali Malad',
+    ],
+    readTime: '8 min read',
+    publishedDate: '2026-02-24T10:00:00+05:30',
+    modifiedDate: '2026-03-05T12:00:00+05:30',
+    author: 'OS Interior F&B Fit-Out Team',
+    category: 'Hospitality & Restaurants',
+    excerpt:
+      'How OS Interior designed and built 99 Wok Street in Kandivali West. High-throughput floorplan planning, high-temperature kitchen exhaust ventilation, industrial brass-and-charcoal aesthetics, and custom banquet joinery engineered for rapid guest turnover.',
+    image: '/images/Kandivali!.webp',
+    relatedServiceSlug: 'commercial-interiors',
+    relatedLocationSlug: 'kandivali',
+    relatedProjectSlug: '99-wok-street',
+    tableOfContents: [
+      { id: 'kandivali-dining-landscape', title: '1. Fast-Casual Asian Dining in Kandivali: Architectural Concept' },
+      { id: 'high-velocity-exhaust', title: '2. High-Temperature Kitchen Exhaust & Commercial Gas Plumbing' },
+      { id: 'banquette-ergonomics', title: '3. Space-Optimized Banquet Seating & Guest Turnover Flow' },
+      { id: 'durable-materials', title: '4. Industrial Asian Aesthetic: Raw Textures & Anti-Slip Flooring' },
+      { id: 'restaurant-costs-kandivali', title: '5. Fit-Out Budget Benchmarks for Western Suburbs Dining' },
+    ],
+    faqs: [
+      {
+        question: 'Who are the best restaurant interior designers in Kandivali and Borivali?',
+        answer: 'OS Interior is a premier turnkey restaurant interior designer headquartered in Kandivali, Mumbai, specializing in fast-casual dining, Asian culinary fit-outs, and commercial kitchen ventilation systems.',
+      },
+      {
+        question: 'How do you handle heavy oil mist and high heat from commercial Chinese woks?',
+        answer: 'We engineer heavy-duty stainless steel (SS304) kitchen hoods with baffle grease filters, water-wash scrubbers, and variable-frequency drive (VFD) exhaust fans capable of 1500–2000 CFM per wok burner.',
+      },
+      {
+        question: 'What is the cost of fitting out a 1,200 to 2,500 sq ft restaurant in Kandivali?',
+        answer: 'Fitting out an urban dining venue in Kandivali typically ranges between ₹2,200 and ₹3,400 per sq ft including kitchen exhaust, gas lines, designer tile flooring, and custom banquet seating.',
+      },
+    ],
+    sections: [
+      {
+        id: 'kandivali-dining-landscape',
+        heading: '1. Fast-Casual Asian Dining in Kandivali: Architectural Concept',
+        content: [
+          'Kandivali West has evolved into one of Mumbai\'s most competitive dining corridors. For 99 Wok Street, the client wanted an urban, edgy Pan-Asian venue that drew eyes from the street while operating like a Swiss clock in the back-of-house kitchen.',
+          'The space needed to accommodate high lunch and dinner footfalls, swift takeaway and delivery handoffs, and immersive in-venue seating without feeling congested.',
+          'OS Interior developed a comprehensive concept: warm charcoal timber wall paneling contrasted with vibrant red brand accents, exposed matte black steel frames, and theatrical drop lighting.',
+        ],
+      },
+      {
+        id: 'high-velocity-exhaust',
+        heading: '2. High-Temperature Kitchen Exhaust & Commercial Gas Plumbing',
+        content: [
+          'Chinese wok cooking generates tremendous heat (over 100,000 BTU per burner) and dense vaporized oil particles. Inadequate kitchen ventilation will ruin the dining experience within minutes:',
+          '• Heavy SS304 Grease Hoods: Custom fabricated stainless steel hoods with centrifugal baffle filters that catch 95% of grease droplets before duct entry.',
+          '• Fire-Rated Ductwork & Fire Dampers: Heavy-gauge GI ducting insulated with ceramic wool, fitted with fusible-link fire dampers that instantly seal off the exhaust shaft in the event of flame flashover.',
+          '• Dedicated Commercial Gas Manifold: High-pressure commercial LPG piping certified under Chief Controller of Explosives (PESO) standards with automatic leak-detection cut-off valves.',
+        ],
+        callout: {
+          title: 'Fire Safety Warning for Wok Kitchens',
+          text: 'Chinese kitchens carry the highest fire risk in commercial hospitality. OS Interior installs dry-chemical kitchen hood suppression systems directly above fryers and woks to satisfy all Mumbai Fire Brigade inspection requirements.',
+          isWarning: true,
+        },
+      },
+      {
+        id: 'banquette-ergonomics',
+        heading: '3. Space-Optimized Banquet Seating & Guest Turnover Flow',
+        content: [
+          'Every square foot of dining floor must generate revenue:',
+          '• Wall-to-Wall Linear Banquettes: Continuous upholstered bench seating along perimeter walls provides flexible party sizing—from couples to groups of eight—without moving heavy furniture.',
+          '• Separate Delivery Dispatch Portal: We segregated the delivery courier handoff counter from the main customer entrance, preventing delivery drivers from crossing seated diners.',
+        ],
+      },
+      {
+        id: 'durable-materials',
+        heading: '4. Industrial Asian Aesthetic: Raw Textures & Anti-Slip Flooring',
+        content: [
+          'Spills, wet shoes, and frequent chair dragging will destroy cheap surfaces within six months:',
+          '• R10 Rated Anti-Slip Vitrified Tiles: Floor tiles featuring micro-textured surfaces that provide slip resistance even when wet, protecting guests and staff.',
+          '• High-Impact Edge Protection: Custom black powder-coated steel corner guards along all high-traffic waiter circulation paths to prevent trolley damage.',
+        ],
+      },
+      {
+        id: 'restaurant-costs-kandivali',
+        heading: '5. Fit-Out Budget Benchmarks for Western Suburbs Dining',
+        content: [
+          'Realistic budget allocation for urban dining venues across Kandivali, Borivali, and Malad:',
+        ],
+        table: {
+          headers: ['Trade / Package', 'Scope of Deliverables', 'Cost / Sq Ft (INR)', 'Timeline'],
+          rows: [
+            ['Commercial Kitchen MEP', 'SS304 hoods, ducting, blowers, gas manifold, grease traps', '₹800 – ₹1,200', '20 Days'],
+            ['Civil, Plumbing & Tiling', 'Waterproofing, vitrified floor, wall tiling, drainage channels', '₹400 – ₹600', '15 Days'],
+            ['Bespoke Dining Joinery', 'Banquettes, tables, waiter stations, cash counter', '₹600 – ₹950', 'Concurrent Factory'],
+            ['Lighting, Audio & Signage', 'LED tracks, ceiling pendants, illuminated facade logo', '₹350 – ₹550', '10 Days'],
+          ],
+        },
+      },
+    ],
+  },
+  {
+    slug: 'retail-cafe-beverage-interior-design-mumbai-juice-crush',
+    title: 'Retail Flagship & Beverage Bar Interior Design in Mumbai: Juice Crush Case Study',
+    metaTitle: 'Retail & Cafe Interior Designers Mumbai | Juice Crush Flagship Case Study',
+    metaDescription:
+      'Turnkey retail and beverage bar interior design in Mumbai: Juice Crush case study. Seamless food-grade solid surfaces, illuminated 3D storefronts, wet MEP & footfall ergonomics.',
+    h1: 'Retail Flagship & Beverage Bar Interior Design in Mumbai: Juice Crush Case Study',
+    primaryKeyword: 'retail interior designers Mumbai',
+    secondaryKeywords: [
+      'beverage bar interior design Mumbai',
+      'cafe interior fit out contractor Bandra Mumbai',
+      'food grade solid surface counter contractors Mumbai',
+      'quick service retail fit out Mumbai',
+      'commercial kiosk and storefront design Mumbai',
+      'retail interior design cost per sq ft Mumbai',
+    ],
+    readTime: '8 min read',
+    publishedDate: '2026-02-20T10:00:00+05:30',
+    modifiedDate: '2026-03-05T12:00:00+05:30',
+    author: 'OS Interior Commercial Retail Team',
+    category: 'Commercial Retail',
+    excerpt:
+      'Architectural case study of the Juice Crush retail flagships in Mumbai. Learn how OS Interior engineered seamless NSF-certified Corian counters, rapid-service customer circulation, and high-impact illuminated storefront portals to elevate brand recognition and daily transactional volume.',
+    image: '/images/juice1.webp',
+    relatedServiceSlug: 'commercial-interiors',
+    relatedLocationSlug: 'mumbai',
+    relatedProjectSlug: 'juice-crush',
+    tableOfContents: [
+      { id: 'retail-branding-mandate', title: '1. Retail Flagship Strategy: Driving Footfall & Brand Recall' },
+      { id: 'hygienic-solid-surfaces', title: '2. Food-Grade Solid Surfaces: Seamless Corian Workstations' },
+      { id: 'wet-mep-drainage', title: '3. Specialized Beverage MEP: High-Amp Circuits & Floor Drainage' },
+      { id: 'storefront-illumination', title: '4. Illuminated Facade Architecture & Express Order Counter' },
+      { id: 'retail-fitout-economics', title: '5. Fast-Track Retail Economics & Execution Timelines' },
+    ],
+    faqs: [
+      {
+        question: 'Why are solid surfaces like Corian essential for beverage and juice bars?',
+        answer: 'Solid surface acrylics are non-porous and seamlessly thermoformed with no grout lines. They prevent fruit acid stains, inhibit bacterial growth, and withstand continuous sanitization without chipping.',
+      },
+      {
+        question: 'How fast can OS Interior execute a retail flagship store or kiosk in Mumbai?',
+        answer: 'Because retail leases demand quick opening to avoid paying rent on closed stores, OS Interior pre-fabricates modular display counters and lighting portals off-site, completing on-site fit-out in 21 to 30 calendar days.',
+      },
+    ],
+    sections: [
+      {
+        id: 'retail-branding-mandate',
+        heading: '1. Retail Flagship Strategy: Driving Footfall & Brand Recall',
+        content: [
+          'High-street retail and specialty beverage outlets succeed or fail on the strength of customer visual attraction and service cycle speed. For Juice Crush, the brand needed an unmistakable, clean, and vibrant physical manifestation across its prime retail stores in Mumbai.',
+          'The architectural mandate was straightforward: create an ultra-modern, luminous storefront that stands out against busy retail streets while engineering a back-counter workspace capable of fulfilling an order every 45 seconds.',
+          'OS Interior handled the complete retail architecture, custom fabrication, wet service plumbing, and illuminated storefront installation under single-point responsibility.',
+        ],
+      },
+      {
+        id: 'hygienic-solid-surfaces',
+        heading: '2. Food-Grade Solid Surfaces: Seamless Corian Workstations',
+        content: [
+          'Natural stone, wood, or tiled counters quickly stain and harbor bacteria when exposed to high-acid fruit juices and dairy liquids:',
+          '• Thermoformed Seamless Acrylic Counters: We fabricated front service and back preparation counters using seamless food-grade acrylic solid surface material with integrated cove backsplashes.',
+          '• Anti-Bacterial & Acid Resistant: The non-porous material prevents citrus acids from etching the surface and allows complete chemical sanitization between shifts.',
+          '• Integrated Under-Counter Equipment Bays: Precise cutouts for commercial blenders, ice wells, dump sinks, and refrigerated topping wells.',
+        ],
+      },
+      {
+        id: 'wet-mep-drainage',
+        heading: '3. Specialized Beverage MEP: High-Amp Circuits & Floor Drainage',
+        content: [
+          'Beverage retail relies heavily on continuous electrical loads and rapid drainage:',
+          '• High-Inrush Power Channels: Multiple 20A dedicated electrical sockets on isolated circuits to support commercial high-horsepower blenders, juicers, and refrigeration compressors without breaker trips.',
+          '• Heavy-Duty Grease Traps & SS Floor Troughs: Custom stainless steel floor drain trenches with removable strainer baskets, preventing citrus pulp and ice buildup from clogging municipal drain connections.',
+        ],
+      },
+      {
+        id: 'storefront-illumination',
+        heading: '4. Illuminated Facade Architecture & Express Order Counter',
+        content: [
+          '• 3D Backlit Acrylic Branding: High-CRI 6500K pure white backlighting highlighting the Juice Crush emblem, visible from 50+ meters away on busy commercial avenues.',
+          '• Linear Menu Lightboxes: Ultra-slim illuminated menu displays engineered for rapid readability and easy seasonal price updates.',
+        ],
+      },
+      {
+        id: 'retail-fitout-economics',
+        heading: '5. Fast-Track Retail Economics & Execution Timelines',
+        content: [
+          'Retail fit-outs require fast-track delivery to minimize rent drag. OS Interior executed the Juice Crush flagships in under 25 days from site possession to commercial launch.',
+        ],
+        table: {
+          headers: ['Component', 'Specification', 'Cost Range (INR)', 'Turnaround'],
+          rows: [
+            ['Front Counter & Solid Surface', 'Seamless Corian, undercounter steel frame, POS bay', '₹1,200 – ₹1,800 / sq ft', '7 Days (Factory)'],
+            ['Wet MEP & High-Amp Electrical', 'Trench drainage, dedicated breaker panels, water filters', '₹600 – ₹900 / sq ft', '6 Days'],
+            ['Storefront Facade & Signage', 'Composite cladding, 3D acrylic letters, LED lightboxes', '₹700 – ₹1,100 / sq ft', '5 Days'],
+            ['Total Project Handover', 'Complete turnkey commercial retail launch', '₹2,500 – ₹3,800 / sq ft', '21–25 Days'],
+          ],
+        },
+      },
+    ],
+  },
+  {
+    slug: 'luxury-lounge-bar-interior-design-mumbai-caravan',
+    title: 'Luxury Lounge & Bar Interior Design in Mumbai: Caravan Lounge Fit-Out Case Study',
+    metaTitle: 'Lounge & Bar Interior Designers Mumbai | Caravan Lounge Case Study',
+    metaDescription:
+      'Bespoke nightlife and cocktail lounge interior design in Bandra West, Mumbai: Caravan Lounge case study. Curved brass bar joinery, DMX scene lighting & acoustic isolation.',
+    h1: 'Luxury Lounge & Bar Interior Design in Mumbai: Caravan Lounge Fit-Out Case Study',
+    primaryKeyword: 'lounge interior designers Mumbai',
+    secondaryKeywords: [
+      'bar interior designers Mumbai',
+      'luxury hospitality fit out contractors Bandra Mumbai',
+      'curved brass bar joinery fabrication Mumbai',
+      'acoustic nightclub and lounge interior contractor Mumbai',
+      'commercial bar lighting design Mumbai',
+      'cocktail lounge interior design cost Mumbai',
+    ],
+    readTime: '9 min read',
+    publishedDate: '2026-02-16T10:00:00+05:30',
+    modifiedDate: '2026-03-05T12:00:00+05:30',
+    author: 'OS Interior Atelier & Hospitality Team',
+    category: 'Hospitality & Nightlife',
+    excerpt:
+      'An executive case study on the creation of Caravan Lounge in Bandra West, Mumbai. Exploring the bespoke fabrication of the monolithic curved brass bar, multi-layered acoustic dampening, ambient lighting controls, and luxury velvet millwork.',
+    image: '/images/caravab1.webp',
+    relatedServiceSlug: 'commercial-interiors',
+    relatedLocationSlug: 'mumbai',
+    relatedProjectSlug: 'caravan-lounge',
+    tableOfContents: [
+      { id: 'hospitality-vision', title: '1. The Hospitality Vision: Sophisticated Nightlife in Bandra' },
+      { id: 'curved-brass-bar', title: '2. The Centerpiece: Custom Curved Brass Bar & LED Underglow' },
+      { id: 'acoustic-isolation', title: '3. Acoustic Isolation & Soundproofing in Dense Residential Hubs' },
+      { id: 'ambient-lighting-dmx', title: '4. DMX Scene Lighting: Transitioning from Twilight to Midnight' },
+      { id: 'luxury-lounge-economics', title: '5. High-End Hospitality Cost Benchmarks & Joinery Craft' },
+    ],
+    faqs: [
+      {
+        question: 'Who are the top luxury bar and lounge interior contractors in Mumbai?',
+        answer: 'OS Interior is a premier luxury hospitality contractor in Mumbai, celebrated for bespoke high-end bar fabrication, curved brass joinery, acoustic sound isolation, and atmosphere-driven ambient lighting as showcased at Caravan Lounge.',
+      },
+      {
+        question: 'How do you prevent noise complaints for commercial lounges located in residential zones like Bandra?',
+        answer: 'We employ a "room-within-a-room" acoustic decoupling strategy using resilient channel clips, multi-layered sound-rated gypsum boards with Green Glue damping compounds, and acoustic ceiling baffles to contain high bass decibels.',
+      },
+    ],
+    sections: [
+      {
+        id: 'hospitality-vision',
+        heading: '1. The Hospitality Vision: Sophisticated Nightlife in Bandra',
+        content: [
+          'Bandra West represents the pinnacle of Mumbai\'s nightlife and fine-dining ecosystem. For Caravan Lounge, the objective was to craft a venue that felt warm, seductive, and architecturally timeless—avoiding the fleeting gimmicks of standard club fit-outs.',
+          'The brief centered on three foundational pillars: an iconic central cocktail bar, intimate acoustic booths lined with velvet upholstery, and sophisticated mood lighting that adapts seamlessly as dinner hours shift to late-night drinks.',
+          'OS Interior executed the complete space planning, MEP, bespoke metal fabrication, acoustic engineering, and turnkey luxury contracting.',
+        ],
+      },
+      {
+        id: 'curved-brass-bar',
+        heading: '2. The Centerpiece: Custom Curved Brass Bar & LED Underglow',
+        content: [
+          'The bar counter is the revenue and energetic epicenter of any lounge:',
+          '• Precision-Rolled Solid Brass Cladding: The front apron was hand-clad in brush-finished architectural brass with protective clear-coat sealants that resist alcohol stains and hand patina.',
+          '• Integrated Under-Counter Speed Rails & Wet Stations: Custom stainless steel ice bins, dual speed rails, cocktail glass rinsers, and concealed soda gun lines designed alongside mixology consultants for maximum bartender output.',
+          '• Floating Stepped Back-Bar: Cantilevered black steel and brass shelving with embedded 2400K ultra-warm micro-LED strips illuminating premium spirits bottles.',
+        ],
+      },
+      {
+        id: 'acoustic-isolation',
+        heading: '3. Acoustic Isolation & Soundproofing in Dense Residential Hubs',
+        content: [
+          'Operating an 85+ dB sound system in Bandra requires uncompromising acoustic engineering to prevent police noise complaints and ensure building safety:',
+          '• Decoupled Sound Isolation Walls: Walls built on acoustic elastomeric isolation pads with dual layers of high-density sound gypsum and mineral rockwool infill, achieving an acoustic reduction exceeding 52 dB.',
+          '• Sculpted Timber Ceiling Baffles: Custom acoustic slats break up sound waves and prevent standing wave bass distortion, ensuring dialogue clarity at seated tables while music pumps on the dance floor.',
+        ],
+      },
+      {
+        id: 'ambient-lighting-dmx',
+        heading: '4. DMX Scene Lighting: Transitioning from Twilight to Midnight',
+        content: [
+          'Lighting sets the emotional tone of a luxury lounge:',
+          '• Architectural Dimming Schedules: DMX-controlled LED systems programmed across three daily presets: Golden Hour Dining (30% warm glow), Cocktail Transition (15% moody ambient), and Late-Night Mode (5% accent lighting with bottle highlights).',
+        ],
+      },
+      {
+        id: 'luxury-lounge-economics',
+        heading: '5. High-End Hospitality Cost Benchmarks & Joinery Craft',
+        content: [
+          'Investment metrics for premium hospitality and cocktail lounge venues in Mumbai:',
+        ],
+        table: {
+          headers: ['Package', 'Scope & Materials', 'Cost / Sq Ft (INR)', 'Execution'],
+          rows: [
+            ['Architectural Bar & Millwork', 'Curved brass counter, marble top, undercounter steel wet stations', '₹1,200 – ₹1,800', 'Workshop Built'],
+            ['Acoustic Decoupling & Ceilings', 'Floating gypsum walls, mineral rockwool, timber baffles', '₹650 – ₹950', 'On-Site Acoustic'],
+            ['DMX Lighting & Pro Audio Cabling', 'Low-voltage dimming drivers, architectural spots, audio conduits', '₹550 – ₹850', 'Certified MEP'],
+            ['Luxury Banquettes & Finishes', 'Bespoke velvet booths, micro-cement wall finishes, solid brass accents', '₹800 – ₹1,200', 'Atelier Crafted'],
+          ],
+        },
+      },
+    ],
+  },
+  {
+    slug: 'heritage-family-restaurant-interior-renovation-mumbai-radhakrishna',
+    title: 'Family Dining & Heritage Restaurant Interior Renovation: RadhaKrishna Cuisine Case Study',
+    metaTitle: 'Restaurant Interior Renovation Mumbai | RadhaKrishna Cuisine Case Study',
+    metaDescription:
+      'Turnkey family restaurant interior renovation in Bhayandar, Mumbai: RadhaKrishna Cuisine case study. Heritage acoustic wood paneling, commercial MEP overhaul & dining booth joinery.',
+    h1: 'Family Dining & Heritage Restaurant Interior Renovation: RadhaKrishna Cuisine Case Study',
+    primaryKeyword: 'restaurant interior renovation contractors Mumbai',
+    secondaryKeywords: [
+      'family restaurant interior design Mumbai',
+      'turnkey dining interior contractor Bhayandar Mira Road',
+      'heritage wood paneling restaurant interior Mumbai',
+      'large format vegetarian dining restaurant fit out',
+      'commercial restaurant remodeling contractors Mumbai',
+      'restaurant interior cost per sq ft Mumbai',
+    ],
+    readTime: '8 min read',
+    publishedDate: '2026-02-10T10:00:00+05:30',
+    modifiedDate: '2026-03-05T12:00:00+05:30',
+    author: 'OS Interior Commercial Renovation Team',
+    category: 'Restaurant Renovation',
+    excerpt:
+      'How OS Interior executed the full turnkey interior renovation of the 180-seat RadhaKrishna Cuisine in Bhayandar, Mumbai. Blending warm Indian heritage woodcraft with contemporary architectural lighting, sound-dampened dining partitions, and zero downtime execution.',
+    image: '/images/caffe.webp',
+    relatedServiceSlug: 'commercial-interiors',
+    relatedLocationSlug: 'mumbai',
+    relatedProjectSlug: 'radhakrishna-cuisine',
+    tableOfContents: [
+      { id: 'heritage-context', title: '1. Modernizing a Dining Landmark: The RadhaKrishna Brief' },
+      { id: 'heritage-woodcraft', title: '2. Contemporary Heritage: Acoustic Wood Paneling & Fluted Millwork' },
+      { id: 'mep-overhaul', title: '3. Complete MEP & HVAC Overhaul in an Operational Building' },
+      { id: 'family-dining-zoning', title: '4. Family Dining Privacy: Semi-Enclosed Booth Architecture' },
+      { id: 'renovation-cost-guide', title: '5. Restaurant Renovation Cost & Phased Handover Guide' },
+    ],
+    faqs: [
+      {
+        question: 'How do you renovate an established restaurant without losing months of revenue?',
+        answer: 'We employ phased night-shift execution and off-site pre-fabrication. Carpentry, booth modules, and electrical panels are pre-assembled off-site and installed during nighttime closure hours, allowing the restaurant to maintain operations.',
+      },
+      {
+        question: 'What is the average cost to renovate a commercial restaurant in Mumbai?',
+        answer: 'Commercial restaurant renovations in Mumbai typically cost between ₹1,500 and ₹2,600 per sq ft for cosmetic, millwork, and lighting upgrades, and ₹2,400 to ₹3,800 per sq ft for complete MEP, kitchen ventilation, and civil re-tiling.',
+      },
+    ],
+    sections: [
+      {
+        id: 'heritage-context',
+        heading: '1. Modernizing a Dining Landmark: The RadhaKrishna Brief',
+        content: [
+          'RadhaKrishna Cuisine has stood for decades as a revered multi-generational family dining institution in the Bhayandar and Mira Road corridor. However, after years of heavy commercial footfall, the original decor, acoustic comfort, and aging electrical systems required a comprehensive transformation.',
+          'The design challenge was delicate: modernize the space to appeal to younger dining demographics while honoring the warmth, cultural identity, and comfort cherished by long-standing family patrons.',
+          'OS Interior was commissioned to deliver a full turnkey interior renovation covering the main 180-seat dining hall, private family dining chambers, service corridors, and lighting infrastructure.',
+        ],
+      },
+      {
+        id: 'heritage-woodcraft',
+        heading: '2. Contemporary Heritage: Acoustic Wood Paneling & Fluted Millwork',
+        content: [
+          '• Rich Warm Woodwork: Replaced dated laminate surfaces with handcrafted fluted teak veneer wall paneling finished in natural matte PU, bringing organic warmth and tactile luxury to the dining perimeter.',
+          '• Integrated Concealed Acoustics: Behind the decorative fluted slats, we incorporated sound-absorbing rockwool backing that tames high dining reverberations, allowing multi-generational family tables to converse comfortably without shouting.',
+        ],
+      },
+      {
+        id: 'mep-overhaul',
+        heading: '3. Complete MEP & HVAC Overhaul in an Operational Building',
+        content: [
+          'Older restaurant buildings often suffer from poor air circulation, hot spots, and overloaded electrical circuits:',
+          '• Re-Engineered Air Distribution: Installed low-noise linear slot diffusers connected to newly balanced ducted fan coil units (FCUs), eliminating hot corners and keeping the entire 180-seat hall at an even 22°C.',
+          '• LED Energy Modernization: Swapped out outdated power-hungry halogen lamps for custom warm 3000K LED chandeliers and architectural downlights, cutting lighting energy consumption by 65%.',
+        ],
+      },
+      {
+        id: 'family-dining-zoning',
+        heading: '4. Family Dining Privacy: Semi-Enclosed Booth Architecture',
+        content: [
+          'Indian family dining rituals require both intimacy and spaciousness:',
+          '• Fluted Glass & Timber Room Dividers: Designed architectural partitions featuring fluted privacy glass set in smoked oak timber frames, establishing cozy 6-to-10 seater family booths without dividing the hall into claustrophobic rooms.',
+          '• Anti-Stain Textured Upholstery: Booth cushions upholstered in stain-resistant nanotech fabric that repels food and turmeric spills while maintaining a luxurious touch.',
+        ],
+      },
+      {
+        id: 'renovation-cost-guide',
+        heading: '5. Restaurant Renovation Cost & Phased Handover Guide',
+        content: [
+          'Typical cost breakdown for large-format commercial dining renovations in Mumbai:',
+        ],
+        table: {
+          headers: ['Renovation Scope', 'Deliverables', 'Cost / Sq Ft (INR)', 'Duration'],
+          rows: [
+            ['Carpentry & Acoustic Paneling', 'Fluted wood slats, booth partitions, service credenzas', '₹750 – ₹1,100', '30 Days (Pre-Fab)'],
+            ['HVAC Balancing & Ducting', 'Linear slot diffusers, duct insulation, fresh air grills', '₹450 – ₹700', '12 Nights'],
+            ['Architectural Lighting Overhaul', 'Warm 3000K chandeliers, cove LEDs, low-glare downlights', '₹350 – ₹550', '8 Nights'],
+            ['Flooring & Civil Refurbishment', 'High-traffic vitrified tiles, skirting, wall plaster repairs', '₹400 – ₹600', '15 Days'],
+          ],
+        },
+      },
+    ],
+  },
 ];

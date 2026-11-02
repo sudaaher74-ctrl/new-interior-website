@@ -159,8 +159,8 @@ export const SERVICES_CATALOG: ServiceDetail[] = [
       { step: '03', title: 'Precision Fabrication & Fit-Out', desc: 'Simultaneous factory joinery production and on-site civil works under a dedicated project manager.' },
       { step: '04', title: 'Turnkey Handover & Launch', desc: 'Testing all MEP systems, life-safety equipment, and handing over a snag-free commercial space ready for launch.' },
     ],
-    relevantIndustries: ['Retail Flagships & Showrooms', 'Fine Dining & Quick Service Restaurants', 'Boutique Hospitality & Lounges', 'Commercial Experience Centers', 'Healthcare & Wellness Clinics'],
-    relatedProjectSlugs: ['bombay-barbeque', '99-wok-street', 'juice-crush', 'caravan-lounge'],
+    relevantIndustries: ['Retail Flagships & Showrooms', 'Fine Dining & Quick Service Restaurants', 'Boutique Hospitality & Lounges', 'Commercial Experience Centers', 'Aviation Hubs & Airport Commercial'],
+    relatedProjectSlugs: ['bombay-barbeque', '99-wok-street', 'juice-crush', 'caravan-lounge', 'radhakrishna-cuisine', 'china-airlines'],
     faqs: [
       {
         question: 'How do you handle restricted night shifts in commercial malls or complexes?',
@@ -294,7 +294,7 @@ export const SERVICES_CATALOG: ServiceDetail[] = [
       { step: '04', title: 'Testing, Commissioning & Handover', desc: 'Air balancing, load testing, acoustic audits, client walk-through, and key handover.' },
     ],
     relevantIndustries: ['Corporate Headquarters', 'Commercial Complexes', 'Large-Scale Retail Chains', 'Dining & Hospitality Venues', 'Healthcare Centers'],
-    relatedProjectSlugs: ['bombay-barbeque', 'netwin-ventures', '99-wok-street', 'caravan-lounge'],
+    relatedProjectSlugs: ['bombay-barbeque', 'netwin-ventures', '99-wok-street', 'caravan-lounge', 'radhakrishna-cuisine', 'china-airlines'],
     faqs: [
       {
         question: 'What are the main advantages of a turnkey contract versus general contracting?',
