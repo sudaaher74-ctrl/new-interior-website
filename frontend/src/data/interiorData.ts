@@ -139,7 +139,7 @@ export const ALL_PROJECTS: ProjectItem[] = [
     category: 'Restaurants & Dining',
     image: '/images/caffe.webp',
     slug: 'radhakrishna-cuisine',
-    gallery: ['/images/caffe.webp', '/images/caravab1.webp', '/images/carvan2.webp'],
+    gallery: ['/images/caffe.webp'],
     scope: 'Turnkey Dining Interior',
     deliverables: ['Civil Works', 'MEP & Plumbing', 'Bespoke Joinery', 'Architectural Lighting'],
     description:

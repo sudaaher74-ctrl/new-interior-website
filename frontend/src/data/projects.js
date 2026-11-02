@@ -80,8 +80,8 @@ export const projects = [
     scope: 'Turnkey',
     status: 'Completed',
     delivered: ['Civil', 'MEP', 'Joinery', 'Furniture', 'Lighting'],
-    gallery: ['/images/caravab1.webp', '/images/carvan2.webp'],
-    galleryWide: '/images/carvan3.webp',
+    gallery: ['/images/caffe.webp'],
+    galleryWide: '/images/caffe.webp',
     altText: 'Elegant dining area for RadhaKrishna Cuisine in Bhayandar with traditional yet modern aesthetics',
   },
 ];
