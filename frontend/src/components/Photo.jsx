@@ -24,6 +24,11 @@ const DIMENSIONS = {
   '/images/juice1.webp': [1086, 723],
   '/images/juice2.webp': [978, 804],
   '/images/juice3.webp': [1010, 777],
+  '/images/china-airlines-1.webp': [1024, 768],
+  '/images/china-airlines-2.webp': [1024, 576],
+  '/images/china-airlines-3.webp': [472, 1024],
+  '/images/china-airlines-4.webp': [472, 1024],
+  '/images/china-airlines-5.webp': [472, 1024],
 };
 
 /**

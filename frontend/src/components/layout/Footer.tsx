@@ -142,6 +142,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/projects/china-airlines" className="hover:text-[#0F0F12] transition-colors">
+                  China Airlines (Navi Mumbai Cargo Hub)
+                </Link>
+              </li>
+              <li>
                 <Link href="/projects/bombay-barbeque" className="hover:text-[#0F0F12] transition-colors">
                   Bombay Barbeque (Malad)
                 </Link>

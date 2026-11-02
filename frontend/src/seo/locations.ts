@@ -139,17 +139,17 @@ export const LOCATIONS_CATALOG: LocationDetail[] = [
       'Kharghar: Corporate finance hubs and institutional administrative facilities',
     ],
     localCapabilities: [
-      'Established delivery record in premier Navi Mumbai business parks (including CBD Belapur)',
-      'Familiarity with CIDCO & NMMC statutory regulations and building codes',
+      'Established delivery record in premier Navi Mumbai business parks and aviation hubs (including CBD Belapur and Navi Mumbai International Airport)',
+      'Familiarity with CIDCO, NMMC, and airport statutory regulations and building codes',
       'Factory-prefabricated joinery dispatched directly from Mumbai to Navi Mumbai sites',
-      'Experienced in high-density IT workstation layouts and round-the-clock server room MEP',
+      'Experienced in high-density corporate workstation layouts and round-the-clock infrastructure MEP',
     ],
-    verifiedLocalProjects: ['netwin-ventures'],
+    verifiedLocalProjects: ['netwin-ventures', 'china-airlines'],
     logisticsHub: 'Dedicated Navi Mumbai execution team backed by our central Mumbai fabrication facility.',
     faqs: [
       {
-        question: 'Does OS Interior execute office interiors in CBD Belapur and Vashi?',
-        answer: 'Yes. Navi Mumbai is a primary market where we have completed flagship corporate projects like NETWIN Ventures in CBD Belapur.',
+        question: 'Does OS Interior execute office interiors in CBD Belapur, Vashi, and airport zones?',
+        answer: 'Yes. Navi Mumbai is a primary market where we have completed flagship corporate projects like NETWIN Ventures in CBD Belapur and the China Airlines Cargo operations hub at Navi Mumbai International Airport.',
       },
       {
         question: 'Do you have a physical office in Navi Mumbai?',

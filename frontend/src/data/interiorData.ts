@@ -145,6 +145,24 @@ export const ALL_PROJECTS: ProjectItem[] = [
     description:
       'Warm heritage tones fused with contemporary architectural brutalism. Hand-crafted acoustic wood paneling and intimate dining booths.',
   },
+  {
+    name: 'CHINA AIRLINES CARGO HUB',
+    location: 'Navi Mumbai International Airport',
+    category: 'Corporate Offices',
+    image: '/images/china-airlines-1.webp',
+    slug: 'china-airlines',
+    gallery: [
+      '/images/china-airlines-1.webp',
+      '/images/china-airlines-2.webp',
+      '/images/china-airlines-3.webp',
+      '/images/china-airlines-4.webp',
+      '/images/china-airlines-5.webp',
+    ],
+    scope: 'Aviation Commercial Fit-Out',
+    deliverables: ['Modular Workstations', 'Acoustic Glass Partitions', 'Pantry & Storage Millwork', 'Executive Meeting Pods', 'Civil & MEP'],
+    description:
+      'Turnkey administrative and cargo operations headquarters for China Airlines at Navi Mumbai International Cargo Airport. Features high-density ergonomic modular workstations, acoustic glass conference cabins, precision cabinetry, and full MEP coordination.',
+  },
 ];
 
 export const MARQUEE_PROJECTS: ProjectItem[] = ALL_PROJECTS;

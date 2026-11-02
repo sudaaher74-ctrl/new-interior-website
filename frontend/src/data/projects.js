@@ -84,6 +84,26 @@ export const projects = [
     galleryWide: '/images/caffe.webp',
     altText: 'Elegant dining area for RadhaKrishna Cuisine in Bhayandar with traditional yet modern aesthetics',
   },
+  {
+    slug: 'china-airlines',
+    title: 'China Airlines Cargo Hub',
+    category: 'Offices',
+    sector: 'Aviation commercial office',
+    location: 'Navi Mumbai International Airport',
+    meta: 'Commercial Office · Navi Mumbai Cargo Airport',
+    img: '/images/china-airlines-1.webp',
+    scope: 'Turnkey',
+    status: 'Completed',
+    delivered: ['Civil', 'MEP', 'Modular Workstations', 'Joinery', 'Partitions', 'Lighting'],
+    gallery: [
+      '/images/china-airlines-2.webp',
+      '/images/china-airlines-3.webp',
+      '/images/china-airlines-4.webp',
+      '/images/china-airlines-5.webp',
+    ],
+    galleryWide: '/images/china-airlines-1.webp',
+    altText: 'Turnkey commercial office fit-out for China Airlines at Navi Mumbai International Cargo Airport',
+  },
 ];
 
 export const getProject = (slug) => projects.find((p) => p.slug === slug);

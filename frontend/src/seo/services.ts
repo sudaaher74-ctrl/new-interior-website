@@ -88,8 +88,8 @@ export const SERVICES_CATALOG: ServiceDetail[] = [
       { step: '03', title: 'Concurrent Off-Site Fabrication', desc: 'Manufacturing bespoke woodwork in our factory while civil and MEP site preparation is underway.' },
       { step: '04', title: 'Quality Audits & Commissioning', desc: 'Pre-handover statutory testing, air balancing, acoustic decibel verification, and formal handover.' },
     ],
-    relevantIndustries: ['Banking & Financial Services', 'Corporate Headquarters', 'Tech & IT Campuses', 'Legal & Consulting Firms', 'Conglomerates & MNCs'],
-    relatedProjectSlugs: ['netwin-ventures'],
+    relevantIndustries: ['Banking & Financial Services', 'Corporate Headquarters', 'Tech & IT Campuses', 'Legal & Consulting Firms', 'Conglomerates & MNCs', 'Aviation & Logistics Hubs'],
+    relatedProjectSlugs: ['netwin-ventures', 'china-airlines'],
     faqs: [
       {
         question: 'What is the typical timeline for a corporate office interior project in Mumbai?',
@@ -226,8 +226,8 @@ export const SERVICES_CATALOG: ServiceDetail[] = [
       { step: '03', title: 'Turnkey Fit-Out Execution', desc: 'Structured on-site engineering led by full-time site supervisors and licensed MEP engineers.' },
       { step: '04', title: 'Ergonomic Testing & Handover', desc: 'Final cleaning, acoustic balance testing, furniture placement, and snag-free client sign-off.' },
     ],
-    relevantIndustries: ['Technology & Software Firms', 'Financial & Investment Offices', 'Consulting & Advisory Practices', 'Creative & Media Agencies', 'Co-working & Enterprise Incubators'],
-    relatedProjectSlugs: ['netwin-ventures', '99-wok-street'],
+    relevantIndustries: ['Technology & Software Firms', 'Financial & Investment Offices', 'Consulting & Advisory Practices', 'Creative & Media Agencies', 'Co-working & Enterprise Incubators', 'Aviation & Cargo Facilities'],
+    relatedProjectSlugs: ['netwin-ventures', 'china-airlines'],
     faqs: [
       {
         question: 'What is the average cost per square foot for an office interior in Mumbai?',
@@ -360,8 +360,8 @@ export const SERVICES_CATALOG: ServiceDetail[] = [
       { step: '03', title: 'Fit-Out Execution', desc: 'Strict milestone delivery covering civil, partitioning, ceiling grids, cabling, and HVAC balancing.' },
       { step: '04', title: 'Final Handover & Certification', desc: 'Securing building management clearances, Fire NOC compliance, and seamless tenant move-in.' },
     ],
-    relevantIndustries: ['Corporate Floorplates', 'Financial Services', 'IT & Tech Campuses', 'BPO & Call Centers', 'Coworking Space Operators'],
-    relatedProjectSlugs: ['netwin-ventures', 'bombay-barbeque'],
+    relevantIndustries: ['Corporate Floorplates', 'Financial Services', 'IT & Tech Campuses', 'BPO & Call Centers', 'Coworking Space Operators', 'Airport & Logistics Commercial Hubs'],
+    relatedProjectSlugs: ['netwin-ventures', 'china-airlines'],
     faqs: [
       {
         question: 'What is the difference between a Cat A and Cat B office fit-out?',
