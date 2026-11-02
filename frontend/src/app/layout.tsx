@@ -110,6 +110,33 @@ export default function RootLayout({
       className={`${poppins.variable} ${cormorant.variable} scroll-smooth`}
     >
       <head>
+        {/* Purge legacy Vite PWA Service Workers and obsolete CacheStorage */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  if (typeof window !== 'undefined') {
+                    if ('serviceWorker' in navigator) {
+                      navigator.serviceWorker.getRegistrations().then(function(regs) {
+                        for (var i = 0; i < regs.length; i++) {
+                          regs[i].unregister();
+                        }
+                      }).catch(function() {});
+                    }
+                    if ('caches' in window) {
+                      caches.keys().then(function(keys) {
+                        for (var j = 0; j < keys.length; j++) {
+                          caches.delete(keys[j]);
+                        }
+                      }).catch(function() {});
+                    }
+                  }
+                } catch(e) {}
+              })();
+            `,
+          }}
+        />
         {/* Google Analytics via next/script */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-XG07N4CDCF"
