@@ -128,11 +128,11 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
               <ArrowUpRight className="h-4 w-4" />
             </Link>
             <a
-              href="tel:+918959173790"
+              href="tel:+917700965189"
               className="inline-flex items-center gap-2 rounded-full border border-stone-300 px-6 py-3.5 text-xs uppercase tracking-[0.16em] font-medium text-[#0F0F12] hover:border-[#8F6E38] hover:text-[#8F6E38] transition-all bg-white shadow-sm"
             >
               <Phone className="h-3.5 w-3.5 text-[#8F6E38]" />
-              <span>Call +91 89591 73790</span>
+              <span>Call +91 77009 65189</span>
             </a>
           </div>
         </div>

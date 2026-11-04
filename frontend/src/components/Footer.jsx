@@ -56,7 +56,7 @@ const Footer = () => {
         <div className="footer-col reveal-stagger">
           <h4>Contact</h4>
           <ul>
-            <li><a href="tel:+918767067884">+91 8767067884</a></li>
+            <li><a href="tel:+917700965189">+91 77009 65189</a></li>
             <li><a href="mailto:info@osinteriors.in">info@osinteriors.in</a></li>
             <li><a href="https://www.osinteriors.in">www.osinteriors.in</a></li>
             <li>Mumbai, India</li>

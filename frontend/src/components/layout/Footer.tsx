@@ -32,11 +32,11 @@ export default function Footer() {
               <span>contact@osinteriors.in</span>
             </a>
             <a
-              href="tel:+918959173790"
+              href="tel:+917700965189"
               className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full border border-stone-300 hover:border-stone-500 text-xs uppercase tracking-[0.14em] font-medium text-[#0F0F12] hover:bg-stone-50 transition-all duration-300"
             >
               <Phone className="h-3.5 w-3.5 text-[#8F6E38]" />
-              <span>+91 89591 73790</span>
+              <span>+91 77009 65189</span>
             </a>
           </div>
         </div>

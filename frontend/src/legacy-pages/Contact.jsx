@@ -20,7 +20,7 @@ const EMPTY = {
 };
 
 const DETAILS = [
-  { label: 'Phone', value: '+91 8767067884', href: 'tel:+918767067884' },
+  { label: 'Phone', value: '+91 77009 65189', href: 'tel:+917700965189' },
   { label: 'Email', value: 'info@osinteriors.in', href: 'mailto:info@osinteriors.in' },
   { label: 'Office address', value: 'Mumbai, India' },
   { label: 'Hours', value: 'Mon–Sat, 10:00–19:00' },

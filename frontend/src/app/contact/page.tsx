@@ -148,7 +148,7 @@ function ContactContent() {
 
               <div className="space-y-4">
                 <a
-                  href="tel:+918959173790"
+                  href="tel:+917700965189"
                   className="flex items-center justify-between p-4 rounded-xl bg-stone-50 border border-stone-200 hover:border-[#8F6E38] transition-colors group"
                 >
                   <div className="flex items-center gap-3">
@@ -158,7 +158,7 @@ function ContactContent() {
                     <div>
                       <div className="text-[10px] uppercase tracking-wider text-stone-500 font-medium">Call Direct</div>
                       <div className="text-sm font-semibold text-[#0F0F12] group-hover:text-[#8F6E38] transition-colors">
-                        +91 89591 73790
+                        +91 77009 65189
                       </div>
                     </div>
                   </div>
@@ -166,7 +166,7 @@ function ContactContent() {
                 </a>
 
                 <a
-                  href={`https://wa.me/918959173790?text=${whatsappMessage}`}
+                  href={`https://wa.me/917700965189?text=${whatsappMessage}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-between p-4 rounded-xl bg-emerald-50 border border-emerald-200 hover:border-emerald-400 transition-colors group"
@@ -289,7 +289,7 @@ function ContactContent() {
 
                   <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
                     <a
-                      href={`https://wa.me/918959173790?text=${whatsappMessage}`}
+                      href={`https://wa.me/917700965189?text=${whatsappMessage}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 rounded-full bg-emerald-600 text-white px-6 py-3 text-xs uppercase tracking-[0.14em] font-semibold hover:bg-emerald-700 transition-all shadow-md"
@@ -457,12 +457,12 @@ function ContactContent() {
                         <p className="mt-1 text-amber-700">
                           You can also reach our Studio Director directly on WhatsApp at{' '}
                           <a
-                            href={`https://wa.me/918959173790?text=${whatsappMessage}`}
+                            href={`https://wa.me/917700965189?text=${whatsappMessage}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="underline font-bold text-emerald-800"
                           >
-                            +91 89591 73790
+                            +91 77009 65189
                           </a>
                         </p>
                       </div>

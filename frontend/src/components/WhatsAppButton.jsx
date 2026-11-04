@@ -1,7 +1,7 @@
 import React from 'react';
 
 const MESSAGE = "Hello OS Interiors, I'm interested in your interior design services.";
-const HREF = `https://wa.me/918767067884?text=${encodeURIComponent(MESSAGE)}`;
+const HREF = `https://wa.me/917700965189?text=${encodeURIComponent(MESSAGE)}`;
 
 /**
  * Floating enquiry button. Lives in the marketing layout rather than

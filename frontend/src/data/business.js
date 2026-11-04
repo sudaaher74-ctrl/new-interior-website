@@ -5,7 +5,7 @@ import { SERVICE_CATEGORIES, CAPABILITIES } from './services';
 export const BUSINESS = {
   name: 'OS Interiors',
   url: 'https://www.osinteriors.in',
-  phone: '+91 8767067884',
+  phone: '+91 77009 65189',
   email: 'info@osinteriors.in',
   city: 'Mumbai',
   region: 'Maharashtra',

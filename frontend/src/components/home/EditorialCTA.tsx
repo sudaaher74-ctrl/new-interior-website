@@ -129,7 +129,7 @@ export default function EditorialCTA() {
                 Thank you, <span className="font-semibold text-[#0F0F12]">{formData.name}</span>. Our Principal Project Director has received your inquiry and will reach out within 24 hours.
               </p>
               <a
-                href={`https://wa.me/918959173790?text=${whatsappMessage}`}
+                href={`https://wa.me/917700965189?text=${whatsappMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full bg-emerald-600 text-white px-6 py-3 text-xs uppercase tracking-[0.14em] font-semibold hover:bg-emerald-700 transition-all shadow-md"
@@ -145,12 +145,12 @@ export default function EditorialCTA() {
                   <p className="mt-1 text-amber-700">
                     Reach us directly on WhatsApp:{' '}
                     <a
-                      href={`https://wa.me/918959173790?text=${whatsappMessage}`}
+                      href={`https://wa.me/917700965189?text=${whatsappMessage}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="underline font-bold text-emerald-800"
                     >
-                      +91 89591 73790
+                      +91 77009 65189
                     </a>
                   </p>
                 </div>
@@ -239,11 +239,11 @@ export default function EditorialCTA() {
                 </button>
 
                 <a
-                  href="tel:+918959173790"
+                  href="tel:+917700965189"
                   className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] font-medium text-[#8F6E38] hover:text-[#0F0F12] transition-colors"
                 >
                   <Phone className="h-3.5 w-3.5" />
-                  <span>Direct Hotline: +91 89591 73790</span>
+                  <span>Direct Hotline: +91 77009 65189</span>
                 </a>
               </div>
             </form>

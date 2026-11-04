@@ -21,7 +21,7 @@ export default function StickyContact() {
       {/* WhatsApp Action */}
       <a
         id="sticky-whatsapp-btn"
-        href="https://wa.me/918959173790?text=Hello%20OS%20Interior%2C%20I%20would%20like%20to%20inquire%20about%20a%20corporate%20interior%20and%20turnkey%20fit-out%20project."
+        href="https://wa.me/917700965189?text=Hello%20OS%20Interior%2C%20I%20would%20like%20to%20inquire%20about%20a%20corporate%20interior%20and%20turnkey%20fit-out%20project."
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => trackConversion('whatsapp_click')}
@@ -41,7 +41,7 @@ export default function StickyContact() {
       {/* Call Direct Action */}
       <a
         id="sticky-call-btn"
-        href="tel:+918959173790"
+        href="tel:+917700965189"
         onClick={() => trackConversion('phone_click')}
         className="group relative flex h-11 w-11 sm:h-13 sm:w-13 items-center justify-center rounded-full bg-white/95 backdrop-blur-md text-[#8F6E38] border border-stone-200 hover:border-[#8F6E38] shadow-[0_4px_20px_rgba(0,0,0,0.12)] transition-all duration-300 hover:scale-110"
         aria-label="Call OS Interior Direct Line"
@@ -49,7 +49,7 @@ export default function StickyContact() {
         <span className="sr-only">Call OS Interior Direct Line</span>
         {/* Tooltip on left */}
         <span className="pointer-events-none absolute right-full mr-3 whitespace-nowrap rounded-full bg-white/95 backdrop-blur-md px-3.5 py-1.5 text-[11px] uppercase tracking-wider font-medium text-stone-800 opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 border border-stone-200">
-          +91 89591 73790
+          +91 77009 65189
         </span>
         <Phone className="h-5 w-5 sm:h-6 sm:w-6" />
       </a>
